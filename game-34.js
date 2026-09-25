@@ -156,7 +156,7 @@ function showCandidates(dir){
     m.on("click",()=>choose(p));
     const btn=document.getElementById(i?"choiceB":"choiceA");
     btn.className=i?"choice-b":"choice-a";
-    btn.innerHTML="<span class=\\"letter\\">"+(i?"B":"A")+"</span> "+(p.isTarget?"META":"okolice "+esc(placeLabel(p)));
+    btn.innerHTML="<span class=\"letter\">"+(i?"B":"A")+"</span> "+(p.isTarget?"META":"okolice "+esc(placeLabel(p)));
   });
   choiceEl.classList.remove("hidden");
   document.getElementById("choiceA").onclick=()=>choose(chosen[0]);
