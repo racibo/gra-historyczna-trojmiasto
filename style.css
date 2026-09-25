@@ -75,3 +75,71 @@ html,body,#map{height:100%;margin:0}body{font-family:system-ui,sans-serif;overfl
 
 .finish-actions{display:flex;gap:9px;margin-top:12px}.finish-actions button{flex:1;margin-top:0!important;padding:11px;border:0;border-radius:9px;font-weight:800;cursor:pointer}.summary-hide{background:#e9ecef;color:#222}.finish-actions .summary-restart{background:#1976d2;color:#fff}.summary-hide:hover{background:#dfe3e7}.finish-actions .summary-restart:hover{background:#1565c0}
 @media(max-width:600px){.finish-actions{flex-direction:column}}
+
+
+/* Etykiety odwiedzonych punktów po ukryciu podsumowania */
+.visited-label-marker{
+  background:transparent!important;
+  border:0!important;
+  width:auto!important;
+  height:auto!important;
+  pointer-events:auto;
+}
+.visited-label-marker>div{
+  min-width:90px;
+  max-width:230px;
+  padding:4px 7px;
+  border-radius:6px;
+  background:rgba(255,255,255,.82);
+  color:#111;
+  border:1px solid rgba(255,255,255,.95);
+  box-shadow:0 1px 5px rgba(0,0,0,.28);
+  backdrop-filter:blur(2px);
+  font-size:10px;
+  line-height:1.25;
+  text-shadow:0 1px 2px rgba(255,255,255,.75);
+}
+.visited-label-marker>div b{
+  font-size:11px;
+}
+.visited-label-marker>div span{
+  opacity:.8;
+}
+.premium-reveal{
+  background:transparent!important;
+  padding:0!important;
+  box-shadow:none!important;
+  width:auto!important;
+  color:inherit!important;
+}
+.premium-message{
+  box-sizing:border-box;
+  width:min(88vw,430px);
+  background:rgba(20,20,20,.95);
+  color:#fff;
+  border-radius:16px;
+  padding:20px 22px;
+  text-align:center;
+  box-shadow:0 10px 40px #000;
+  font-size:14px;
+  line-height:1.5;
+}
+.premium-message b:first-child{
+  display:block;
+  margin-bottom:7px;
+  font-size:16px;
+}
+.premium-message b:last-child{
+  display:block;
+  margin-top:9px;
+  font-size:15px;
+}
+@media(max-width:600px){
+  .visited-label-marker>div{
+    max-width:180px;
+    font-size:9px;
+  }
+  .visited-label-marker>div b{
+    font-size:10px;
+  }
+}
