@@ -124,7 +124,7 @@ function drawSearchZone(dir,radius,count){
   }
   pts.push(center);
   searchZone=L.polygon(pts,{color:"#1565c0",weight:2,opacity:.9,fillColor:"#42a5f5",fillOpacity:.14,dashArray:"7 6",interactive:true}).addTo(map);
-
+  searchZone.bindTooltip("Strefa wyszukiwania: ±45° • promień "+(radius/1000)+" km<br>Znaleziono: "+count+" punktów",{sticky:true,direction:"top"});
 }
 function revealTarget(){
   if(!target||targetMarker)return;
