@@ -179,7 +179,21 @@ function finish(){
   html+="</div><button id='restart' class='summary-restart'>NOWA GRA</button></div></div>";
   revealEl.innerHTML=html;revealEl.classList.remove("hidden");document.getElementById("restart").onclick=()=>location.reload();
 }
-function updateProgress(){const done=activeTasks.filter(t=>completed.has(t.type)).length;progressEl.textContent="Zadania: "+done+"/"+activeTasks.length+" • Odwiedzone: "+visited.size;tasksEl.innerHTML=activeTasks.map(t=>"<div class=\""+(completed.has(t.type)?"task-done":"")+"\">"+(completed.has(t.type)?"✓":"○")+" "+esc(t.text)+"</div>").join("")}
+function missionHeat(t){
+  if(!current||completed.has(t.type))return "";
+  const targets=points.filter(p=>p.id!==current.id&&t.test(p));
+  if(!targets.length)return " ❄️";
+  const nearest=Math.min(...targets.map(p=>distance(current,p)));
+  return nearest<1000?" 🔥":" ❄️";
+}
+function updateProgress(){
+  const done=activeTasks.filter(t=>completed.has(t.type)).length;
+  progressEl.textContent="Zadania: "+done+"/"+activeTasks.length+" • Odwiedzone: "+visited.size;
+  tasksEl.innerHTML=activeTasks.map(t=>{
+    const doneTask=completed.has(t.type);
+    return "<div class=\""+(doneTask?"task-done":"")+"\">"+(doneTask?"✓":"○")+" "+esc(t.text)+(doneTask?"":missionHeat(t))+"</div>";
+  }).join("");
+}
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
 function start(){document.getElementById("start").classList.add("hidden");moves=0;visited=new Set();completed=new Set();missionHits=new Map();const audited=chooseStartAndTarget();
   if(!audited){statusEl.textContent="Nie udało się znaleźć gry dla wybranych ustawień. Wybierz inny zakres odległości lub miejsce startu.";document.getElementById("start").classList.remove("hidden");return}
