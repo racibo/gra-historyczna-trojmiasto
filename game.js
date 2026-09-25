@@ -4,6 +4,58 @@ function year(p){const m=p.date.match(/(1[0-9]{3}|20[0-9]{2})/);return m?+m[1]:n
 function setCurrent(p,showHere=true){if(currentMarker)map.removeLayer(currentMarker);currentMarker=L.marker([p.lat,p.lon],{icon:icon("current-marker"),zIndexOffset:1000}).addTo(map);if(showHere)currentMarker.bindTooltip("TU JESTEŚ",{permanent:true,direction:"top",className:"current-label"});map.panTo([p.lat,p.lon],{animate:true,duration:.5})}
 function updateRoute(){if(routeLine)map.removeLayer(routeLine);routeLine=L.polyline(routePoints.map(p=>[p.lat,p.lon]),{color:"#f5a623",weight:4,opacity:.9,dashArray:"9 8",lineCap:"round"}).addTo(map)}
 function placeLabel(p){let n=String(p.name||"Obiekt").replace(/^\\d{2}-\\d{3}\\s+[^,]+,\\s*/,"").replace(/^[^,]+,\\s*/,"");if(!n)n=p.name||"Obiekt";return n.length>42?n.slice(0,39)+"…":n}
+function moveCandidates(from,seen){
+  const result=[];
+  for(const dir of ["up","right","down","left"]){
+    const a=dirAngle(dir),c=[];
+    for(let radius=1000;radius<=5000;radius+=1000){
+      const found=points.filter(p=>!seen.has(p.id)&&p.id!==from.id&&distance(from,p)>=120&&distance(from,p)<=radius)
+        .map(p=>({...p,d:distance(from,p),bd:bearing(from,p),ad:angleDiff(bearing(from,p),a)}))
+        .filter(p=>p.ad<=45).sort((x,y)=>(x.d-y.d)||(x.ad-y.ad));
+      c.length=0;
+      for(const p of found){
+        if(c.length>=2)break;
+        if(!c.some(q=>distance(p,q)<120))c.push(p);
+      }
+      if(c.length>=2||radius===5000)break;
+    }
+    c.forEach(p=>result.push(p));
+  }
+  return [...new Map(result.map(p=>[p.id,p])).values()];
+}
+function auditPath(start,maxDepth=10){
+  const queue=[{p:start,seen:new Set([start.id]),path:[start]}],paths=[],stateKeys=new Set();
+  let examined=0;
+  while(queue.length&&examined<3500){
+    const state=queue.shift(),key=state.p.id+"|"+[...state.seen].sort((a,b)=>a-b).join(",");
+    if(stateKeys.has(key))continue;
+    stateKeys.add(key);examined++;
+    if(state.path.length>=4)paths.push(state.path);
+    if(state.path.length>=maxDepth)continue;
+    for(const next of moveCandidates(state.p,state.seen)){
+      if(state.seen.has(next.id))continue;
+      const seen=new Set(state.seen);seen.add(next.id);
+      queue.push({p:next,seen,path:[...state.path,next]});
+    }
+  }
+  return {paths,examined};
+}
+function chooseStartAndTarget(){
+  for(let attempt=0;attempt<35;attempt++){
+    const start=points[Math.floor(Math.random()*points.length)];
+    const audit=auditPath(start,10);
+    if(!audit.paths.length)continue;
+    const candidates=audit.paths.filter(path=>path.length>=4&&path.length<=10);
+    if(!candidates.length)continue;
+    const path=candidates[Math.floor(Math.random()*candidates.length)];
+    const target=path[path.length-1];
+    return {start,target,auditMoves:path.length-1,auditedStates:audit.examined};
+  }
+  const start=points[Math.floor(Math.random()*points.length)];
+  let target=points[Math.floor(Math.random()*points.length)];
+  while(target.id===start.id)target=points[Math.floor(Math.random()*points.length)];
+  return {start,target,auditMoves:0,auditedStates:0};
+}
 function showCandidates(dir){if(choiceLocked)return;candidateMarkers.forEach(m=>map.removeLayer(m));candidateMarkers=[];const a=dirAngle(dir),MIN=120,START_RADIUS=1000,MAX=5000;let tolerance=45;let c=[];for(let radius=START_RADIUS;radius<=MAX;radius+=1000){c=points.filter(p=>!visited.has(p.id)&&p.id!==current.id&&distance(current,p)>=MIN&&distance(current,p)<=radius).map(p=>({...p,d:distance(current,p),bd:bearing(current,p),ad:angleDiff(bearing(current,p),a)})).filter(p=>p.ad<=tolerance);if(c.length>=2||radius===MAX)break}c.sort((x,y)=>(x.d-y.d)||(x.ad-y.ad));const GOAL_UNLOCK=800;const goalDistance=distance(current,target),goalBearing=bearing(current,target),goalDiff=angleDiff(goalBearing,a);if(goalDistance>=MIN&&goalDistance<=GOAL_UNLOCK&&goalDiff<=tolerance){c=c.filter(p=>p.id!==target.id);c.unshift({...target,d:goalDistance,bd:goalBearing,ad:goalDiff,isTarget:true})}const chosen=[];for(const p of c){if(chosen.length>=2)break;if(!chosen.some(q=>distance(p,q)<120))chosen.push(p)}if(chosen.length<2){statusEl.textContent="W tym kierunku nie ma dwóch dostępnych punktów — wybierz inną strzałkę.";return}choiceLocked=true;chosen.forEach((p,i)=>{const m=L.marker([p.lat,p.lon],{icon:icon(i?"candidate-b":"candidate-a")}).addTo(map);candidateMarkers.push(m);m.on("click",()=>choose(p));const btn=document.getElementById(i?"choiceB":"choiceA");btn.className=i?"choice-b":"choice-a";btn.innerHTML="<span class=\"letter\">"+(i?"B":"A")+"</span> "+(p.isTarget?"META":"okolice "+esc(placeLabel(p)));});choiceEl.classList.remove("hidden");document.getElementById("choiceA").onclick=()=>choose(chosen[0]);document.getElementById("choiceB").onclick=()=>choose(chosen[1])}
 function loadSettings(){try{const x=JSON.parse(localStorage.getItem("trojmiastoGameSettings")||"null");if(x)settings={...settings,...x}}catch(e){}}
 function saveSettings(){settings.count=+document.getElementById("missionCount").value;settings.age=document.getElementById("catAge").checked;settings.periods=document.getElementById("catPeriods").checked;settings.architects=document.getElementById("catArchitects").checked;localStorage.setItem("trojmiastoGameSettings",JSON.stringify(settings))}
@@ -65,5 +117,5 @@ function finish(){
 }
 function updateProgress(){const done=activeTasks.filter(t=>completed.has(t.type)).length;progressEl.textContent="Zadania: "+done+"/"+activeTasks.length+" • Odwiedzone: "+visited.size;tasksEl.innerHTML=activeTasks.map(t=>"<div class=\""+(completed.has(t.type)?"task-done":"")+"\">"+(completed.has(t.type)?"✓":"○")+" "+esc(t.text)+"</div>").join("")}
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
-function start(){document.getElementById("start").classList.add("hidden");moves=0;visited=new Set();completed=new Set();missionHits=new Map();current=points[Math.floor(Math.random()*points.length)];target=points[Math.floor(Math.random()*points.length)];while(target.id===current.id)target=points[Math.floor(Math.random()*points.length)];gameDistance=distance(current,target);activeTasks=taskForGame();routePoints=[current];updateRoute();missionEl.innerHTML="<b>META:</b> "+esc(target.name);updateProgress();if(startMarker)map.removeLayer(startMarker);startMarker=L.marker([current.lat,current.lon],{icon:icon("start-marker"),zIndexOffset:1100}).addTo(map).bindTooltip("START", {permanent:true,direction:"top",className:"start-label"});setCurrent(current,false);if(targetMarker)map.removeLayer(targetMarker);targetMarker=L.marker([target.lat,target.lon],{icon:icon("target-marker")}).addTo(map).bindTooltip("META: "+esc(target.name),{permanent:true,direction:"top",className:"target-label"});statusEl.textContent="Wybierz kierunek strzałką."}
+function start(){document.getElementById("start").classList.add("hidden");moves=0;visited=new Set();completed=new Set();missionHits=new Map();const audited=chooseStartAndTarget();current=audited.start;target=audited.target;gameDistance=distance(current,target);activeTasks=taskForGame();routePoints=[current];updateRoute();missionEl.innerHTML="<b>META:</b> "+esc(target.name);updateProgress();if(startMarker)map.removeLayer(startMarker);startMarker=L.marker([current.lat,current.lon],{icon:icon("start-marker"),zIndexOffset:1100}).addTo(map).bindTooltip("START", {permanent:true,direction:"top",className:"start-label"});setCurrent(current,false);if(targetMarker)map.removeLayer(targetMarker);targetMarker=L.marker([target.lat,target.lon],{icon:icon("target-marker")}).addTo(map).bindTooltip("META: "+esc(target.name),{permanent:true,direction:"top",className:"target-label"});statusEl.textContent="Wybierz kierunek strzałką."}
 async function init(){map=L.map("map",{zoomControl:false}).setView([54.38,18.62],12);L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap"}).addTo(map);try{const r=await fetch(DATA_URL);points=parseKml(await r.text());if(points.length<20)throw Error("Za mało punktów");statusEl.textContent="Załadowano "+points.length+" punktów historycznych."}catch(e){statusEl.textContent="Błąd danych: "+e.message}}loadSettings();document.getElementById("startBtn").onclick=start;document.getElementById("settingsBtn").onclick=openSettings;document.getElementById("saveSettings").onclick=()=>{saveSettings();document.getElementById("settings").classList.add("hidden")};document.querySelectorAll("[data-dir]").forEach(b=>b.onclick=()=>showCandidates(b.dataset.dir));document.addEventListener("keydown",e=>{const d={ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right"}[e.key];if(d){e.preventDefault();showCandidates(d)}});init();
