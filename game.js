@@ -4,6 +4,19 @@ function parseSheetRows(data){return data.map((item,i)=>{const name=getSheetVal(
 function year(p){const m=p.date.match(/(1[0-9]{3}|20[0-9]{2})/);return m?+m[1]:null}function distance(a,b){const R=6371000,dLat=(b.lat-a.lat)*Math.PI/180,dLon=(b.lon-a.lon)*Math.PI/180,x=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(x))}function bearing(a,b){const y=Math.sin((b.lon-a.lon)*Math.PI/180)*Math.cos(b.lat*Math.PI/180),x=Math.cos(a.lat*Math.PI/180)*Math.sin(b.lat*Math.PI/180)-Math.sin(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.cos((b.lon-a.lon)*Math.PI/180);return(Math.atan2(y,x)*180/Math.PI+360)%360}function dirAngle(d){return{up:0,right:90,down:180,left:270}[d]}function angleDiff(a,b){const d=Math.abs(a-b)%360;return d>180?360-d:d}function icon(cls){return L.divIcon({className:cls,iconSize:[28,28],iconAnchor:[14,14]})}
 function setCurrent(p,showHere=true){if(currentMarker)map.removeLayer(currentMarker);currentMarker=L.marker([p.lat,p.lon],{icon:icon("current-marker"),zIndexOffset:1000}).addTo(map);if(showHere)currentMarker.bindTooltip("TU JESTEŚ",{permanent:true,direction:"top",className:"current-label"});map.panTo([p.lat,p.lon],{animate:true,duration:.5})}
 function updateRoute(){if(routeLine)map.removeLayer(routeLine);routeLine=L.polyline(routePoints.map(p=>[p.lat,p.lon]),{color:"#f5a623",weight:4,opacity:.9,dashArray:"9 8",lineCap:"round"}).addTo(map)}
+function visitedLabelHtml(p,index){
+  let html="<b>"+(index+1)+". "+esc(p.date||"brak daty")+"</b>";
+  if(p.architect)html+="<br><span>"+esc(p.architect)+"</span>";
+  if(p.notes)html+="<br><span>"+esc(p.notes.length>180?p.notes.slice(0,177)+"…":p.notes)+"</span>";
+  return html
+}
+function updateVisitedLabels(){
+  document.querySelectorAll(".visited-label-marker").forEach(el=>el.remove());
+  visitedHistory.forEach((p,i)=>{
+    const marker=L.marker([p.lat,p.lon],{icon:L.divIcon({className:"visited-label-marker",html:"<div>"+visitedLabelHtml(p,i)+"</div>",iconSize:null,iconAnchor:[0,0]}),zIndexOffset:200+i}).addTo(map);
+    marker.bindPopup(visitedLabelHtml(p,i),{closeButton:true,autoClose:true});
+  });
+}
 function placeLabel(p){let n=String(p.name||"Obiekt").replace(/^\\d{2}-\\d{3}\\s+[^,]+,\\s*/,"").replace(/^[^,]+,\\s*/,"");if(!n)n=p.name||"Obiekt";return n.length>42?n.slice(0,39)+"…":n}
 function chooseBestPair(candidates){
   if(candidates.length<2)return candidates;
@@ -240,7 +253,27 @@ function reveal(p){
     if(!revealEl.classList.contains("hidden"))revealEl.classList.add("hidden");
     choiceLocked=false;
     updateProgress();
-    if(completed.size===activeTasks.length&&!targetMarker){revealTarget();missionEl.innerHTML="<b>Teraz część premium.</b> Możesz swobodnie eksplorować mapę podążając do wyznaczonego celu.";}
+    if(completed.size===activeTasks.length&&!targetMarker){
+      revealTarget();
+      const premiumText="<b>Teraz część premium.</b><br>Możesz swobodnie eksplorować mapę podążając do wyznaczonego celu.<br><b>Twoim nowym celem jest teraz: "+esc(target.name)+"</b>";
+      missionEl.innerHTML=premiumText;
+      if(current.id!==target.id){
+        revealEl.innerHTML="<div class='premium-message'>"+premiumText+"</div>";
+        revealEl.className="reveal premium-reveal";
+        revealEl.style.zIndex="1400";
+        revealEl.style.bottom="auto";
+        revealEl.style.top="50%";
+        window.setTimeout(()=>{
+          if(revealEl.classList.contains("premium-reveal")){
+            revealEl.classList.add("hidden");
+            revealEl.classList.remove("premium-reveal");
+            revealEl.style.zIndex="";
+            revealEl.style.top="";
+            revealEl.style.bottom="";
+          }
+        },3500);
+      }
+    }
     if(current.id===target.id){if(completed.size===activeTasks.length)finish();else{statusEl.textContent="Jeszcze za szybko na metę, zalicz wszystkie misje";}}
   },1500);
   hits.forEach(h=>completed.add(h.type));
@@ -254,12 +287,22 @@ function finish(){
   candidateMarkers.forEach(m=>map.removeLayer(m));
   candidateMarkers=[];
   if(routePoints.length>1)map.fitBounds(routePoints.map(p=>[p.lat,p.lon]),{padding:[70,70],maxZoom:15});
-  revealEl.innerHTML="<div class='finish-message'><div class='finish-kicker'>GRA ZALICZONA</div><h2>"+moves+" "+(moves===1?"ruch":"ruchów")+"</h2><p>W tylu ruchach udało Ci się wykonać wszystkie misje i dotrzeć do mety.</p><div class='finish-actions'><button id='hideSummary' class='summary-hide'>UKRYJ PODSUMOWANIE</button><button id='restart' class='summary-restart'>NOWA GRA</button></div></div>";
+  const distanceKm=gameDistance/1000;
+  const missionMoves=Math.max(0,moves-1);
+  revealEl.innerHTML="<div class='finish-message'><div class='finish-kicker'>GRA ZALICZONA</div><h2>"+moves+" "+(moves===1?"ruch":"ruchów")+"</h2><p>W "+missionMoves+" "+(missionMoves===1?"ruchu":"ruchach")+" zaliczyłeś wszystkie misje. Łączny dystans od startu do mety: <b>"+distanceKm.toFixed(1)+" km</b>.</p><div class='finish-actions'><button id='hideSummary' class='summary-hide'>UKRYJ PODSUMOWANIE</button><button id='restart' class='summary-restart'>NOWA GRA</button></div></div>";
   revealEl.className="reveal finish-reveal";
   revealEl.style.zIndex="1400";
   revealEl.style.bottom="auto";
   revealEl.style.top="50%";
-  document.getElementById("hideSummary").onclick=()=>{revealEl.classList.add("hidden");revealEl.classList.remove("finish-reveal");revealEl.style.zIndex="";revealEl.style.top="";revealEl.style.bottom="";};document.getElementById("restart").onclick=()=>location.reload();
+  document.getElementById("hideSummary").onclick=()=>{
+    revealEl.classList.add("hidden");
+    revealEl.classList.remove("finish-reveal");
+    revealEl.style.zIndex="";
+    revealEl.style.top="";
+    revealEl.style.bottom="";
+    updateVisitedLabels();
+  };
+  document.getElementById("restart").onclick=()=>location.reload();
 }
 function updateTagCloud(){
   const years=[...new Set(visitedHistory.map(p=>year(p)).filter(y=>y!==null))].sort((a,b)=>b-a);
@@ -298,5 +341,5 @@ function updateProgress(){
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
 async function start(){if(choiceLocked)return;const startBtn=document.getElementById("startBtn");startBtn.disabled=true;startBtn.textContent="LOSOWANIE TRASY…";statusEl.textContent="Trwa przygotowanie gry i wyszukiwanie możliwej trasy…";await new Promise(r=>setTimeout(r,40));document.getElementById("start").classList.add("hidden");moves=0;visited=new Set();visitedHistory=[];completed=new Set();missionHits=new Map();const audited=chooseStartAndTarget();
   if(!audited){statusEl.textContent="Nie udało się znaleźć gry dla wybranych ustawień. Wybierz inny zakres odległości lub miejsce startu.";document.getElementById("start").classList.remove("hidden");startBtn.disabled=false;startBtn.textContent="ROZPOCZNIJ GRĘ";return}
-  current=audited.start;gameStart=audited.start;target=audited.target;gameDistance=distance(current,target);activeTasks=taskForGame();routePoints=[current];updateRoute();missionEl.innerHTML="";updateProgress();if(startMarker)map.removeLayer(startMarker);startMarker=L.marker([current.lat,current.lon],{icon:icon("start-marker"),zIndexOffset:1100}).addTo(map);setCurrent(current,true);if(targetMarker)map.removeLayer(targetMarker);targetMarker=null;if(activeTasks.length===0)revealTarget();else statusEl.textContent="Wybierz kierunek strzałką.";startBtn.disabled=false;startBtn.textContent="ROZPOCZNIJ GRĘ"}
+  current=audited.start;gameStart=audited.start;target=audited.target;gameDistance=distance(current,target);activeTasks=taskForGame();routePoints=[current];updateRoute();missionEl.innerHTML="";updateProgress();if(startMarker)map.removeLayer(startMarker);startMarker=L.marker([current.lat,current.lon],{icon:icon("start-marker"),zIndexOffset:1100}).addTo(map);setCurrent(current,true);if(targetMarker)map.removeLayer(targetMarker);targetMarker=null;if(activeTasks.length===0){revealTarget();missionEl.innerHTML="<b>Teraz część premium.</b><br>Możesz swobodnie eksplorować mapę podążając do wyznaczonego celu.<br><b>Twoim nowym celem jest teraz: "+esc(target.name)+"</b>"}else statusEl.textContent="Wybierz kierunek strzałką.";startBtn.disabled=false;startBtn.textContent="ROZPOCZNIJ GRĘ"}
 async function init(){try{if(typeof L==="undefined")throw new Error("Leaflet nie został załadowany");const mapEl=document.getElementById("map");if(!mapEl)throw new Error("Brak elementu mapy");map=L.map(mapEl,{zoomControl:false}).setView([54.38,18.62],12);if(!map||typeof map.addLayer!=="function")throw new Error("Nie udało się utworzyć mapy Leaflet");L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap"}).addTo(map);loadSettings();document.getElementById("startBtn").onclick=start;document.getElementById("settingsBtn").onclick=openSettings;const tagToggle=document.getElementById("tagToggle"),tagCloud=document.getElementById("tagCloud");if(tagToggle&&tagCloud)tagToggle.onclick=()=>tagCloud.classList.toggle("closed");updateTagCloud();statusEl.addEventListener("click",()=>{if(!searchZone)return;searchZone.setStyle({fillOpacity:searchZone.options.fillOpacity>0?0:.14,opacity:searchZone.options.opacity>0?0:.9})});document.getElementById("saveSettings").onclick=async()=>{const btn=document.getElementById("saveSettings");btn.disabled=true;btn.textContent="ZAPISYWANIE…";statusEl.textContent="Trwa zapisywanie ustawień…";await new Promise(r=>setTimeout(r,350));const distanceChanged=saveSettings();document.getElementById("settings").classList.add("hidden");btn.disabled=false;btn.textContent="ZAPISZ";if(document.getElementById("start").classList.contains("hidden")){if(distanceChanged)await start();else{activeTasks=taskForGame();updateProgress();statusEl.textContent="Ustawienia zapisane."}}else statusEl.textContent="Ustawienia zapisane.";};document.querySelectorAll("[data-dir]").forEach(b=>b.onclick=()=>showCandidates(b.dataset.dir));document.addEventListener("keydown",e=>{const d={ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right"}[e.key];if(d){e.preventDefault();showCandidates(d)}});try{if(typeof Papa==="undefined")throw Error("Nie załadowano parsera CSV");const r=await fetch(DATA_URL,{cache:"no-store"});if(!r.ok)throw Error("Arkusz Google zwrócił HTTP "+r.status);const csv=await r.text();const parsed=Papa.parse(csv,{header:true,skipEmptyLines:true});if(parsed.errors?.length)console.warn("Ostrzeżenia CSV:",parsed.errors);points=parseSheetRows(parsed.data);if(points.length<20)throw Error("Za mało poprawnych punktów GPS w arkuszu");statusEl.textContent="Załadowano "+points.length+" punktów z Google Sheets (wierszy CSV: "+parsed.data.length+")."}catch(e){console.error("Błąd ładowania Google Sheets:",e);statusEl.textContent="Błąd danych: "+e.message}try{if(L.control&&L.control.scale) L.control.scale({imperial:false,metric:true,position:"bottomleft"}).addTo(map)}catch(e){console.warn("Kontrolka skali pominięta:",e)} }catch(e){console.error("Błąd inicjalizacji gry:",e);statusEl.textContent="BŁĄD MAPY: "+e.message;statusEl.title=e.stack||"";document.getElementById("start").classList.remove("hidden")}}init();
