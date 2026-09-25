@@ -100,10 +100,10 @@ function showCandidates(dir){
   candidateMarkers=[];
   let c=directionCandidates(current,visited,dir);
   const searchRadius=c.searchRadius||10000;
-  const foundBeforeGoal=c.length;
   // Meta nie może być dostępna w pierwszym ruchu. Od drugiego ruchu
   // jest specjalnym punktem: można do niej wrócić nawet po wcześniejszym odwiedzeniu.
   if(moves===0)c=c.filter(p=>p.id!==target.id);
+  const foundBeforeGoal=c.length;
   const GOAL_UNLOCK=800;
   const goalDistance=distance(current,target),goalBearing=bearing(current,target),goalDiff=angleDiff(goalBearing,dirAngle(dir));
   if(moves>0&&goalDistance<=GOAL_UNLOCK&&goalDiff<=45&&!c.some(p=>p.id===target.id))
