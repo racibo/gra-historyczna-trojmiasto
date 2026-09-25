@@ -1,0 +1,3318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <Placemark>
+      <name>80-366 Gdańsk, Pawła Gdańca 10</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1977<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.5548447,54.4137092,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>80-366 Gdańsk, Pawła Gdańca 4</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1978<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.5566901,54.4136929,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>80-366 Gdańsk, Pawła Gdańca 6</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1975 (długopisem w windzie)<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.555874,54.4136101,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>81-339 Gdynia, Polska 1, Muzeum Emigracji</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1933<br><b>Architekt:</b> Dyckerhoff & Widmann; Od 2015 ME]]></description>
+      <Point>
+        <coordinates>undefined,Brak wyników,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk Kliniczna 3</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2021<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.627328195023637,54.376111,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, 3 Maja 25</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1894<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.642643399275787,54.3594719,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Abrahama 16</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1980 wg nr windy<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.57328207121893,54.390740050000005,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Angielska Grobla 19</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1894<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.666651588709676,54.350842,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Arkońska 17</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1957<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.578860446470753,54.4035045,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Arkońska 43</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1932<br><b>Architekt:</b> 2020 - remont]]></description>
+      <Point>
+        <coordinates>18.58078338003465,54.40059195,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Arkońska 6</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2009<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.575865550210768,54.4054571,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Arkońska 6 A1</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2008<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.579090585327805,54.4057227,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Arkońska 6 A2</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2008<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.579090585327805,54.4057227,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Arkońska 6 A5</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2010<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.579090585327805,54.4057227,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Batorego 38A-38B</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2023<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.59678390541076,54.3777689,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Bażyńskiego 1a, Biblioteka Główna Uniwersytetu Gdańskiego</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2005<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>undefined,Brak wyników,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Belgradzka</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1985<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.58676387375359,54.35456668692217,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Beniowskiego 1</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2017<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.578608890356143,54.406548,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Beniowskiego 3</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2017<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.579186558333333,54.406931,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Beniowskiego 3a</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2017<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.578248240963855,54.406964,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Beniowskiego 7</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1996<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.57860594383365,54.4078274,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Beniowskiego 9-11a</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2014<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.575180647891372,54.414245808427665,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Biała 1</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1977<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.61494532496844,54.37939245,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Biegańskiego</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1985<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.621354062619723,54.344551970728084,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Biegańskiego 31</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1981<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.620103862087177,54.3435468,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Bitwy Oliwskiej 14</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1971<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.566168027560572,54.4216536,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Bitwy Oliwskiej 15</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1970<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.566861199999995,54.421972600000004,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Bitwy Oliwskiej 16</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1971<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.56697800686814,54.421523949999994,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Wojciecha Bogusławskiego 1</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2014<br><b>Architekt:</b> Renato Rizzie]]></description>
+      <Point>
+        <coordinates>18.64790943154242,54.3478538,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Braci Majewskich 22</name>
+      <description><![CDATA[<b>Data wybudowania:</b> <br><b>Architekt:</b> ok. 1985 (wtedy szpital)]]></description>
+      <Point>
+        <coordinates>18.61104614654341,54.4000339,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Brama Stągiewna</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1519<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>undefined,Brak wyników,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Tadeusza Bramińskiego 2</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2022<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.585730703638816,54.323068500000005,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Bronisława Czecha</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1985<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.574725702442084,54.36104875232213,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Cebertowicza</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1990<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.6050396,54.3384478,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Chałubińskiego</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1985<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.6170619,54.3421961,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Tytusa Chałubińskiego 12</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1984<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.623034075744496,54.3422701,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Chłopska 20</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1966-1970<br><b>Architekt:</b> Janusz Morek]]></description>
+      <Point>
+        <coordinates>18.589085720169017,54.41048465,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Chłopska 22</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1966-1970<br><b>Architekt:</b> Janusz Morek]]></description>
+      <Point>
+        <coordinates>18.59189624098677,54.41137785,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Chłopska 24</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1966-1970<br><b>Architekt:</b> Janusz Morek]]></description>
+      <Point>
+        <coordinates>18.588701,54.4116932,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Chłopska 34</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1964-1966<br><b>Architekt:</b> Janusz Morek]]></description>
+      <Point>
+        <coordinates>18.588211455099206,54.41490115,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Chłopska 36</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1964-1966<br><b>Architekt:</b> Janusz Morek]]></description>
+      <Point>
+        <coordinates>18.58905995,54.41410380000001,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Chłopska 38</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1964-1966<br><b>Architekt:</b> Janusz Morek]]></description>
+      <Point>
+        <coordinates>18.589239022673215,54.414479150000005,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Chłopska 40</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1964-1966<br><b>Architekt:</b> Janusz Morek]]></description>
+      <Point>
+        <coordinates>18.589191200000002,54.4148427,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Chłopska 42</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1964-1966<br><b>Architekt:</b> Janusz Morek]]></description>
+      <Point>
+        <coordinates>18.589552177320442,54.41522375,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Chłopska 44</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1964-1966<br><b>Architekt:</b> Janusz Morek]]></description>
+      <Point>
+        <coordinates>18.5891409,54.4155765,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Chłopska 64</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1960<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.586677663535976,54.41804995,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Chłopska 7</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1980<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.588390068181816,54.405436,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Chmielna 6</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2019<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.658407,54.3493795,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Chrobrego 16</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1906-1907<br><b>Architekt:</b> fundacja Abbega]]></description>
+      <Point>
+        <coordinates>18.61600956556659,54.38541965,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Chrobrego 26</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1906-1907<br><b>Architekt:</b> fundacja Abbega, nr 28 także]]></description>
+      <Point>
+        <coordinates>18.616097714185408,54.38595915,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Chrobrego 34-36</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1906-1907<br><b>Architekt:</b> fundacja Abbega]]></description>
+      <Point>
+        <coordinates>18.615916179610473,54.3909458,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Bernarda Chrzanowskiego 10A</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2010<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.585918602743018,54.381827200000004,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Bernarda Chrzanowskiego 21A</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2002<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.5846403,54.3834149,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Cieszyńskiego</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1988<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.615937090068208,54.336002,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Cieszyńskiego 14</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1986<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.607523783114445,54.337395650000005,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Czarny Dwór 6</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2011<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.6093959,54.4084733,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Dekerta 5</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1911<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.597956376247893,54.3810511,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Długa 45</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1560<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.65266113781863,54.348504750000004,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Długi Targ 41/42</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1609<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.653805547770553,54.348667199999994,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Długie Ogrody 11D</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1962<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.6622352,54.3477393,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>80-761 Gdańsk, Długie Ogrody 19</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1387<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.663833996,54.347978499999996,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Dragana</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1982<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.61142711814926,54.340092150000004,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Dragana 2</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1993<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.60782115826798,54.339286200000004,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Dragana 3</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1984<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.609567659002895,54.340019549999994,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Droszyńskiego 24</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2022<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.573593092323044,54.4087465,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Drożyny 6</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2002<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.57552727464889,54.3900181,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Drzewieckiego 8</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2009<br><b>Architekt:</b> to jest data produkcji windy w budynku]]></description>
+      <Point>
+        <coordinates>18.61115886581228,54.3928375,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Dyrekcyjna 2-4</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1914<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.64589870470852,54.359424450000006,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Europejskie Centrum Solidarności</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2014<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.64941889584214,54.3613609,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>gdańsk, Fiszera 14</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1971<br><b>Architekt:</b> sgraffito Kazimierza Ostrowskiego]]></description>
+      <Point>
+        <coordinates>18.615149402521208,54.3727259,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Fontanna Neptuna</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1633<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.653228046143376,54.34854635,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Galeria Przymorze</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2009<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.591813502113,54.4098101,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Gdańska 32</name>
+      <description><![CDATA[<b>Data wybudowania:</b> początek XX wieku<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.62749434797402,54.40037785,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Szeroka 67/68</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1444<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.657483103891245,54.35055955,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Gdyńska 5F</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1975<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.576816799999996,54.4211918,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Gospody 8</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1975<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.580194822369624,54.42159275,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Gościnna 10</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1801<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.63268549974424,54.32274185,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Gościnna 15</name>
+      <description><![CDATA[<b>Data wybudowania:</b> I poł. XIX wieku<br><b>Architekt:</b> K.F.Schinkl]]></description>
+      <Point>
+        <coordinates>18.632893808175666,54.323112800000004,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Góralska 12</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1991<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.566429647368423,54.3782961,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Góralska 51</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1988<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.5589522,54.3795877,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Góralska 61</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1989<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.55862015196807,54.37855925,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Góralska 65</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1988<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.55799657805469,54.37953515,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Grabowskiego</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1985<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.6209568,54.3415877,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Witolda Grabowskiego 7</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2005<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.621389149745333,54.33863065,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Grabowskiego 9-11</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1980<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.623012846864167,54.33884341260208,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Grunwaldzka 103A</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2014<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.605201581399875,54.3795789,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, al. Grunwaldzka 105</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1961<br><b>Architekt:</b> Witold Wierzbicki]]></description>
+      <Point>
+        <coordinates>18.604845371219977,54.3798621,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, al. Grunwaldzka 141</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2007<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.600695874373933,54.3826251,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Grunwaldzka 18</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1886<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.617466014261556,54.37496255,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Grunwaldzka 184</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1903/2008<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.593460387370584,54.38523615,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Grunwaldzka 186</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1903/2009<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.592556324627797,54.384795499999996,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Grunwaldzka 203</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1892<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.5912695316778,54.3875609,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Grunwaldzka 343</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2020<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.578703185895563,54.39700955,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Grunwaldzka 409</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2015<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.5769283,54.3984839,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Grunwaldzka 411</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2013<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.577001292817933,54.39893325,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Grunwaldzka 415</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2017<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.575419847633583,54.400618,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Grunwaldzka 472, Olivia Gate</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2011<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.571804117705646,54.40281275,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Grunwaldzka 472A, Olivia Point</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2012<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.570399845281997,54.40239475,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, al. Grunwaldzka 472B</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2014<br><b>Architekt:</b> Olivia Tower]]></description>
+      <Point>
+        <coordinates>18.569827224164744,54.4031938,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Grunwaldzka 472C</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2018<br><b>Architekt:</b> Olivia Star]]></description>
+      <Point>
+        <coordinates>18.57061924988716,54.4034199,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Grunwaldzka 472D</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2015<br><b>Architekt:</b> Olivia Six]]></description>
+      <Point>
+        <coordinates>18.571365869555517,54.4035584,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Grunwaldzka 472E</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2018<br><b>Architekt:</b> Olivia Prime A]]></description>
+      <Point>
+        <coordinates>18.57092229404521,54.40415495,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Grunwaldzka 472F</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2020<br><b>Architekt:</b> Olivia Prime B]]></description>
+      <Point>
+        <coordinates>18.570237615530843,54.403925,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Grunwaldzka 476</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1962<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.56965104280203,54.4052015,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Grunwaldzka 478</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1962<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.57026157204985,54.40548675,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Grunwaldzka 480</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1962<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.569961319789947,54.40594685,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Grunwaldzka 505</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2017<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.568565272137477,54.40952125,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Grunwaldzka 516</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1900<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.566012389179107,54.4113539,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, GRunwaldzka 519</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1899<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.56755017347758,54.41053625,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Grunwaldzka 529</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1910<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.56781956484857,54.412134449999996,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Grunwaldzka 573</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1969<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.565917153956036,54.418966850000004,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Grunwaldzka 579</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1968<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.56581570156422,54.41939765,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, al. Grunwaldzka 583</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1969<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.56571247796125,54.41982845,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Grunwaldzka 82</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2004<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.607099478047303,54.377224299999995,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Grunwaldzka 82</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2004<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.607099478047303,54.377224299999995,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, al. Grunwaldzka 470</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1972<br><b>Architekt:</b> Maciej Gintowt]]></description>
+      <Point>
+        <coordinates>18.5718893538778,54.40142935,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Hala Widowiskowo-Sportowa AWFiS</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1998<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.563388846450408,54.416923749999995,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Hallera 165</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2010<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.623371939099737,54.388083800000004,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Hemara 11</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2022<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.5904907,54.3825463,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Jana Heweliusza 11</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1980<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.649954,54.356452,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Heweliusza 22</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1979<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.65154474074074,54.3560993,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Hokejowa 6</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2019<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.591583801745237,54.30935565,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Instytut Informatyki Uniwersytetu Gdańskiego</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2019<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>undefined,Brak wyników,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Jagiellońska 10</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1972<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.59502635866337,54.4129791,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Jagiellońska 13</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2024<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.596813243745277,54.41423365,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Jagiellońska 26D</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1966-1970<br><b>Architekt:</b> Janusz Morek]]></description>
+      <Point>
+        <coordinates>18.59766746453971,54.411498550000005,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Jagiellońska 28</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1966-1970<br><b>Architekt:</b> Janusz Morek]]></description>
+      <Point>
+        <coordinates>18.59636115853496,54.4117581,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Jagiellońska 30D</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1966-1970<br><b>Architekt:</b> Janusz Morek]]></description>
+      <Point>
+        <coordinates>18.59730565,54.4123163,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Jagiellońska 32</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1966-1970<br><b>Architekt:</b> Janusz Morek]]></description>
+      <Point>
+        <coordinates>18.59457464394592,54.4122493,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Jagiellońska 40</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1966-1970<br><b>Architekt:</b> Janusz Morek]]></description>
+      <Point>
+        <coordinates>18.59843768761523,54.4127058,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Jagiellońska 42</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1966-1970<br><b>Architekt:</b> Janusz Morek]]></description>
+      <Point>
+        <coordinates>18.59918658311613,54.41245455,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Jagiellońska 44</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1966-1970<br><b>Architekt:</b> Janusz Morek]]></description>
+      <Point>
+        <coordinates>18.600134919049886,54.4121988,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Jana Pawła II 3a</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2017<br><b>Architekt:</b> też 3b,3c,3d]]></description>
+      <Point>
+        <coordinates>18.60381600545348,54.397114450000004,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Jana Pawła II 50</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1985<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.613473375528557,54.402631150000005,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Jana z Kolna 11</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2016<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.64721110053152,54.36011775,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Jasia i Małgosi</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1956<br><b>Architekt:</b> m.in. Andrzej Jagodziński]]></description>
+      <Point>
+        <coordinates>18.56565522371977,54.3976058266751,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Jaśkowa Dolina 17</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1902<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.603870641157883,54.374264499999995,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Jesionowa 14C</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2018<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.599862550653384,54.37965255,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kamienna Grobla 30</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2019<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.65679980104823,54.3418121,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kapliczna 30</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1976<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.597101843522907,54.42279535,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kaprów 10</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1954<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.564191693552633,54.4069031,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kaprów 13</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1902<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.565006690789474,54.40764835,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kaprów 16</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1890<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.566156396666667,54.4082659,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kaprów 9</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1911<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.564563831331043,54.40716965,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Karpacka 2</name>
+      <description><![CDATA[<b>Data wybudowania:</b> <br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.55703,54.4152802,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Karpacka 4</name>
+      <description><![CDATA[<b>Data wybudowania:</b> <br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.55638833036173,54.4158688,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Karpacka 6</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1976<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.5553704,54.4152857,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Karpacka 8</name>
+      <description><![CDATA[<b>Data wybudowania:</b> <br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.5546315,54.4156845,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kaszubska 10</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1957<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.567334335788313,54.405146349999995,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kieturakisa 1</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1853<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.659537829935502,54.3404984,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kilarskich 8</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2021<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.561995996386948,54.4159075,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kilińskiego 3</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2014<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.608377403188488,54.382400450000006,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kilińskiego 7</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1914<br><b>Architekt:</b> d.willa dyrektora]]></description>
+      <Point>
+        <coordinates>18.6077734,54.3828894,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kilińskiego 7E</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1885<br><b>Architekt:</b> obok na pd suszarnia z 1921]]></description>
+      <Point>
+        <coordinates>18.6077066,54.3833205,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kilińskiego 9A</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1937<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.60670361641141,54.3838504,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kliniczna 1A</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1912<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.624841893026048,54.376154799999995,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kładka na Ołowiankę</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2017<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.660493546250308,54.35359915971579,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kładki 24</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1882/1905<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.647215952647866,54.3469562,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kołłątaja 4</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2023<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.596798439171977,54.38118955,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kołłątaja 7</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2007<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.596179800561885,54.3800751,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kołobrzeska 32</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2003<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.588132273567194,54.40265205,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kołobrzeska 41C</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2002<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.587823746084183,54.40434125,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kołobrzeska 42</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1975<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.596474899934613,54.40398835,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kołobrzeska 54C</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1972<br><b>Architekt:</b> Kombinat Budowy Domów nr 3 w Leningradzie]]></description>
+      <Point>
+        <coordinates>18.60493375,54.4056894,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kołobrzeska 56 C</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1972<br><b>Architekt:</b> Kombinat Budowy Domów nr 3 w Leningradzie]]></description>
+      <Point>
+        <coordinates>18.605946416093012,54.406016449999996,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kołobrzeska 58 C</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1972<br><b>Architekt:</b> Kombinat Budowy Domów nr 3 w Leningradzie]]></description>
+      <Point>
+        <coordinates>18.607229667481988,54.40738915,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kombatantów 4</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1982<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.607804651358936,54.39835645,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Konopnickiej 10</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2018<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.610228182308195,54.379681149999996,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kopeckiego 8</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2013<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.611685534101817,54.336565381412804,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kopeckiego 9</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2013<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.61172332902418,54.33584605,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kossaka 7</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1913<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.608073666166725,54.374678700000004,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kościół Matki Bożej Królowej Korony Polskiej w Gdańsku</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1920<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>undefined,Brak wyników,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, kościół pw. Świętego Antoniego</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1924<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.631382177299464,54.4089968,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kościuszki 111</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1958<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.625452815709245,54.3873419,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kościuszki 8</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2021<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.6033622,54.3857344,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Krzywoustego 19B</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2012<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.58120684708193,54.41391755,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Księdza Józefa Zator-Przytockiego 3, Kolegiata Najświętszego Serca Jezusowego </name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1911<br><b>Architekt:</b> Karl Zillmer]]></description>
+      <Point>
+        <coordinates>18.609024950816327,54.3798638,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Księdza Zator-Przytockiego 3</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1984<br><b>Architekt:</b> Szczepan Baum;  Dom katechetyczny]]></description>
+      <Point>
+        <coordinates>18.60839621367432,54.3797865,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kubusia Puchatka</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1956<br><b>Architekt:</b> m.in. Andrzej Jagodziński]]></description>
+      <Point>
+        <coordinates>18.566913979127968,54.397869296324444,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kwietna 23</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1875<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.545200631422276,54.407690599999995,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Kwietna 27</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1880<br><b>Architekt:</b> wcześniejsze słupki]]></description>
+      <Point>
+        <coordinates>18.544220128596088,54.40699711554301,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Lelewela 13</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1908<br><b>Architekt:</b> G. Beyer]]></description>
+      <Point>
+        <coordinates>18.611897204256607,54.3834322,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Joachima Lelewela 17</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1985<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.614327002407435,54.3829106,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Lendziona 6</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1895<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.602586933163735,54.38123865,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Lendziona 7</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1895<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.602215666852956,54.381242900000004,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Leśmiana 1</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2021<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.58736372311763,54.38166995,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Leśna Góra 19</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1980<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.562715904114597,54.37402435,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Lęborska 21</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1979<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.58324437828915,54.40493405,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Lęborska 22</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2007<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.582131225162865,54.4049465,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Lęborska 22a-22e</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2015-2019<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.577179788461898,54.404394019926485,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Lęborska 25</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2014<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.584268820778355,54.40494665,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Lęborska 3B</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2011<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.576140465274825,54.40481615,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Liczmańskiego 12</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1913<br><b>Architekt:</b> Kurt Arnheima]]></description>
+      <Point>
+        <coordinates>18.550238761226257,54.406418349999996,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Liczmańskiego 3</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1911<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.555051003814384,54.40722235,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Ludowa 10</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1934<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.578539557815734,54.383565250000004,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Łąkowa 39-44</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1927<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.66244080768255,54.34248515,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Ferdynanda Magellana 4</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2023<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.582933638806047,54.36571045,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Magellana 6</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2022<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.582696176041665,54.3663249,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Magellana 8</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2021<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.581573866761957,54.3657536,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Magellana 8A</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2020<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.581813088403138,54.3652615,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Marynarki Polskiej 138A</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1976<br><b>Architekt:</b> według daty w windzie]]></description>
+      <Point>
+        <coordinates>18.630821488820356,54.3781984,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Matemblewska 9</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1992<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.556308598415605,54.3630606,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Matki Polki 2</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1914<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.60377793462957,54.3773831,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Mazowiecka 3</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1978<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.5662213,54.3749138,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Michałowskiego 41</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1963<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.57053388705753,54.3852263,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Mickiewicza 5</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2021<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.6168972369365,54.3829408,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, molo w Brzeźnie</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1996<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.624886153844407,54.41408545,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Moniuszki 19</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2000<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.58784319939322,54.38795135,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Most Chlebowy</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1901<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.648496216200236,54.35368415,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Muzeum Archeologiczne</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1599<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.6596937,54.3548344,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Nałkowskiej 3</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1984<br><b>Architekt:</b> Otwarty jako Spółdzielczy DK]]></description>
+      <Point>
+        <coordinates>18.590561296055586,54.360003000000006,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Nieborowska 8</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2011<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.60401785061208,54.32968875,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Niepołomicka 47</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2023<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.600780751725576,54.308093850000006,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Noakowskiego 3</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2000<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.563384197211132,54.403929000000005,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Norwida 1</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2020<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.59365025774084,54.3839709,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Norwida 11</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2017<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.5917127,54.3832969,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Norwida 5</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2017<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.5924117,54.383719,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Nowomiejska 3</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2020<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.647931785647714,54.3618145,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Obrońców Westerplatte 16</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1890<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.561236212018766,54.4081942,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Obrońców Wybrzeża 11</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2014<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.596469503416646,54.4097213,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Obrońców Wybrzeża 15</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2017<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.597890484967024,54.4100064,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Obrońców Wybrzeża 17</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2017<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.59837230249753,54.4100462,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Obrońców Wybrzeża 25 A</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2006<br><b>Architekt:</b> ASA Architektoniczne Studio Autorskie
+Marian Synakiewicz]]></description>
+      <Point>
+        <coordinates>18.602202635936173,54.4105832,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Obrońców Wybrzeża 4</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1973<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.59345222307044,54.40740425,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Obrońców Wybrzeża 5</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2020<br><b>Architekt:</b> ASA Architektoniczne Studio Autorskie
+Marian Synakiewicz]]></description>
+      <Point>
+        <coordinates>18.59592599513817,54.41055,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Obrońców Wybrzeża 7</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2011<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.595574349556873,54.4095524,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Obywatelska 1</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1963<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.59404032330501,54.3806542,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Ogrodowa 4</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2021<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.573381766955755,54.37035885,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Okopowa 1</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1906<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.646456999740835,54.34953765,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Okopowa 21/27b</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1936<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.645964,54.3435962,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Okrąg 14</name>
+      <description><![CDATA[<b>Data wybudowania:</b> około 1971 (według ogłoszeń)<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.631469359956053,54.3753082,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Olsztyńska 1A</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2014<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.60602454422046,54.404931950000005,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Olsztyńska 2</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1996<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.603670728814645,54.40484535,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Olsztyńska 3a</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2011<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.607186410981686,54.404638899999995,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Olsztyńska 3b</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2010<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.607952306989738,54.4049296,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Olsztyńska 3 c</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2011<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.60668304258043,54.405356100000006,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Olsztyńska 5</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1985<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.6065412,54.4059708,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Opacka 20</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2019<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.564949093559854,54.413149250000004,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Opacka 23</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2019<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.563170092016804,54.414682,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Opacka 29</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2017<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.56276965755358,54.41523,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Opacka 35</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2018<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.563940695982144,54.41548745,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Beniowskiego 15A</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2017-2020<br><b>Architekt:</b> Osiedle Idea]]></description>
+      <Point>
+        <coordinates>18.575180647891372,54.414245808427665,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Ostroroga 3</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1975<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.624409347617913,54.3867384,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Ostroroga 5</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1976<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.624191324684947,54.386157049999994,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Paneckiego 19</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1977<br><b>Architekt:</b> wg tabliczki w windzie]]></description>
+      <Point>
+        <coordinates>18.570377690702266,54.39286715,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Park Millenium</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1998<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.613539445585978,54.3971107,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Partyzantów 14</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2011<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.605118709508226,54.37736155,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Partyzantów 7</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1927<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.605405322023042,54.3780283,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Pastelowa 12</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2021<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.611534,54.310143,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Pestalloziego 7/9</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1929<br><b>Architekt:</b> M. Kiessling , A. Krüger]]></description>
+      <Point>
+        <coordinates>undefined,Brak wyników,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Pętla tramwajowa Oliwa</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1948<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>undefined,Brak wyników,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Piastowska 100</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1969<br><b>Architekt:</b> Danuta Olędzka ; (mural: Medicine , Ruch i Woda, 2024)]]></description>
+      <Point>
+        <coordinates>18.591924068831048,54.416903899999994,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Piastowska 104</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1964-1966<br><b>Architekt:</b> Janusz Morek]]></description>
+      <Point>
+        <coordinates>18.59240895,54.4151018,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Piastowska 106D</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1964-1966<br><b>Architekt:</b> Janusz Morek]]></description>
+      <Point>
+        <coordinates>18.594443483010643,54.415373599999995,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Piastowska 186A</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2019<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.575867733746268,54.41316358037883,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Piastowska 22</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1910<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.572529800000005,54.4119451,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Piastowska 3</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1923<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.567999386206438,54.411411150000006,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Piastowska 35/37</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1972<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.574256969457736,54.41340785,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Piastowska 7/9</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2013<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.591807144387914,54.41520007078277,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Piastowska 90</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1966-1969?<br><b>Architekt:</b> Danuta Olędzka]]></description>
+      <Point>
+        <coordinates>18.590751740701087,54.41662585,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Piastowska 94</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1964-1966<br><b>Architekt:</b> Janusz Morek]]></description>
+      <Point>
+        <coordinates>18.5909719,54.41488605,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Piastowska 96</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1964-1966<br><b>Architekt:</b> Janusz Morek]]></description>
+      <Point>
+        <coordinates>18.59168305,54.41499555,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Piecewska 20A</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1978<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.5897298,54.3592017,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Piecewska 29A</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2022<br><b>Architekt:</b> MWH-architekci A.Wyszynski]]></description>
+      <Point>
+        <coordinates>18.59112354481127,54.35746531610108,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Piecewska 31</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2022<br><b>Architekt:</b> MWH-architekci A.Wyszynski]]></description>
+      <Point>
+        <coordinates>18.582162041044565,54.35883655,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Piecewska 33</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2012<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.5815879745509,54.35915455,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Pilotów 20</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1974<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.587663026675134,54.395832,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Plac Dwóch Miast</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2010<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.579877656399518,54.42571242883127,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, plac Najświętszej Maryi Panny 1</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1976<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.583980017670786,54.4075717,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Plac Porozumienia Gdańskiego 1</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1875/1878<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.653073115881,54.36193635,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Plac Wałowy 14</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1867<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.646831653676692,54.34123185,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Poczty Gdańskiej 7</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1902<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.569715200191045,54.40976834999999,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Podwale Przedmiejskie</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1959<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.668916219337913,54.34632509998074,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Polanki 1</name>
+      <description><![CDATA[<b>Data wybudowania:</b> <br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.559373919920567,54.40871435,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Polanki 117</name>
+      <description><![CDATA[<b>Data wybudowania:</b> II poł. XVII wieku<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.566567637512623,54.393417850000006,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Polanki 117 - 7 Szpital Marynarki Wojennej</name>
+      <description><![CDATA[<b>Data wybudowania:</b> ok. 1954<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.566567637512623,54.393417850000006,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Polanki 131</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1938<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.558952522642606,54.4073611,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Pomnik Tatara RP</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2010<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.6270489,54.3222602,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Pomorska 13</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1992<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.5743577,54.4178352,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Pomorska 16</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1975<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.576391155009325,54.41839465,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Pomorska 22A</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1975<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.580292052999617,54.41972925,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Pomorska 82</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1969<br><b>Architekt:</b> może 1970 skończone]]></description>
+      <Point>
+        <coordinates>18.583130620737933,54.41939985,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Pomorska 96</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1977<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.576683997220314,54.41726705,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Powstańców Warszawskich 3</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1975<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.634323901877618,54.3523844,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Powstańców Wielkopolskich 5D</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2022<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.615938224152124,54.39878273039011,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Prezydenta Lecha Kaczyńskiego 10D</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1964-1966<br><b>Architekt:</b> Janusz Morek]]></description>
+      <Point>
+        <coordinates>18.59594985,54.4151057,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Prezydenta Lecha Kaczyńskiego 18</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2022<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.599633628312638,54.4136941,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Prezydenta Lecha Kaczyńskiego 2D</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1964-1966<br><b>Architekt:</b> Janusz Morek]]></description>
+      <Point>
+        <coordinates>18.59479015,54.416581199999996,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Prezydenta Lecha Kaczyńskiego 22A</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2008<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.60118819194847,54.41127795,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Prezydenta Lecha Kaczyńskiego 24</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2009<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.600087546907808,54.4109754,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Prezydenta Lecha Kaczyńskiego 24A</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2007<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.599776371791016,54.411365,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Prezydenta Lecha Kaczyńskiego 4</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1964-1966<br><b>Architekt:</b> Janusz Morek]]></description>
+      <Point>
+        <coordinates>18.5958928,54.41624745,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Prezydenta Lecha Kaczyńskiego 6</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1964-1966<br><b>Architekt:</b> Janusz Morek]]></description>
+      <Point>
+        <coordinates>18.595488449999998,54.415842850000004,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Prezydenta Lecha Kaczyńskiego 8D</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1964-1966<br><b>Architekt:</b> Janusz Morek]]></description>
+      <Point>
+        <coordinates>18.59590542727956,54.41548515,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Pstrowskiego</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1948<br><b>Architekt:</b> Kolonia Fińskich Domków]]></description>
+      <Point>
+        <coordinates>18.617747624133692,54.39209223536314,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Pszenna 12</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2020<br><b>Architekt:</b> KD Kozikowski Design]]></description>
+      <Point>
+        <coordinates>18.6571775,54.3462517,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, pw. Św. Urszuli Ledóchowskiej</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1995<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.614122776594748,54.33738845,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Racławicka 17</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1952<br><b>Architekt:</b> dawny Robotniczy D Stoczniowca (hotelowiec)]]></description>
+      <Point>
+        <coordinates>18.629014199999997,54.386210899999995,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Radna</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1927<br><b>Architekt:</b> Dawna Zajezdnia Tramwajowa]]></description>
+      <Point>
+        <coordinates>18.655920999478067,54.3398259525284,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Rajska 10</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2003<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.6495126,54.3562937,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Rajska 8</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2019<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.649633587664614,54.35539235,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Rakoczego 9</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2017<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.58048073496463,54.35832,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>80-864 Gdańsk, Robotnicza 16</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2020<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.6468616,54.3626375,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Rogaczewskiego 55</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1932<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.637592005654977,54.34946945,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Rogaczewskiego 9/19</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1887<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.640300348360448,54.348819250000005,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Rybaki Górne, zbiornik gazowni</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1926<br><b>Architekt:</b> zbiornik gazowni]]></description>
+      <Point>
+        <coordinates>undefined,Brak wyników,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, al. Rzeczypospolitej 1</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1975<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.59433512094158,54.40290805,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Rzeczypospolitej 7</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1975<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.594070316860247,54.40146775,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Rzeczypospolitej 8</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1978<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.59119941455421,54.399919999999995,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Sieroca 6</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1699<br><b>Architekt:</b> Barthel Ranisch]]></description>
+      <Point>
+        <coordinates>18.65670772667976,54.355684800000006,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, SKM Gdańsk Przymorze-Uniwersytet</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1951<br><b>Architekt:</b> Początkowo Polanki, od 64 Przymorze, od 2004 ob.nazwa]]></description>
+      <Point>
+        <coordinates>undefined,Brak wyników,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Pachołek, Słoneczna 13</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1940<br><b>Architekt:</b> przed wojną drewniany]]></description>
+      <Point>
+        <coordinates>18.552087226702334,54.40658725,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Słoneczna 14</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1940<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.551984154042266,54.406795599999995,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Słoneczna 15</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1910<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.5518362007055,54.407155,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Słonimskiego 1</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2012<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.590735938446272,54.38411465,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Słonimskiego 2</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2014<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.5899719618822,54.38399215,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Juliusza Słowackiego 165</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1897<br><b>Architekt:</b> kapliczka]]></description>
+      <Point>
+        <coordinates>18.48580306314055,54.3796698,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Słowackiego 64</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1978<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.580984049999998,54.3787881,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Słowackiego 69</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2009<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.57718456019,54.379063349999996,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Słowackiego 77</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2021<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.576633043804993,54.37925495,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Słowiańska 28A</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2010<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.57806068887698,54.41078650590449,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Słupska 35</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1932<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.57837214842263,54.4008368,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Sobótki 15</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1959<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.607526622388978,54.3736272,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Sosnowa 5</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2018<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.601592,54.3775868,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Karwieńska 1A</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2023<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.546902666889483,54.412176,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Karwieńska 1 E</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2020<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.546803152653766,54.4134181,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Spacerowa 48</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1998<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.491139027183337,54.42554265,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Edwarda Stachury 4</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2019<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.58811554532825,54.38249715,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Stągiewna 26</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2015<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.658885960217013,54.347595,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Stągiewna 27</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2024<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.6581262,54.3476543,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Subisława 23</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1975<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.57164,54.4201287,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Subisława 31</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1972<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.571028614566714,54.421880200000004,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Suchanka 33</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2020<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.620216529285713,54.334045200000006,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Suchanka 35</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2020<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.620065163656506,54.3349536,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Szafarnia 2/3</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1735<br><b>Architekt:</b> Krzysztof Strzycki]]></description>
+      <Point>
+        <coordinates>18.660281569444457,54.350492,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Szczecińska 8</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2019<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.579636422439737,54.4051015,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Szczęśliwa 3</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1998<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.525261235309276,54.351914699999995,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Szeroka 64/66</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1955<br><b>Architekt:</b> Odbudowana według projektu Danuty Kirstein]]></description>
+      <Point>
+        <coordinates>18.656981357442113,54.3504806,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Sztormowa 7</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1974<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.573786364544702,54.42154755,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Szymanowskiego 14</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2014<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.5885114,54.3838213,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Szymanowskiego 18</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2016<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.58737586053806,54.38321655,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Szymanowskiego 4</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1903/2015<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.5921439394332,54.38520715,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>gdańsk, Szyprów 3</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1974<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.575843819117335,54.42217290000001,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Śląska 12</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2022<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.57689566010484,54.406138999999996,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Śląska 11</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2020<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.576204999190566,54.4071345,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Śląska 11A</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2020<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.57589948814229,54.4075605,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Śląska 21</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1961<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.580449626733486,54.406465600000004,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Śląska 3</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1907<br><b>Architekt:</b> gazownia]]></description>
+      <Point>
+        <coordinates>18.574288791629122,54.406332000000006,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Śląska 66</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1964<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.58454075,54.40614175,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Śląska 68</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1960<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.58528645,54.406685350000004,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Śląska 9 A</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2020<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.583810492747936,54.40667442343273,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Targ Sienny 7</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2018<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.643381014578367,54.348873600000005,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Traugutta 92</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1959<br><b>Architekt:</b> Adam Matoń, Zofia Wciorkowa]]></description>
+      <Point>
+        <coordinates>18.609292446050326,54.371234,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Trzy Lipy 3</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2008<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.592881941691598,54.354741700000005,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Tunel pod Martwą Wisłą im. abp Tadeusza Gocłowskiego</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2016<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.663110097013412,54.382884486625656,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, VII Dwór 7</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1966<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.574630149704834,54.38774755,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, VII Dwór 7B</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2007<br><b>Architekt:</b> Gdańska Szkoła Floretu]]></description>
+      <Point>
+        <coordinates>18.5711949,54.3880598,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Wajdeloty 11</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1900<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.60990991528073,54.381792700000005,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Wajdeloty 12, Centrum</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2014<br><b>Architekt:</b> (budynek gdzie jest biedronka)]]></description>
+      <Point>
+        <coordinates>18.60823420698322,54.3819481,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Wajdeloty 13</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1763<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.60882979214,54.3816438,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Wałowa 27</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1926<br><b>Architekt:</b> Adolph Bielefeldt]]></description>
+      <Point>
+        <coordinates>18.653864465123455,54.3588089,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Wałowa 41/43</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1998<br><b>Architekt:</b> gazownia z 1904]]></description>
+      <Point>
+        <coordinates>18.659459411834437,54.3582528,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Wały Jagiellońskie 2/4</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1961<br><b>Architekt:</b> Lech Kadłubowski]]></description>
+      <Point>
+        <coordinates>18.64670747759165,54.3503213,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Wały Piastowskie 1</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1971<br><b>Architekt:</b> Stanisław Tobolczyk, Jasna Strzałkowska]]></description>
+      <Point>
+        <coordinates>18.64682435157519,54.35874145,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Majora Henryka Sucharskiego, Wartownia nr 1, </name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1934<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.675990347889233,54.406024099999996,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Wejhera 3</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1967<br><b>Architekt:</b> w 1966 trwała budowa]]></description>
+      <Point>
+        <coordinates>18.583084446751535,54.42191095,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Koszary, 54.406491, 18.671624</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1936<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.671692252772402,54.40647335,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Więckowskiego 1</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1993<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.61530709739732,54.333507049999994,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Więckowskiego 3 C</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1993<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.613900909924602,54.33421308622335,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Więckowskiego 5</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1993<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.614146955727016,54.333498649999996,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Więckowskiego 9</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1993<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.614946387161815,54.3330043,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Wileńska 53E</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1976<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.5962464,54.3617629,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Wita Stwosza 110</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1934<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.58010044727805,54.3890811,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Wita Stwosza 3</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1905<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.563667473519285,54.40747175,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Wita Stwosza 48</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1962<br><b>Architekt:</b> J. Kowalski, Nauczycielska SM]]></description>
+      <Point>
+        <coordinates>18.568107474753283,54.39866095,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Wita Stwosza 50</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1962<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.568524808918127,54.3982549,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Wita Stwosza 52</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1963<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.56892917331081,54.3978525,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Wita Stwosza 54</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1964<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.569333264718722,54.3974489,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Wita Stwosza 55</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1974<br><b>Architekt:</b> Witold Benedek, Stanisław Niewiadomski ; Wydział Matematyczno-Fizyczny]]></description>
+      <Point>
+        <coordinates>18.572345792197655,54.3971585,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Wita Stwosza 56</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1964<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.569739580678466,54.3970452,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Witosa 15</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1991<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.61436825119746,54.33911125,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Własna Strzecha</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1895-1900<br><b>Architekt:</b> fundacja Abbega]]></description>
+      <Point>
+        <coordinates>18.618805324660247,54.37384156112119,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Aleja Wojska Polskiego 39</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1997<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.581489211858923,54.38945565,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Wydział Chemii</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2013<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.576794004445347,54.39359915,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Wypoczynkowa 4</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2017<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.605807999480263,54.41915965,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Romana Wyrobka</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1985<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.575720349771633,54.35984136725178,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Wyzwolenia 51</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1978<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.66163442650705,54.4006446,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Zamiejska 38</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1990<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.627300992718446,54.3349265,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Zdrojowa 2</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1893<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.63787138681534,54.40797365,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Zdrojowa 3</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1893<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.638522650707156,54.407857199999995,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Bateria Wiejska</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1910<br><b>Architekt:</b> Bateria Wiejska]]></description>
+      <Point>
+        <coordinates>18.644831226455054,54.4026505,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Zgody 6</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1965<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.584556920012734,54.40806245,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Zwycięstwa 13A</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2012<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.628677839075625,54.37143585,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Żeromskiego 6</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1928<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.56190919604851,54.40683545,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Żeromskiego 7</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1928<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.562067464735378,54.4068749,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Żeromskiego 8</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1928<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.562384363392358,54.406919,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańsk, Żeromskiego 8-9</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1928<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.67637681469793,54.3394909,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdańśk, Wita Stwosza 55, Wydział Historyczny</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1972<br><b>Architekt:</b> Witold Benedek, Stanisław Niewiadomski]]></description>
+      <Point>
+        <coordinates>18.572345792197655,54.3971585,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia , Św. Piotra 6</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2023<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.5442492,54.5249959,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, 10 Lutego 11</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1998<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.53956557073165,54.51902535,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, 10 Lutego 16</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2004<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.53812704105205,54.5198447,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, 10 Lutego 2</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1912<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.542190369157336,54.51955925,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, 10 Lutego 20/22</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1929<br><b>Architekt:</b> Stanisław Filasiewicz]]></description>
+      <Point>
+        <coordinates>18.54007419724896,54.51947428703718,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, 10 Lutego 24, </name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1926<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.534911451773453,54.51995195,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, 10 Lutego 33</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1963<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.53517723172598,54.5195073,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, 10 Lutego 35/35a</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1935<br><b>Architekt:</b> S. Ziołowski]]></description>
+      <Point>
+        <coordinates>18.5418735558001,54.51938874792399,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, 10 Lutego 8</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1928<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.540517779993095,54.519771399999996,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Aleja Zwycięstwa 256</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1996<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.55176956451438,54.47598535,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Cechowa 22</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1935<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.5151069,54.552869,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Chabrowa 43</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1962<br><b>Architekt:</b> wtedy przeniesiono tu instytucję szkoły]]></description>
+      <Point>
+        <coordinates>18.444977521586107,54.53361295,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Chylońska 129</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1999<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.463610850255165,54.544061549999995,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Chylońska 227</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1939/1982/1987<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.44585971647329,54.54812375,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Gniewska 21</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1993<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.461982577620077,54.5420268,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Hryniewickiego 6</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2009<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.54892082824666,54.521849599999996,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Jana Pawła II 13b</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1974<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.55301725129421,54.51899557932877,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Jana Pawła II 13b</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1971<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.55301725129421,54.51899557932877,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Jana Pawła II 3</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1939<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.55506980924808,54.5182608,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Jerzego Waszyngtona 17</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2015<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.5487679,54.521076,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Kazimierza Górskiego 8</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2008<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.531364235031788,54.498922050000004,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Kcyńska 27c</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2012<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.453301128725474,54.53744565,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Kielecka 2</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2022<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.532898036549376,54.5085562,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Kielecka 5</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2014<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.531415433116628,54.5078063,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Kolejka linowa na Kamienną Górę</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2015<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.543695267689994,54.51604797817286,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Korzeniowskiego 7</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1936<br><b>Architekt:</b> Zbigniew Kupiec – Tadeusz Kossak]]></description>
+      <Point>
+        <coordinates>18.549986975000003,54.511053849999996,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Korzeniowskiego 8</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1935<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.55083956750357,54.5104151015191,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Lniana 19</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1991<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.43693699448341,54.546484899999996,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Łużycka 6A</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2008<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.533689171121345,54.494936499999994,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Łużycka 6B</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2008<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.533545121033924,54.49451075,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Łużycka 6D</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2009<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.534400553952658,54.494138199999995,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Łużycka 6E</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2010<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.53334809213714,54.493641600000004,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Łużycka 8B</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2017<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.533997324472168,54.4927257,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Łużycka 8C</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2016<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.533070710721105,54.49300205,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Morska 186</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1973<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.482583443931144,54.5351764,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Morska 83</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1930<br><b>Architekt:</b> Wacław Tomaszewski]]></description>
+      <Point>
+        <coordinates>18.5123904,54.5260785,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Orłowska 8</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1840<br><b>Architekt:</b> około 1840]]></description>
+      <Point>
+        <coordinates>18.563495906707278,54.481443150000004,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Plac Grunwaldzki 1</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1979<br><b>Architekt:</b> Józef Chmiel, Daniel Olędzki]]></description>
+      <Point>
+        <coordinates>18.54555707460149,54.51656415,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Plac Grunwaldzki 2</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2015<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.543186053081396,54.51684865,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Podolska 21</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2004<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.5342455918717,54.515185599999995,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Polska 13 A</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2008<br><b>Architekt:</b> Biurowiec Portu Gdynia]]></description>
+      <Point>
+        <coordinates>18.536776737286285,54.52942605,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Pucka 5</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2020<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.4677530967797,54.54550304999999,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Pułaskiego 6</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1948<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.54463592404135,54.52090415,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Sędzickiego 19</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1968<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.548597676990347,54.51457765,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Skwer Kościuszki 10/12</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1937<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.545749723471424,54.51919975,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Skwer Kościuszki 16</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1938<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.54414887173562,54.51976195,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Batorego 28</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2002<br><b>Architekt:</b> 28/32]]></description>
+      <Point>
+        <coordinates>18.53511067983979,54.5188956,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Szkolna 10</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1929<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.53362371715714,54.5200327,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Świętojańska 43</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2016<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.541868037208616,54.51637375,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Wendy 22</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2020<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.54428367662405,54.52872610197639,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Witomino-Leśniczówka, Wielkokacka 2</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2002<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.5092435,54.4979528,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Władysława IV 43</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2001<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.53847568061002,54.5123663,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Zawiszy Czarnego 1</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1923<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.548007252901648,54.5160774,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Zawiszy Czarnego 1a</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2007<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.547302932915503,54.51596055,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Zawiszy Czarnego 1b</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2012<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.54786423682534,54.515817600000005,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Zbożowa 59</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2007<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.44679087473333,54.54344645,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Gdynia, Zwycięstwa 241</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2016<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.552814234297813,54.4803342,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Muzeum II Wojny Światowej</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2017<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.661121202226163,54.35594145,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Rumia, Sobieskiego 14a</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2010<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.3906217,54.5630664,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Sopot, 3 Maja 49</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1951 (dln) i 1972 (górny kościół)<br><b>Architekt:</b> projekt Marka Sztafrowskiego]]></description>
+      <Point>
+        <coordinates>18.56747038770992,54.43548885,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Sopot, Bitwy pod Płowcami 59</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2012<br><b>Architekt:</b> "Dom i Miasto'84" (Dim'84) Czesława Bieleckiego]]></description>
+      <Point>
+        <coordinates>18.58402774119418,54.4337908,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Sopot, Bohaterów Monte Cassino 31</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1891<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.563264290146773,54.44351495,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Sopot, Haffnera 55</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2001<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.562491964991967,54.449140549999996,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Sopot, Haffnera 88</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2016<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.56023980821032,54.4551489,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Sopot, kościół św. Jerzego</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1901<br><b>Architekt:</b> Ludwig von Tiedemann]]></description>
+      <Point>
+        <coordinates>18.563861268745597,54.443214299999994,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Sopot, Kościuszki 14</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2015<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.562886611167823,54.44118815,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Sopot, Niepodległości 761</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1899/2013<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.56085733031584,54.44013675,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Sopot, Opera Leśna</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1909<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.544391243716817,54.4446267,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Sopot, plac Zdrojowy 2</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2009<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.5689404964984,54.44579305,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Sopot, Powstańców Warszawy 10</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2008<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.569270656891163,54.44655985,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Sopot, Powstańców Warszawy 3</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2008<br><b>Architekt:</b> tunel]]></description>
+      <Point>
+        <coordinates>18.564514490532353,54.450554567006286,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Sopot, Rzemieślnicza 17/19</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2009<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.564719424842146,54.4273354,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Sopot, Rzemieślnicza 33</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2006<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.565243029912878,54.42600545,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Sopot, Rzemieślnicza 7</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 2003<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.564068065875805,54.42873994999999,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Sopot, Tatrzańska 4</name>
+      <description><![CDATA[<b>Data wybudowania:</b> 1968<br><b>Architekt:</b> ]]></description>
+      <Point>
+        <coordinates>18.55118057401921,54.454733250000004,0</coordinates>
+      </Point>
+    </Placemark>
+  </Document>
+</kml>
