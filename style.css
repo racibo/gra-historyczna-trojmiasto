@@ -72,3 +72,6 @@ html,body,#map{height:100%;margin:0}body{font-family:system-ui,sans-serif;overfl
 /* Meta panel: pojedyncze okno zamiast białego panelu reveal + zagnieżdżonego panelu. */
 .finish-reveal{background:transparent!important;padding:0!important;box-shadow:none!important;width:auto!important;color:inherit!important}
 .finish-reveal .finish-message{box-sizing:border-box}
+
+.finish-actions{display:flex;gap:9px;margin-top:12px}.finish-actions button{flex:1;margin-top:0!important;padding:11px;border:0;border-radius:9px;font-weight:800;cursor:pointer}.summary-hide{background:#e9ecef;color:#222}.finish-actions .summary-restart{background:#1976d2;color:#fff}.summary-hide:hover{background:#dfe3e7}.finish-actions .summary-restart:hover{background:#1565c0}
+@media(max-width:600px){.finish-actions{flex-direction:column}}
