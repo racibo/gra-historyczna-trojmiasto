@@ -142,7 +142,15 @@ function missionPoints(){
 }
 function personNames(p){
   const text=String(p.architect||"")+" "+String(p.notes||"");
-  return [...new Set(text.match(/\b[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż-]{2,}\s+[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż-]{2,}\b/g)||[])];
+  const names=[];
+  const words=text.split(/[,;()]/).map(x=>x.trim()).filter(Boolean);
+  for(const part of words){
+    const matches=part.match(/\\b[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż-]{2,}\\s+[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż-]{2,}\\b/g)||[];
+    matches.forEach(name=>{
+      if(!/studio|pracownia|biuro|architektoniczne|architektura|projektowe|projekty|firma/i.test(name))names.push(name);
+    });
+  }
+  return [...new Set(names)];
 }
 function personMatch(p,name){
   const text=String(p.architect||"")+" "+String(p.notes||"");
@@ -164,7 +172,7 @@ function taskForGame(){
   );
   if(settings.architects){
     const people=[...new Set(all.flatMap(personNames))];
-    people.forEach(name=>pool.push({type:"person:"+name,category:"people",text:"Odwiedź miejsce związane z osobą: "+name,test:p=>personMatch(p,name)}));
+    people.forEach(name=>pool.push({type:"person:"+name,category:"people",text:"Odwiedź miejsce zaprojektowane przez: "+name,test:p=>personMatch(p,name)}));
   }
   const usable=pool.filter(t=>all.some(t.test));
   for(let i=usable.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[usable[i],usable[j]]=[usable[j],usable[i]]}
