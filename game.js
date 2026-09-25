@@ -203,27 +203,30 @@ function missionPoints(){
 function personNames(p){
   const text=String(p.architect||"")+" "+String(p.notes||"");
   const names=[];
-  const words=text.split(/[,;()]/).map(x=>x.trim()).filter(Boolean);
-  for(const part of words){
-    const matches=part.match(/\b[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż-]{2,}\s+[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż-]{2,}\b/g)||[];
-    matches.forEach(name=>{
-      if(!/studio|pracownia|biuro|architektoniczne|architektura|projektowe|projekty|firma/i.test(name))names.push(name);
-    });
-  }
+  const matches=text.match(/[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż-]{2,}(?:\s+[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż-]{2,})+/g)||[];
+  matches.forEach(name=>{
+    if(!/studio|pracownia|biuro|architektoniczne|architektura|projektowe|projekty|firma/i.test(name))names.push(name.trim());
+  });
   return [...new Set(names)];
 }
 function personMatch(p,name){
   const text=String(p.architect||"")+" "+String(p.notes||"");
   return text.toLowerCase().includes(name.toLowerCase());
 }
+function descriptionLabel(p){
+  const architect=String(p.architect||"").trim();
+  if(architect)return architect.length>90?architect.slice(0,87)+"…":architect;
+  const note=String(p.notes||"").replace(/\s+/g," ").trim();
+  return note.length>90?note.slice(0,87)+"…":note;
+}
 function taskForGame(){
-  const all=missionPoints().filter(p=>p.date),pool=[];
-  if(settings.age)pool.push(
+  const all=missionPoints(),dated=all.filter(p=>p.date),pool=[];
+  if(settings.age)dated.length&&pool.push(
     {type:"19",category:"age",text:"Odwiedź obiekt z XIX wieku",test:p=>{const y=year(p);return y>=1800&&y<=1899}},
     {type:"20",category:"age",text:"Odwiedź obiekt z XX wieku",test:p=>{const y=year(p);return y>=1900&&y<=1999}},
     {type:"21",category:"age",text:"Odwiedź obiekt z XXI wieku",test:p=>{const y=year(p);return y>=2000&&y<=2099}}
   );
-  if(settings.periods)pool.push(
+  if(settings.periods)dated.length&&pool.push(
     {type:"1900-14",category:"periods",text:"Odwiedź obiekt z lat 1900–1914",test:p=>{const y=year(p);return y>=1900&&y<=1914}},
     {type:"1918-39",category:"periods",text:"Odwiedź obiekt z lat 1918–1939",test:p=>{const y=year(p);return y>=1918&&y<=1939}},
     {type:"1945-89",category:"periods",text:"Odwiedź obiekt z lat 1945–1989",test:p=>{const y=year(p);return y>=1945&&y<=1989}},
@@ -233,6 +236,16 @@ function taskForGame(){
   if(settings.architects){
     const people=[...new Set(all.flatMap(personNames))];
     people.forEach(name=>pool.push({type:"person:"+name,category:"descriptions",text:"Znajdź miejsce powiązane z hasłem: "+name,test:p=>personMatch(p,name)}));
+    const described=all.filter(p=>String(p.architect||"").trim()||String(p.notes||"").trim());
+    described.forEach(p=>{
+      const label=descriptionLabel(p);
+      if(label)pool.push({
+        type:"description:"+p.id,
+        category:"descriptions",
+        text:"Znajdź miejsce związane z opisem: "+label,
+        test:q=>q.id===p.id
+      });
+    });
   }
   const usable=pool.filter(t=>all.some(t.test));
   for(let i=usable.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[usable[i],usable[j]]=[usable[j],usable[i]]}
