@@ -23,9 +23,9 @@ html,body,#map{height:100%;margin:0}body{font-family:system-ui,sans-serif;overfl
 .choice button:disabled,#startBtn:disabled,#saveSettings:disabled{opacity:.65;cursor:wait}
 .tag-cloud{position:absolute;z-index:1050;top:105px;right:10px;width:min(220px,42vw);background:rgba(20,20,20,.94);border-radius:10px;padding:8px;box-shadow:0 3px 15px #0008;transition:transform .2s ease,opacity .2s ease}
 .tag-cloud.closed{transform:translateX(calc(100% + 12px));opacity:.15;pointer-events:none}
-.tag-toggle{position:absolute;left:-54px;top:0;width:50px;height:34px;border:0;border-radius:8px 0 0 8px;background:#202020;color:#fff;font-size:10px;font-weight:800;cursor:pointer}
+.tag-toggle{position:absolute;z-index:1051;top:105px;right:calc(min(220px,42vw) + 10px);width:50px;height:34px;border:0;border-radius:8px 0 0 8px;background:#202020;color:#fff;font-size:10px;font-weight:800;cursor:pointer}
 .tag-list{display:flex;flex-wrap:wrap;gap:6px;max-height:42vh;overflow:auto}
 .year-tag{border:0;border-radius:999px;padding:7px 10px;background:#444;color:#fff;font-weight:800;font-size:12px;cursor:pointer}
 .year-tag:hover{background:#555}
 .tag-empty{font-size:11px;line-height:1.35;color:#aaa;padding:4px}
-@media(max-width:600px){.tag-cloud{top:105px;width:min(190px,48vw)}.tag-toggle{left:-50px;width:46px}}
+@media(max-width:600px){.tag-cloud{top:105px;width:min(190px,48vw)}.tag-toggle{top:105px;right:calc(min(190px,48vw) + 10px);width:46px}}
