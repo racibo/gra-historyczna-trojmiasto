@@ -101,7 +101,19 @@ function showCandidates(dir){
   const goalDistance=distance(current,target),goalBearing=bearing(current,target),goalDiff=angleDiff(goalBearing,dirAngle(dir));
   if(goalDistance<=GOAL_UNLOCK&&goalDiff<=45&&!visited.has(target.id)&&!c.some(p=>p.id===target.id))
     c.push({...target,d:goalDistance,bd:goalBearing,ad:goalDiff,isTarget:true});
-  const chosen=chooseBestPair(c);
+
+  const missionTargets=c.filter(p=>activeTasks.some(t=>!completed.has(t.type)&&t.test(p)));
+  let chosen=chooseBestPair(c);
+  if(missionTargets.length){
+    const forced=missionTargets.sort((a,b)=>a.d-b.d)[0];
+    if(!chosen.some(p=>p.id===forced.id)){
+      const companion=c.filter(p=>p.id!==forced.id).sort((a,b)=>{
+        const da=Math.abs(distance(forced,a)-300),db=Math.abs(distance(forced,b)-300);
+        return (da+ a.d*0.15)-(db+b.d*0.15);
+      })[0];
+      if(companion)chosen=[forced,companion];
+    }
+  }
   if(chosen.length<2){
     const msg="W tym kierunku nie ma dwóch dostępnych punktów — wybierz inną strzałkę.";
     statusEl.textContent=msg;
