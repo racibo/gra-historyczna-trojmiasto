@@ -97,9 +97,12 @@ function showCandidates(dir){
   candidateMarkers.forEach(m=>map.removeLayer(m));
   candidateMarkers=[];
   let c=directionCandidates(current,visited,dir);
+  // Meta nie może być dostępna w pierwszym ruchu. Od drugiego ruchu
+  // jest specjalnym punktem: można do niej wrócić nawet po wcześniejszym odwiedzeniu.
+  if(moves===0)c=c.filter(p=>p.id!==target.id);
   const GOAL_UNLOCK=800;
   const goalDistance=distance(current,target),goalBearing=bearing(current,target),goalDiff=angleDiff(goalBearing,dirAngle(dir));
-  if(goalDistance<=GOAL_UNLOCK&&goalDiff<=45&&!visited.has(target.id)&&!c.some(p=>p.id===target.id))
+  if(moves>0&&goalDistance<=GOAL_UNLOCK&&goalDiff<=45&&!c.some(p=>p.id===target.id))
     c.push({...target,d:goalDistance,bd:goalBearing,ad:goalDiff,isTarget:true});
 
   const missionTargets=c.filter(p=>activeTasks.some(t=>!completed.has(t.type)&&t.test(p)));
