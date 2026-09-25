@@ -4,23 +4,41 @@ function year(p){const m=p.date.match(/(1[0-9]{3}|20[0-9]{2})/);return m?+m[1]:n
 function setCurrent(p,showHere=true){if(currentMarker)map.removeLayer(currentMarker);currentMarker=L.marker([p.lat,p.lon],{icon:icon("current-marker"),zIndexOffset:1000}).addTo(map);if(showHere)currentMarker.bindTooltip("TU JESTEŚ",{permanent:true,direction:"top",className:"current-label"});map.panTo([p.lat,p.lon],{animate:true,duration:.5})}
 function updateRoute(){if(routeLine)map.removeLayer(routeLine);routeLine=L.polyline(routePoints.map(p=>[p.lat,p.lon]),{color:"#f5a623",weight:4,opacity:.9,dashArray:"9 8",lineCap:"round"}).addTo(map)}
 function placeLabel(p){let n=String(p.name||"Obiekt").replace(/^\\d{2}-\\d{3}\\s+[^,]+,\\s*/,"").replace(/^[^,]+,\\s*/,"");if(!n)n=p.name||"Obiekt";return n.length>42?n.slice(0,39)+"…":n}
+function chooseBestPair(candidates){
+  if(candidates.length<2)return candidates;
+  const pairs=[];
+  const maxD=Math.max(...candidates.map(p=>p.d),1);
+  for(let i=0;i<candidates.length;i++)for(let j=i+1;j<candidates.length;j++){
+    const x=candidates[i],y=candidates[j],pairDistance=distance(x,y);
+    const distanceScore=(x.d+y.d)/(2*maxD);
+    const pairScore=Math.abs(pairDistance-300)/300;
+    let dateBonus=0;
+    if(candidates.length>4){
+      const xa=year(x),yb=year(y);
+      if(xa!==null&&yb!==null){
+        const yearDiff=Math.abs(xa-yb);
+        dateBonus=yearDiff>=50?0.45:yearDiff>=20?0.3:yearDiff>=10?0.15:0;
+      }
+    }
+    pairs.push({x,y,score:distanceScore*0.6+pairScore*0.4-dateBonus});
+  }
+  pairs.sort((m,n)=>m.score-n.score);
+  return [pairs[0].x,pairs[0].y];
+}
+function directionCandidates(from,seen,dir){
+  const a=dirAngle(dir),START_RADIUS=1000,MAX_RADIUS=8000,tolerance=45;
+  let c=[];
+  for(let radius=START_RADIUS;radius<=MAX_RADIUS;radius+=1000){
+    c=points.filter(p=>!seen.has(p.id)&&p.id!==from.id&&distance(from,p)<=radius)
+      .map(p=>({...p,d:distance(from,p),bd:bearing(from,p),ad:angleDiff(bearing(from,p),a)}))
+      .filter(p=>p.ad<=tolerance);
+    if(c.length>=2||radius===MAX_RADIUS)break;
+  }
+  return c;
+}
 function moveCandidates(from,seen){
   const result=[];
-  for(const dir of ["up","right","down","left"]){
-    const a=dirAngle(dir),c=[];
-    for(let radius=1000;radius<=5000;radius+=1000){
-      const found=points.filter(p=>!seen.has(p.id)&&p.id!==from.id&&distance(from,p)<=radius)
-        .map(p=>({...p,d:distance(from,p),bd:bearing(from,p),ad:angleDiff(bearing(from,p),a)}))
-        .filter(p=>p.ad<=45).sort((x,y)=>(x.d-y.d)||(x.ad-y.ad));
-      c.length=0;
-      for(const p of found){
-        if(c.length>=2)break;
-        if(!c.some(q=>distance(p,q)<120))c.push(p);
-      }
-      if(c.length>=2||radius===5000)break;
-    }
-    c.forEach(p=>result.push(p));
-  }
+  for(const dir of ["up","right","down","left"])result.push(...chooseBestPair(directionCandidates(from,seen,dir)));
   return [...new Map(result.map(p=>[p.id,p])).values()];
 }
 function auditPath(start,maxDepth=10){
@@ -73,7 +91,36 @@ function chooseStartAndTarget(){
   }
   return null;
 }
-function showCandidates(dir){if(choiceLocked)return;statusEl.textContent="";candidateMarkers.forEach(m=>map.removeLayer(m));candidateMarkers=[];const a=dirAngle(dir),MIN=120,START_RADIUS=1000,MAX=8000;let tolerance=45;let c=[];for(let radius=START_RADIUS;radius<=MAX;radius+=1000){c=points.filter(p=>!visited.has(p.id)&&p.id!==current.id&&distance(current,p)>=MIN&&distance(current,p)<=radius).map(p=>({...p,d:distance(current,p),bd:bearing(current,p),ad:angleDiff(bearing(current,p),a)})).filter(p=>p.ad<=tolerance);if(c.length>=2||radius===MAX)break}c.sort((x,y)=>(x.d-y.d)||(x.ad-y.ad));const GOAL_UNLOCK=800;const goalDistance=distance(current,target),goalBearing=bearing(current,target),goalDiff=angleDiff(goalBearing,a);if(goalDistance<=GOAL_UNLOCK&&goalDiff<=tolerance&&!visited.has(target.id)){c=c.filter(p=>p.id!==target.id);c.unshift({...target,d:goalDistance,bd:goalBearing,ad:goalDiff,isTarget:true})}const chosen=[];for(const p of c){if(chosen.length>=2)break;if(visited.has(p.id)||routePoints.some(q=>q.id===p.id))continue;if(!chosen.some(q=>distance(p,q)<120))chosen.push(p)}if(chosen.length<2){for(const p of c){if(chosen.length>=2)break;if(visited.has(p.id)||routePoints.some(q=>q.id===p.id)||chosen.some(q=>q.id===p.id))continue;chosen.push(p)}}if(chosen.length<2){"W tym kierunku nie ma dwóch dostępnych punktów — wybierz inną strzałkę.";setTimeout(()=>{if(!choiceLocked&&statusEl.textContent==="W tym kierunku nie ma dwóch dostępnych punktów — wybierz inną strzałkę.")statusEl.textContent="Wybierz inny kierunek.";},3000);return}choiceLocked=true;chosen.forEach((p,i)=>{const m=L.marker([p.lat,p.lon],{icon:icon(i?"candidate-b":"candidate-a")}).addTo(map);candidateMarkers.push(m);m.on("click",()=>choose(p));const btn=document.getElementById(i?"choiceB":"choiceA");btn.className=i?"choice-b":"choice-a";btn.innerHTML="<span class=\"letter\">"+(i?"B":"A")+"</span> "+(p.isTarget?"META":"okolice "+esc(placeLabel(p)));});choiceEl.classList.remove("hidden");document.getElementById("choiceA").onclick=()=>choose(chosen[0]);document.getElementById("choiceB").onclick=()=>choose(chosen[1])}
+function showCandidates(dir){
+  if(choiceLocked)return;
+  statusEl.textContent="";
+  candidateMarkers.forEach(m=>map.removeLayer(m));
+  candidateMarkers=[];
+  let c=directionCandidates(current,visited,dir);
+  const GOAL_UNLOCK=800;
+  const goalDistance=distance(current,target),goalBearing=bearing(current,target),goalDiff=angleDiff(goalBearing,dirAngle(dir));
+  if(goalDistance<=GOAL_UNLOCK&&goalDiff<=45&&!visited.has(target.id)&&!c.some(p=>p.id===target.id))
+    c.push({...target,d:goalDistance,bd:goalBearing,ad:goalDiff,isTarget:true});
+  const chosen=chooseBestPair(c);
+  if(chosen.length<2){
+    const msg="W tym kierunku nie ma dwóch dostępnych punktów — wybierz inną strzałkę.";
+    statusEl.textContent=msg;
+    setTimeout(()=>{if(!choiceLocked&&statusEl.textContent===msg)statusEl.textContent="Wybierz inny kierunek."},3000);
+    return;
+  }
+  choiceLocked=true;
+  chosen.forEach((p,i)=>{
+    const m=L.marker([p.lat,p.lon],{icon:icon(i?"candidate-b":"candidate-a")}).addTo(map);
+    candidateMarkers.push(m);
+    m.on("click",()=>choose(p));
+    const btn=document.getElementById(i?"choiceB":"choiceA");
+    btn.className=i?"choice-b":"choice-a";
+    btn.innerHTML="<span class=\\"letter\\">"+(i?"B":"A")+"</span> "+(p.isTarget?"META":"okolice "+esc(placeLabel(p)));
+  });
+  choiceEl.classList.remove("hidden");
+  document.getElementById("choiceA").onclick=()=>choose(chosen[0]);
+  document.getElementById("choiceB").onclick=()=>choose(chosen[1]);
+}
 function loadSettings(){try{const x=JSON.parse(localStorage.getItem("trojmiastoGameSettings")||"null");if(x)settings={...settings,...x}}catch(e){}}
 function saveSettings(){const oldRange=settings.distanceRange,oldCity=settings.startCity;settings.count=+document.getElementById("missionCount").value;settings.age=document.getElementById("catAge").checked;settings.periods=document.getElementById("catPeriods").checked;settings.architects=document.getElementById("catArchitects").checked;settings.distanceRange=document.getElementById("distanceRange").value;settings.startCity=document.getElementById("startCity").value;localStorage.setItem("trojmiastoGameSettings",JSON.stringify(settings));return oldRange!==settings.distanceRange||oldCity!==settings.startCity}
 function openSettings(){document.getElementById("missionCount").value=settings.count;document.getElementById("catAge").checked=settings.age;document.getElementById("catPeriods").checked=settings.periods;document.getElementById("catArchitects").checked=settings.architects;document.getElementById("distanceRange").value=settings.distanceRange||"0-3";document.getElementById("startCity").value=settings.startCity||"random";document.getElementById("settings").classList.remove("hidden")}
