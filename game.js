@@ -26,14 +26,16 @@ function chooseBestPair(candidates){
   return [pairs[0].x,pairs[0].y];
 }
 function directionCandidates(from,seen,dir){
-  const a=dirAngle(dir),START_RADIUS=1000,MAX_RADIUS=8000,tolerance=45;
-  let c=[];
+  const a=dirAngle(dir),START_RADIUS=1000,MAX_RADIUS=10000,tolerance=45;
+  let c=[],searchRadius=MAX_RADIUS;
   for(let radius=START_RADIUS;radius<=MAX_RADIUS;radius+=1000){
     c=points.filter(p=>!seen.has(p.id)&&p.id!==from.id&&distance(from,p)<=radius)
       .map(p=>({...p,d:distance(from,p),bd:bearing(from,p),ad:angleDiff(bearing(from,p),a)}))
       .filter(p=>p.ad<=tolerance);
-    if(c.length>=2||radius===MAX_RADIUS)break;
+    if(c.length>=2){searchRadius=radius;break}
   }
+  c.searchRadius=searchRadius;
+  c.sectorAngle=tolerance;
   return c;
 }
 function moveCandidates(from,seen){
@@ -97,6 +99,8 @@ function showCandidates(dir){
   candidateMarkers.forEach(m=>map.removeLayer(m));
   candidateMarkers=[];
   let c=directionCandidates(current,visited,dir);
+  const searchRadius=c.searchRadius||10000;
+  const foundBeforeGoal=c.length;
   // Meta nie może być dostępna w pierwszym ruchu. Od drugiego ruchu
   // jest specjalnym punktem: można do niej wrócić nawet po wcześniejszym odwiedzeniu.
   if(moves===0)c=c.filter(p=>p.id!==target.id);
@@ -118,11 +122,18 @@ function showCandidates(dir){
     }
   }
   if(chosen.length<2){
-    const msg="W tym kierunku nie ma dwóch dostępnych punktów — wybierz inną strzałkę.";
+    let msg;
+    if(foundBeforeGoal===0){
+      msg="W tym kierunku znaleziono 0 punktów w sektorze ±45° nawet w promieniu "+(searchRadius/1000)+" km. Wybierz inną strzałkę.";
+    }else{
+      msg="W tym kierunku znaleziono tylko "+foundBeforeGoal+" dostępny punkt w promieniu "+(searchRadius/1000)+" km i sektorze ±45°. Do wyboru potrzebne są 2.";
+    }
     statusEl.textContent=msg;
-    setTimeout(()=>{if(!choiceLocked&&statusEl.textContent===msg)statusEl.textContent="Wybierz inny kierunek."},3000);
+    setTimeout(()=>{if(!choiceLocked&&statusEl.textContent===msg)statusEl.textContent="Wybierz inny kierunek."},5000);
     return;
   }
+  const selectedInfo="Znaleziono "+c.length+" punktów w sektorze ±45° do "+(searchRadius/1000)+" km. Wybrano 2: możliwie blisko Ciebie, z preferencją odległości około 300 m między nimi"+(c.length>4?" i zróżnicowania dat budowy":"")+".";
+  statusEl.textContent=selectedInfo;
   choiceLocked=true;
   chosen.forEach((p,i)=>{
     const m=L.marker([p.lat,p.lon],{icon:icon(i?"candidate-b":"candidate-a")}).addTo(map);
@@ -205,9 +216,14 @@ function reveal(p){
 }
 function choose(p){choiceEl.classList.add("hidden");candidateMarkers.forEach(m=>map.removeLayer(m));candidateMarkers=[];current=p;visited.add(p.id);moves++;movesEl.textContent="Ruchy: "+moves;routePoints.push(p);updateRoute();setCurrent(p);reveal(p)}
 function finish(){
+  document.querySelectorAll(".summary-overlay,.summary-card").forEach(el=>el.remove());
+  choiceEl.classList.add("hidden");
+  candidateMarkers.forEach(m=>map.removeLayer(m));
+  candidateMarkers=[];
   if(routePoints.length>1)map.fitBounds(routePoints.map(p=>[p.lat,p.lon]),{padding:[70,70],maxZoom:15});
   revealEl.innerHTML="<div class='finish-message'><div class='finish-kicker'>GRA ZALICZONA</div><h2>"+moves+" "+(moves===1?"ruch":"ruchów")+"</h2><p>W tylu ruchach udało Ci się wykonać wszystkie misje i dotrzeć do mety.</p><button id='restart' class='summary-restart'>NOWA GRA</button></div>";
   revealEl.classList.remove("hidden");
+  revealEl.style.zIndex="1400";
   document.getElementById("restart").onclick=()=>location.reload();
 }
 function updateTagCloud(){
