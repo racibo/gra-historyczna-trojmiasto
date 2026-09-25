@@ -68,3 +68,7 @@ html,body,#map{height:100%;margin:0}body{font-family:system-ui,sans-serif;overfl
 .rules li{font-size:12px;line-height:1.4;margin:6px 0}
 .year-tag.mission-tag{background:rgba(46,125,50,.78);color:#fff;border-color:rgba(255,255,255,.9);text-shadow:0 1px 2px rgba(0,0,0,.35)}
 .year-tag.mission-tag:hover{background:rgba(46,125,50,.92)}
+
+/* Meta panel: pojedyncze okno zamiast białego panelu reveal + zagnieżdżonego panelu. */
+.finish-reveal{background:transparent!important;padding:0!important;box-shadow:none!important;width:auto!important;color:inherit!important}
+.finish-reveal .finish-message{box-sizing:border-box}
