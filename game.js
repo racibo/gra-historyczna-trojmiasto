@@ -1,5 +1,5 @@
 const DATA_URL="./data/mapa-db.kml";let map,points=[],current=null,target=null,visited=new Set(),moves=0,choiceLocked=false,candidateMarkers=[],currentMarker,startMarker,targetMarker,routeLine=null,routePoints=[];const missionEl=document.getElementById("mission"),tasksEl=document.getElementById("tasks"),progressEl=document.getElementById("progress"),movesEl=document.getElementById("moves"),choiceEl=document.getElementById("choice"),revealEl=document.getElementById("reveal"),statusEl=document.getElementById("status");let activeTasks=[],completed=new Set(),missionHits=new Map(),gameDistance=0,settings={count:4,age:true,periods:true,architects:true,distanceRange:"0-3",startCity:"random"},pathGraph=null;
-function parseKml(txt){const xml=new DOMParser().parseFromString(txt,"text/xml");return [...xml.querySelectorAll("Placemark")].map((p,i)=>{const name=p.querySelector("name")?.textContent?.trim()||"Obiekt",desc=p.querySelector("description")?.textContent||"",c=p.querySelector("coordinates")?.textContent?.trim()?.split(",")||[],lon=parseFloat(c[0]),lat=parseFloat(c[1]);if(!Number.isFinite(lat)||!Number.isFinite(lon))return null;const clean=desc.replace(/<[^>]*>/g," ").replace(/&nbsp;/g," ").replace(/\s+/g," ").trim(),date=(clean.match(/Data wybudowania:\s*([0-9]{3,4}(?:-[0-9]{2,4})?)/i)||[])[1]||"",architect=(clean.match(/Architekt:\s*([^<]+)/i)||[])[1]?.trim()||"";return{id:i,name,lat,lon,raw:clean,date,architect}}).filter(Boolean).filter(p=>p.lat>53.9&&p.lat<54.7&&p.lon>18.2&&p.lon<19.1)}
+function parseKml(txt){const xml=new DOMParser().parseFromString(txt,"text/xml");return [...xml.querySelectorAll("Placemark")].map((p,i)=>{const name=p.querySelector("name")?.textContent?.trim()||"Obiekt",desc=p.querySelector("description")?.textContent||"",c=p.querySelector("coordinates")?.textContent?.trim()?.split(",")||[],lon=parseFloat(c[0]),lat=parseFloat(c[1]);if(!Number.isFinite(lat)||!Number.isFinite(lon))return null;const clean=desc.replace(/<[^>]*>/g," ").replace(/&nbsp;/g," ").replace(/\s+/g," ").trim(),date=(clean.match(/Data wybudowania:\s*([0-9]{3,4}(?:-[0-9]{2,4})?)/i)||[])[1]||"",architect=(clean.match(/Architekt:\s*([^<]+)/i)||[])[1]?.trim()||"";const notes=(clean.match(/Uwagi:\s*([^<]+)/i)||[])[1]?.trim()||"";return{id:i,name,lat,lon,raw:clean,date,architect,notes}}).filter(Boolean).filter(p=>p.lat>53.9&&p.lat<54.7&&p.lon>18.2&&p.lon<19.1)}
 function year(p){const m=p.date.match(/(1[0-9]{3}|20[0-9]{2})/);return m?+m[1]:null}function distance(a,b){const R=6371000,dLat=(b.lat-a.lat)*Math.PI/180,dLon=(b.lon-a.lon)*Math.PI/180,x=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(x))}function bearing(a,b){const y=Math.sin((b.lon-a.lon)*Math.PI/180)*Math.cos(b.lat*Math.PI/180),x=Math.cos(a.lat*Math.PI/180)*Math.sin(b.lat*Math.PI/180)-Math.sin(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.cos((b.lon-a.lon)*Math.PI/180);return(Math.atan2(y,x)*180/Math.PI+360)%360}function dirAngle(d){return{up:0,right:90,down:180,left:270}[d]}function angleDiff(a,b){return Math.abs((a-b+180)%360-180)}function icon(cls){return L.divIcon({className:cls,iconSize:[28,28],iconAnchor:[14,14]})}
 function setCurrent(p,showHere=true){if(currentMarker)map.removeLayer(currentMarker);currentMarker=L.marker([p.lat,p.lon],{icon:icon("current-marker"),zIndexOffset:1000}).addTo(map);if(showHere)currentMarker.bindTooltip("TU JESTEŚ",{permanent:true,direction:"top",className:"current-label"});map.panTo([p.lat,p.lon],{animate:true,duration:.5})}
 function updateRoute(){if(routeLine)map.removeLayer(routeLine);routeLine=L.polyline(routePoints.map(p=>[p.lat,p.lon]),{color:"#f5a623",weight:4,opacity:.9,dashArray:"9 8",lineCap:"round"}).addTo(map)}
@@ -124,8 +124,20 @@ function showCandidates(dir){
 function loadSettings(){try{const x=JSON.parse(localStorage.getItem("trojmiastoGameSettings")||"null");if(x)settings={...settings,...x}}catch(e){}}
 function saveSettings(){const oldRange=settings.distanceRange,oldCity=settings.startCity;settings.count=+document.getElementById("missionCount").value;settings.age=document.getElementById("catAge").checked;settings.periods=document.getElementById("catPeriods").checked;settings.architects=document.getElementById("catArchitects").checked;settings.distanceRange=document.getElementById("distanceRange").value;settings.startCity=document.getElementById("startCity").value;localStorage.setItem("trojmiastoGameSettings",JSON.stringify(settings));return oldRange!==settings.distanceRange||oldCity!==settings.startCity}
 function openSettings(){document.getElementById("missionCount").value=settings.count;document.getElementById("catAge").checked=settings.age;document.getElementById("catPeriods").checked=settings.periods;document.getElementById("catArchitects").checked=settings.architects;document.getElementById("distanceRange").value=settings.distanceRange||"0-3";document.getElementById("startCity").value=settings.startCity||"random";document.getElementById("settings").classList.remove("hidden")}
+function missionPoints(){
+  if(!current||!target)return points;
+  return points.filter(p=>distance(p,current)<=5000&&distance(p,target)<=5000);
+}
+function personNames(p){
+  const text=String(p.architect||"")+" "+String(p.notes||"");
+  return [...new Set(text.match(/\b[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż-]{2,}\s+[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż-]{2,}\b/g)||[])];
+}
+function personMatch(p,name){
+  const text=String(p.architect||"")+" "+String(p.notes||"");
+  return text.toLowerCase().includes(name.toLowerCase());
+}
 function taskForGame(){
-  const all=points.filter(p=>p.date),pool=[];
+  const all=missionPoints().filter(p=>p.date),pool=[];
   if(settings.age)pool.push(
     {type:"19",category:"age",text:"Odwiedź obiekt z XIX wieku",test:p=>{const y=year(p);return y>=1800&&y<=1899}},
     {type:"20",category:"age",text:"Odwiedź obiekt z XX wieku",test:p=>{const y=year(p);return y>=1900&&y<=1999}},
@@ -139,8 +151,8 @@ function taskForGame(){
     {type:"2000+",category:"periods",text:"Odwiedź obiekt wybudowany po 2000 roku",test:p=>{const y=year(p);return y>=2001&&y<=2099}}
   );
   if(settings.architects){
-    const architectNames=[...new Set(all.map(p=>String(p.architect||"").match(/\b[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż-]{2,}\s+[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż-]{2,}\b/)?.[0]).filter(Boolean))];
-    architectNames.forEach(name=>pool.push({type:"arch:"+name,category:"people",text:"Odwiedź miejsce związane z osobą: "+name,test:p=>String(p.architect||"").includes(name)}));
+    const people=[...new Set(all.flatMap(personNames))];
+    people.forEach(name=>pool.push({type:"person:"+name,category:"people",text:"Odwiedź miejsce związane z osobą: "+name,test:p=>personMatch(p,name)}));
   }
   const usable=pool.filter(t=>all.some(t.test));
   for(let i=usable.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[usable[i],usable[j]]=[usable[j],usable[i]]}
