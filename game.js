@@ -93,12 +93,31 @@ function chooseStartAndTarget(){
   }
   return null;
 }
+function clearSearchZone(){if(searchZone){map.removeLayer(searchZone);searchZone=null}}
+function drawSearchZone(dir,radius,count){
+  clearSearchZone();
+  const center=[current.lat,current.lon],start=dirAngle(dir)-45,stop=dirAngle(dir)+45,steps=36;
+  const latStep=radius/6371000*180/Math.PI;
+  const lonScale=1/Math.cos(current.lat*Math.PI/180);
+  const pts=[center];
+  for(let i=0;i<=steps;i++){
+    const a=(start+(stop-start)*i/steps)*Math.PI/180;
+    pts.push([
+      current.lat+latStep*Math.cos(a),
+      current.lon+latStep*lonScale*Math.sin(a)
+    ]);
+  }
+  pts.push(center);
+  searchZone=L.polygon(pts,{color:"#1565c0",weight:2,opacity:.9,fillColor:"#42a5f5",fillOpacity:.14,dashArray:"7 6",interactive:true}).addTo(map);
+  searchZone.bindTooltip("Strefa wyszukiwania: ±45° • promień "+(radius/1000)+" km<br>Znaleziono: "+count+" punktów",{sticky:true,direction:"top"});
+  searchZone.on("click",()=>searchZone.openTooltip());
+}
 function showCandidates(dir){
   if(choiceLocked)return;
   statusEl.textContent="";
   candidateMarkers.forEach(m=>map.removeLayer(m));
   candidateMarkers=[];
-  if(searchZone){map.removeLayer(searchZone);searchZone=null}
+  clearSearchZone()
   let c=directionCandidates(current,visited,dir);
   const searchRadius=c.searchRadius||10000;
   // Meta nie może być dostępna w pierwszym ruchu. Od drugiego ruchu
@@ -135,23 +154,9 @@ function showCandidates(dir){
   }
   const selectedInfo="Znaleziono "+c.length+" punktów w sektorze ±45° do "+(searchRadius/1000)+" km. Wybrano 2: możliwie blisko Ciebie, z preferencją odległości około 300 m między nimi"+(c.length>4?" i zróżnicowania dat budowy":"")+".";
   statusEl.textContent=selectedInfo;
-  searchZone=L.semiCircle([current.lat,current.lon],{
-    radius:searchRadius,
-    startAngle:dirAngle(dir)-45,
-    stopAngle:dirAngle(dir)+45,
-    color:"#1565c0",
-    weight:2,
-    opacity:.9,
-    fillColor:"#42a5f5",
-    fillOpacity:.14,
-    dashArray:"7 6",
-    interactive:true
-  }).addTo(map);
-  searchZone.bindTooltip("Strefa wyszukiwania: ±45° • promień "+(searchRadius/1000)+" km<br>Znaleziono: "+c.length+" punktów",{
-    sticky:true,
-    direction:"top"
-  });
-  searchZone.on("click",()=>searchZone.openTooltip());
+  drawSearchZone(dir,searchRadius,c.length);
+  statusEl.style.cursor="pointer";
+  statusEl.title="Kliknij, aby pokazać/ukryć strefę wyszukiwania";
   choiceLocked=true;
   chosen.forEach((p,i)=>{
     const m=L.marker([p.lat,p.lon],{icon:icon(i?"candidate-b":"candidate-a")}).addTo(map);
@@ -232,7 +237,7 @@ function reveal(p){
   hits.forEach(h=>completed.add(h.type));
   updateTagCloud();
 }
-function choose(p){choiceEl.classList.add("hidden");candidateMarkers.forEach(m=>map.removeLayer(m));candidateMarkers=[];if(searchZone){map.removeLayer(searchZone);searchZone=null}current=p;visited.add(p.id);moves++;movesEl.textContent="Ruchy: "+moves;routePoints.push(p);updateRoute();setCurrent(p);reveal(p)}
+function choose(p){choiceEl.classList.add("hidden");candidateMarkers.forEach(m=>map.removeLayer(m));candidateMarkers=[];clearSearchZone();statusEl.style.cursor="";statusEl.title="";current=p;visited.add(p.id);moves++;movesEl.textContent="Ruchy: "+moves;routePoints.push(p);updateRoute();setCurrent(p);reveal(p)}
 function finish(){
   document.querySelectorAll(".summary-overlay,.summary-card").forEach(el=>el.remove());
   choiceEl.classList.add("hidden");
@@ -282,4 +287,4 @@ function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",
 async function start(){if(choiceLocked)return;const startBtn=document.getElementById("startBtn");startBtn.disabled=true;startBtn.textContent="LOSOWANIE TRASY…";statusEl.textContent="Trwa przygotowanie gry i wyszukiwanie możliwej trasy…";await new Promise(r=>setTimeout(r,40));document.getElementById("start").classList.add("hidden");moves=0;visited=new Set();visitedHistory=[];completed=new Set();missionHits=new Map();const audited=chooseStartAndTarget();
   if(!audited){statusEl.textContent="Nie udało się znaleźć gry dla wybranych ustawień. Wybierz inny zakres odległości lub miejsce startu.";document.getElementById("start").classList.remove("hidden");startBtn.disabled=false;startBtn.textContent="ROZPOCZNIJ GRĘ";return}
   current=audited.start;gameStart=audited.start;target=audited.target;gameDistance=distance(current,target);activeTasks=taskForGame();routePoints=[current];updateRoute();missionEl.innerHTML="<b>META:</b> "+esc(target.name);updateProgress();if(startMarker)map.removeLayer(startMarker);startMarker=L.marker([current.lat,current.lon],{icon:icon("start-marker"),zIndexOffset:1100}).addTo(map);setCurrent(current,true);if(targetMarker)map.removeLayer(targetMarker);targetMarker=L.marker([target.lat,target.lon],{icon:icon("target-marker")}).addTo(map).bindTooltip("META: "+esc(target.name),{permanent:true,direction:"top",className:"target-label"});statusEl.textContent="Wybierz kierunek strzałką.";startBtn.disabled=false;startBtn.textContent="ROZPOCZNIJ GRĘ"}
-async function init(){map=L.map("map",{zoomControl:false}).setView([54.38,18.62],12);L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap"}).addTo(map);try{const r=await fetch(DATA_URL);points=parseKml(await r.text());if(points.length<20)throw Error("Za mało punktów");statusEl.textContent="Załadowano "+points.length+" punktów historycznych."}catch(e){statusEl.textContent="Błąd danych: "+e.message}}loadSettings();document.getElementById("startBtn").onclick=start;document.getElementById("settingsBtn").onclick=openSettings;const tagToggle=document.getElementById("tagToggle"),tagCloud=document.getElementById("tagCloud");if(tagToggle&&tagCloud)tagToggle.onclick=()=>tagCloud.classList.toggle("closed");updateTagCloud();document.getElementById("saveSettings").onclick=async()=>{const btn=document.getElementById("saveSettings");btn.disabled=true;btn.textContent="ZAPISYWANIE…";statusEl.textContent="Trwa zapisywanie ustawień…";await new Promise(r=>setTimeout(r,350));const distanceChanged=saveSettings();document.getElementById("settings").classList.add("hidden");btn.disabled=false;btn.textContent="ZAPISZ";if(document.getElementById("start").classList.contains("hidden")){if(distanceChanged)await start();else{activeTasks=taskForGame();updateProgress();statusEl.textContent="Ustawienia zapisane."}}else statusEl.textContent="Ustawienia zapisane.";};document.querySelectorAll("[data-dir]").forEach(b=>b.onclick=()=>showCandidates(b.dataset.dir));document.addEventListener("keydown",e=>{const d={ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right"}[e.key];if(d){e.preventDefault();showCandidates(d)}});init();
+async function init(){map=L.map("map",{zoomControl:false}).setView([54.38,18.62],12);L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap"}).addTo(map);try{const r=await fetch(DATA_URL);points=parseKml(await r.text());if(points.length<20)throw Error("Za mało punktów");statusEl.textContent="Załadowano "+points.length+" punktów historycznych."}catch(e){statusEl.textContent="Błąd danych: "+e.message}}loadSettings();L.control.scale({imperial:false,metric:true,position:"bottomleft"}).addTo(map);document.getElementById("startBtn").onclick=start;document.getElementById("settingsBtn").onclick=openSettings;const tagToggle=document.getElementById("tagToggle"),tagCloud=document.getElementById("tagCloud");if(tagToggle&&tagCloud)tagToggle.onclick=()=>tagCloud.classList.toggle("closed");updateTagCloud();statusEl.addEventListener("click",()=>{if(!searchZone)return;searchZone.setStyle({fillOpacity:searchZone.options.fillOpacity>0?0:.14,opacity:searchZone.options.opacity>0?0:.9})});document.getElementById("saveSettings").onclick=async()=>{const btn=document.getElementById("saveSettings");btn.disabled=true;btn.textContent="ZAPISYWANIE…";statusEl.textContent="Trwa zapisywanie ustawień…";await new Promise(r=>setTimeout(r,350));const distanceChanged=saveSettings();document.getElementById("settings").classList.add("hidden");btn.disabled=false;btn.textContent="ZAPISZ";if(document.getElementById("start").classList.contains("hidden")){if(distanceChanged)await start();else{activeTasks=taskForGame();updateProgress();statusEl.textContent="Ustawienia zapisane."}}else statusEl.textContent="Ustawienia zapisane.";};document.querySelectorAll("[data-dir]").forEach(b=>b.onclick=()=>showCandidates(b.dataset.dir));document.addEventListener("keydown",e=>{const d={ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right"}[e.key];if(d){e.preventDefault();showCandidates(d)}});init();
