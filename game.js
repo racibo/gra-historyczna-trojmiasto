@@ -137,48 +137,18 @@ function showCandidates(dir){
   statusEl.textContent="";
   candidateMarkers.forEach(m=>map.removeLayer(m));
   candidateMarkers=[];
-  clearSearchZone()
   let c=directionCandidates(current,visited,dir);
-  const searchRadius=c.searchRadius||10000;
-  const missionsDone=completed.size===activeTasks.length;
-  if(!missionsDone)c=c.filter(p=>p.id!==target.id);
-  // Meta nie może być dostępna w pierwszym ruchu. Od drugiego ruchu
-  // jest specjalnym punktem: można do niej wrócić nawet po wcześniejszym odwiedzeniu.
-  if(moves===0)c=c.filter(p=>p.id!==target.id);
-  const foundBeforeGoal=c.length;
   const GOAL_UNLOCK=800;
   const goalDistance=distance(current,target),goalBearing=bearing(current,target),goalDiff=angleDiff(goalBearing,dirAngle(dir));
-  if(missionsDone&&goalDistance<=GOAL_UNLOCK&&goalDiff<=45&&!c.some(p=>p.id===target.id))
+  if(goalDistance<=GOAL_UNLOCK&&goalDiff<=45&&!visited.has(target.id)&&!c.some(p=>p.id===target.id))
     c.push({...target,d:goalDistance,bd:goalBearing,ad:goalDiff,isTarget:true});
-
-  const missionTargets=c.filter(p=>activeTasks.some(t=>!completed.has(t.type)&&t.test(p)));
-  let chosen=chooseBestPair(c);
-  if(missionTargets.length){
-    const forced=missionTargets.sort((a,b)=>a.d-b.d)[0];
-    if(!chosen.some(p=>p.id===forced.id)){
-      const companion=c.filter(p=>p.id!==forced.id).sort((a,b)=>{
-        const da=Math.abs(distance(forced,a)-300),db=Math.abs(distance(forced,b)-300);
-        return (da+ a.d*0.15)-(db+b.d*0.15);
-      })[0];
-      if(companion)chosen=[forced,companion];
-    }
-  }
+  const chosen=chooseBestPair(c);
   if(chosen.length<2){
-    let msg;
-    if(foundBeforeGoal===0){
-      msg="W tym kierunku znaleziono 0 punktów w sektorze ±45° nawet w promieniu "+(searchRadius/1000)+" km. Wybierz inną strzałkę.";
-    }else{
-      msg="W tym kierunku znaleziono tylko "+foundBeforeGoal+" dostępny punkt w promieniu "+(searchRadius/1000)+" km i sektorze ±45°. Do wyboru potrzebne są 2.";
-    }
+    const msg="W tym kierunku nie ma dwóch dostępnych punktów — wybierz inną strzałkę.";
     statusEl.textContent=msg;
-    setTimeout(()=>{if(!choiceLocked&&statusEl.textContent===msg)statusEl.textContent="Wybierz inny kierunek."},5000);
+    setTimeout(()=>{if(!choiceLocked&&statusEl.textContent===msg)statusEl.textContent="Wybierz inny kierunek."},3000);
     return;
   }
-  const selectedInfo="Znaleziono "+c.length+" punktów w sektorze ±45° do "+(searchRadius/1000)+" km. Wybrano 2: możliwie blisko Ciebie, z preferencją odległości około 300 m między nimi"+(c.length>4?" i zróżnicowania dat budowy":"")+".";
-  statusEl.textContent=selectedInfo;
-  drawSearchZone(dir,searchRadius,c.length);
-  statusEl.style.cursor="pointer";
-  statusEl.title="Kliknij, aby pokazać/ukryć strefę wyszukiwania";
   choiceLocked=true;
   chosen.forEach((p,i)=>{
     const m=L.marker([p.lat,p.lon],{icon:icon(i?"candidate-b":"candidate-a")}).addTo(map);
@@ -186,7 +156,7 @@ function showCandidates(dir){
     m.on("click",()=>choose(p));
     const btn=document.getElementById(i?"choiceB":"choiceA");
     btn.className=i?"choice-b":"choice-a";
-    btn.innerHTML="<span class=\"letter\">"+(i?"B":"A")+"</span> "+(p.isTarget?"META":"okolice "+esc(placeLabel(p)));
+    btn.innerHTML="<span class=\\"letter\\">"+(i?"B":"A")+"</span> "+(p.isTarget?"META":"okolice "+esc(placeLabel(p)));
   });
   choiceEl.classList.remove("hidden");
   document.getElementById("choiceA").onclick=()=>choose(chosen[0]);
