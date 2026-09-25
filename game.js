@@ -287,7 +287,8 @@ function finish(){
   candidateMarkers.forEach(m=>map.removeLayer(m));
   candidateMarkers=[];
   if(routePoints.length>1)map.fitBounds(routePoints.map(p=>[p.lat,p.lon]),{padding:[70,70],maxZoom:15});
-  const distanceKm=gameDistance/1000;
+  const travelledDistance=routePoints.reduce((sum,p,i)=>i?sum+distance(routePoints[i-1],p):0,0);
+  const distanceKm=travelledDistance/1000;
   const missionMoves=Math.max(0,moves-1);
   revealEl.innerHTML="<div class='finish-message'><div class='finish-kicker'>GRA ZALICZONA</div><h2>"+moves+" "+(moves===1?"ruch":"ruchów")+"</h2><p>W "+missionMoves+" "+(missionMoves===1?"ruchu":"ruchach")+" zaliczyłeś wszystkie misje. Łączny dystans od startu do mety: <b>"+distanceKm.toFixed(1)+" km</b>.</p><div class='finish-actions'><button id='hideSummary' class='summary-hide'>UKRYJ PODSUMOWANIE</button><button id='restart' class='summary-restart'>NOWA GRA</button></div></div>";
   revealEl.className="reveal finish-reveal";
