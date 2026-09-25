@@ -38,7 +38,7 @@ function directionCandidates(from,seen,dir){
 }
 function moveCandidates(from,seen){
   const result=[];
-  for(const dir of ["up","right","down","left"])result.push(...chooseBestPair(directionCandidates(from,seen,dir)));
+  for(const dir of ["up","right","down","left"]){const pair=chooseBestPair(directionCandidates(from,seen,dir));if(pair.length===2)result.push(...pair)}
   return [...new Map(result.map(p=>[p.id,p])).values()];
 }
 function auditPath(start,maxDepth=10){
