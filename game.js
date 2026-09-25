@@ -223,6 +223,7 @@ function updateTagCloud(){
   const cloud=document.getElementById("tagCloud");if(!cloud)return;
   cloud.querySelector(".tag-list").innerHTML=years.map(y=>"<button class=\"year-tag\" data-year=\""+y+"\">"+y+"</button>").join("")||"<div class=\"tag-empty\">Odwiedzone daty pojawią się tutaj.</div>";
   cloud.querySelectorAll(".year-tag").forEach(btn=>btn.onclick=()=>showYearObject(+btn.dataset.year));
+  if(years.length)cloud.classList.remove("closed");
 }
 function showYearObject(y){
   const matches=visitedHistory.filter(p=>year(p)===y);
