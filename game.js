@@ -1,4 +1,4 @@
-const DATA_URL="./data/mapa-db.kml";let map,points=[],current=null,gameStart=null,target=null,visited=new Set(),moves=0,choiceLocked=false,candidateMarkers=[],currentMarker,startMarker,targetMarker,routeLine=null,routePoints=[],visitedHistory=[];const missionEl=document.getElementById("mission"),tasksEl=document.getElementById("tasks"),progressEl=document.getElementById("progress"),movesEl=document.getElementById("moves"),choiceEl=document.getElementById("choice"),revealEl=document.getElementById("reveal"),statusEl=document.getElementById("status");let activeTasks=[],completed=new Set(),missionHits=new Map(),gameDistance=0,settings={count:4,age:true,periods:true,architects:true,distanceRange:"0-3",startCity:"random"},pathGraph=null;
+const DATA_URL="./data/mapa-db.kml";let map,points=[],current=null,gameStart=null,target=null,visited=new Set(),moves=0,choiceLocked=false,candidateMarkers=[],currentMarker,startMarker,targetMarker,routeLine=null,routePoints=[],visitedHistory=[];const missionEl=document.getElementById("mission"),tasksEl=document.getElementById("tasks"),progressEl=document.getElementById("progress"),movesEl=document.getElementById("moves"),choiceEl=document.getElementById("choice"),revealEl=document.getElementById("reveal"),statusEl=document.getElementById("status");let activeTasks=[],completed=new Set(),missionHits=new Map(),gameDistance=0,searchZone=null,settings={count:4,age:true,periods:true,architects:true,distanceRange:"0-3",startCity:"random"},pathGraph=null;
 function parseKml(txt){const xml=new DOMParser().parseFromString(txt,"text/xml");return [...xml.querySelectorAll("Placemark")].map((p,i)=>{const name=p.querySelector("name")?.textContent?.trim()||"Obiekt",desc=p.querySelector("description")?.textContent||"",c=p.querySelector("coordinates")?.textContent?.trim()?.split(",")||[],lon=parseFloat(c[0]),lat=parseFloat(c[1]);if(!Number.isFinite(lat)||!Number.isFinite(lon))return null;const clean=desc.replace(/<[^>]*>/g," ").replace(/&nbsp;/g," ").replace(/\s+/g," ").trim(),date=(clean.match(/Data wybudowania:\s*([0-9]{3,4}(?:-[0-9]{2,4})?)/i)||[])[1]||"",architect=(clean.match(/Architekt:\s*([^<]+)/i)||[])[1]?.trim()||"";const notes=(clean.match(/Uwagi:\s*([^<]+)/i)||[])[1]?.trim()||"";return{id:i,name,lat,lon,raw:clean,date,architect,notes}}).filter(Boolean).filter(p=>p.lat>53.9&&p.lat<54.7&&p.lon>18.2&&p.lon<19.1)}
 function year(p){const m=p.date.match(/(1[0-9]{3}|20[0-9]{2})/);return m?+m[1]:null}function distance(a,b){const R=6371000,dLat=(b.lat-a.lat)*Math.PI/180,dLon=(b.lon-a.lon)*Math.PI/180,x=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(x))}function bearing(a,b){const y=Math.sin((b.lon-a.lon)*Math.PI/180)*Math.cos(b.lat*Math.PI/180),x=Math.cos(a.lat*Math.PI/180)*Math.sin(b.lat*Math.PI/180)-Math.sin(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.cos((b.lon-a.lon)*Math.PI/180);return(Math.atan2(y,x)*180/Math.PI+360)%360}function dirAngle(d){return{up:0,right:90,down:180,left:270}[d]}function angleDiff(a,b){return Math.abs((a-b+180)%360-180)}function icon(cls){return L.divIcon({className:cls,iconSize:[28,28],iconAnchor:[14,14]})}
 function setCurrent(p,showHere=true){if(currentMarker)map.removeLayer(currentMarker);currentMarker=L.marker([p.lat,p.lon],{icon:icon("current-marker"),zIndexOffset:1000}).addTo(map);if(showHere)currentMarker.bindTooltip("TU JESTEŚ",{permanent:true,direction:"top",className:"current-label"});map.panTo([p.lat,p.lon],{animate:true,duration:.5})}
@@ -98,6 +98,7 @@ function showCandidates(dir){
   statusEl.textContent="";
   candidateMarkers.forEach(m=>map.removeLayer(m));
   candidateMarkers=[];
+  if(searchZone){map.removeLayer(searchZone);searchZone=null}
   let c=directionCandidates(current,visited,dir);
   const searchRadius=c.searchRadius||10000;
   // Meta nie może być dostępna w pierwszym ruchu. Od drugiego ruchu
@@ -134,6 +135,23 @@ function showCandidates(dir){
   }
   const selectedInfo="Znaleziono "+c.length+" punktów w sektorze ±45° do "+(searchRadius/1000)+" km. Wybrano 2: możliwie blisko Ciebie, z preferencją odległości około 300 m między nimi"+(c.length>4?" i zróżnicowania dat budowy":"")+".";
   statusEl.textContent=selectedInfo;
+  searchZone=L.semiCircle([current.lat,current.lon],{
+    radius:searchRadius,
+    startAngle:dirAngle(dir)-45,
+    stopAngle:dirAngle(dir)+45,
+    color:"#1565c0",
+    weight:2,
+    opacity:.9,
+    fillColor:"#42a5f5",
+    fillOpacity:.14,
+    dashArray:"7 6",
+    interactive:true
+  }).addTo(map);
+  searchZone.bindTooltip("Strefa wyszukiwania: ±45° • promień "+(searchRadius/1000)+" km<br>Znaleziono: "+c.length+" punktów",{
+    sticky:true,
+    direction:"top"
+  });
+  searchZone.on("click",()=>searchZone.openTooltip());
   choiceLocked=true;
   chosen.forEach((p,i)=>{
     const m=L.marker([p.lat,p.lon],{icon:icon(i?"candidate-b":"candidate-a")}).addTo(map);
@@ -214,7 +232,7 @@ function reveal(p){
   hits.forEach(h=>completed.add(h.type));
   updateTagCloud();
 }
-function choose(p){choiceEl.classList.add("hidden");candidateMarkers.forEach(m=>map.removeLayer(m));candidateMarkers=[];current=p;visited.add(p.id);moves++;movesEl.textContent="Ruchy: "+moves;routePoints.push(p);updateRoute();setCurrent(p);reveal(p)}
+function choose(p){choiceEl.classList.add("hidden");candidateMarkers.forEach(m=>map.removeLayer(m));candidateMarkers=[];if(searchZone){map.removeLayer(searchZone);searchZone=null}current=p;visited.add(p.id);moves++;movesEl.textContent="Ruchy: "+moves;routePoints.push(p);updateRoute();setCurrent(p);reveal(p)}
 function finish(){
   document.querySelectorAll(".summary-overlay,.summary-card").forEach(el=>el.remove());
   choiceEl.classList.add("hidden");
