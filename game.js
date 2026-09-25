@@ -240,6 +240,7 @@ function reveal(p){
 function choose(p){choiceEl.classList.add("hidden");candidateMarkers.forEach(m=>map.removeLayer(m));candidateMarkers=[];clearSearchZone();statusEl.style.cursor="";statusEl.title="";current=p;visited.add(p.id);moves++;movesEl.textContent="Ruchy: "+moves;routePoints.push(p);updateRoute();setCurrent(p);reveal(p)}
 function finish(){
   document.querySelectorAll(".summary-overlay,.summary-card").forEach(el=>el.remove());
+  document.querySelectorAll(".summary-overlay,.summary-card").forEach(el=>{el.removeAttribute("style");});
   choiceEl.classList.add("hidden");
   candidateMarkers.forEach(m=>map.removeLayer(m));
   candidateMarkers=[];
@@ -247,6 +248,8 @@ function finish(){
   revealEl.innerHTML="<div class='finish-message'><div class='finish-kicker'>GRA ZALICZONA</div><h2>"+moves+" "+(moves===1?"ruch":"ruchów")+"</h2><p>W tylu ruchach udało Ci się wykonać wszystkie misje i dotrzeć do mety.</p><button id='restart' class='summary-restart'>NOWA GRA</button></div>";
   revealEl.classList.remove("hidden");
   revealEl.style.zIndex="1400";
+  revealEl.style.bottom="auto";
+  revealEl.style.top="50%";
   document.getElementById("restart").onclick=()=>location.reload();
 }
 function updateTagCloud(){
