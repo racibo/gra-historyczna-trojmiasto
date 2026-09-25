@@ -253,12 +253,12 @@ function finish(){
   candidateMarkers.forEach(m=>map.removeLayer(m));
   candidateMarkers=[];
   if(routePoints.length>1)map.fitBounds(routePoints.map(p=>[p.lat,p.lon]),{padding:[70,70],maxZoom:15});
-  revealEl.innerHTML="<div class='finish-message'><div class='finish-kicker'>GRA ZALICZONA</div><h2>"+moves+" "+(moves===1?"ruch":"ruchów")+"</h2><p>W tylu ruchach udało Ci się wykonać wszystkie misje i dotrzeć do mety.</p><button id='restart' class='summary-restart'>NOWA GRA</button></div>";
+  revealEl.innerHTML="<div class='finish-message'><div class='finish-kicker'>GRA ZALICZONA</div><h2>"+moves+" "+(moves===1?"ruch":"ruchów")+"</h2><p>W tylu ruchach udało Ci się wykonać wszystkie misje i dotrzeć do mety.</p><div class='finish-actions'><button id='hideSummary' class='summary-hide'>UKRYJ PODSUMOWANIE</button><button id='restart' class='summary-restart'>NOWA GRA</button></div></div>";
   revealEl.className="reveal finish-reveal";
   revealEl.style.zIndex="1400";
   revealEl.style.bottom="auto";
   revealEl.style.top="50%";
-  document.getElementById("restart").onclick=()=>location.reload();
+  document.getElementById("hideSummary").onclick=()=>{revealEl.classList.add("hidden");revealEl.classList.remove("finish-reveal");revealEl.style.zIndex="";revealEl.style.top="";revealEl.style.bottom="";};document.getElementById("restart").onclick=()=>location.reload();
 }
 function updateTagCloud(){
   const years=[...new Set(visitedHistory.map(p=>year(p)).filter(y=>y!==null))].sort((a,b)=>b-a);
