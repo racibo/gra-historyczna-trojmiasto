@@ -109,6 +109,23 @@ function chooseStartAndTarget(){
   return null;
 }
 function clearSearchZone(){if(searchZone){map.removeLayer(searchZone);searchZone=null}}
+function drawSearchZone(dir,radius,count){
+  clearSearchZone();
+  const center=[current.lat,current.lon],start=dirAngle(dir)-45,stop=dirAngle(dir)+45,steps=36;
+  const latStep=radius/6371000*180/Math.PI;
+  const lonScale=1/Math.cos(current.lat*Math.PI/180);
+  const pts=[center];
+  for(let i=0;i<=steps;i++){
+    const a=(start+(stop-start)*i/steps)*Math.PI/180;
+    pts.push([
+      current.lat+latStep*Math.cos(a),
+      current.lon+latStep*lonScale*Math.sin(a)
+    ]);
+  }
+  pts.push(center);
+  searchZone=L.polygon(pts,{color:"#1565c0",weight:2,opacity:.9,fillColor:"#42a5f5",fillOpacity:.14,dashArray:"7 6",interactive:true}).addTo(map);
+
+}
 function revealTarget(){
   if(!target||targetMarker)return;
   targetMarker=L.marker([target.lat,target.lon],{icon:icon("target-marker")}).addTo(map).bindTooltip("META: "+esc(target.name),{permanent:true,direction:"top",className:"target-label"});
