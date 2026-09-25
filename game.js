@@ -1,4 +1,4 @@
-const DATA_URL="./data/mapa-db.kml";let map,points=[],current=null,target=null,visited=new Set(),moves=0,choiceLocked=false,candidateMarkers=[],currentMarker,startMarker,targetMarker,routeLine=null,routePoints=[];const missionEl=document.getElementById("mission"),tasksEl=document.getElementById("tasks"),progressEl=document.getElementById("progress"),movesEl=document.getElementById("moves"),choiceEl=document.getElementById("choice"),revealEl=document.getElementById("reveal"),statusEl=document.getElementById("status");let activeTasks=[],completed=new Set(),missionHits=new Map(),gameDistance=0,settings={count:4,age:true,periods:true,architects:true,distanceRange:"0-3",startCity:"random"},pathGraph=null;
+const DATA_URL="./data/mapa-db.kml";let map,points=[],current=null,gameStart=null,target=null,visited=new Set(),moves=0,choiceLocked=false,candidateMarkers=[],currentMarker,startMarker,targetMarker,routeLine=null,routePoints=[],visitedHistory=[];const missionEl=document.getElementById("mission"),tasksEl=document.getElementById("tasks"),progressEl=document.getElementById("progress"),movesEl=document.getElementById("moves"),choiceEl=document.getElementById("choice"),revealEl=document.getElementById("reveal"),statusEl=document.getElementById("status");let activeTasks=[],completed=new Set(),missionHits=new Map(),gameDistance=0,settings={count:4,age:true,periods:true,architects:true,distanceRange:"0-3",startCity:"random"},pathGraph=null;
 function parseKml(txt){const xml=new DOMParser().parseFromString(txt,"text/xml");return [...xml.querySelectorAll("Placemark")].map((p,i)=>{const name=p.querySelector("name")?.textContent?.trim()||"Obiekt",desc=p.querySelector("description")?.textContent||"",c=p.querySelector("coordinates")?.textContent?.trim()?.split(",")||[],lon=parseFloat(c[0]),lat=parseFloat(c[1]);if(!Number.isFinite(lat)||!Number.isFinite(lon))return null;const clean=desc.replace(/<[^>]*>/g," ").replace(/&nbsp;/g," ").replace(/\s+/g," ").trim(),date=(clean.match(/Data wybudowania:\s*([0-9]{3,4}(?:-[0-9]{2,4})?)/i)||[])[1]||"",architect=(clean.match(/Architekt:\s*([^<]+)/i)||[])[1]?.trim()||"";const notes=(clean.match(/Uwagi:\s*([^<]+)/i)||[])[1]?.trim()||"";return{id:i,name,lat,lon,raw:clean,date,architect,notes}}).filter(Boolean).filter(p=>p.lat>53.9&&p.lat<54.7&&p.lon>18.2&&p.lon<19.1)}
 function year(p){const m=p.date.match(/(1[0-9]{3}|20[0-9]{2})/);return m?+m[1]:null}function distance(a,b){const R=6371000,dLat=(b.lat-a.lat)*Math.PI/180,dLon=(b.lon-a.lon)*Math.PI/180,x=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(x))}function bearing(a,b){const y=Math.sin((b.lon-a.lon)*Math.PI/180)*Math.cos(b.lat*Math.PI/180),x=Math.cos(a.lat*Math.PI/180)*Math.sin(b.lat*Math.PI/180)-Math.sin(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.cos((b.lon-a.lon)*Math.PI/180);return(Math.atan2(y,x)*180/Math.PI+360)%360}function dirAngle(d){return{up:0,right:90,down:180,left:270}[d]}function angleDiff(a,b){return Math.abs((a-b+180)%360-180)}function icon(cls){return L.divIcon({className:cls,iconSize:[28,28],iconAnchor:[14,14]})}
 function setCurrent(p,showHere=true){if(currentMarker)map.removeLayer(currentMarker);currentMarker=L.marker([p.lat,p.lon],{icon:icon("current-marker"),zIndexOffset:1000}).addTo(map);if(showHere)currentMarker.bindTooltip("TU JESTEŚ",{permanent:true,direction:"top",className:"current-label"});map.panTo([p.lat,p.lon],{animate:true,duration:.5})}
@@ -137,8 +137,8 @@ function loadSettings(){try{const x=JSON.parse(localStorage.getItem("trojmiastoG
 function saveSettings(){const oldRange=settings.distanceRange,oldCity=settings.startCity;settings.count=+document.getElementById("missionCount").value;settings.age=document.getElementById("catAge").checked;settings.periods=document.getElementById("catPeriods").checked;settings.architects=document.getElementById("catArchitects").checked;settings.distanceRange=document.getElementById("distanceRange").value;settings.startCity=document.getElementById("startCity").value;localStorage.setItem("trojmiastoGameSettings",JSON.stringify(settings));return oldRange!==settings.distanceRange||oldCity!==settings.startCity}
 function openSettings(){document.getElementById("missionCount").value=settings.count;document.getElementById("catAge").checked=settings.age;document.getElementById("catPeriods").checked=settings.periods;document.getElementById("catArchitects").checked=settings.architects;document.getElementById("distanceRange").value=settings.distanceRange||"0-3";document.getElementById("startCity").value=settings.startCity||"random";document.getElementById("settings").classList.remove("hidden")}
 function missionPoints(){
-  if(!current||!target)return points;
-  return points.filter(p=>distance(p,current)<=5000&&distance(p,target)<=5000);
+  if(!gameStart||!target)return points;
+  return points.filter(p=>distance(p,gameStart)<=5000&&distance(p,target)<=5000);
 }
 function personNames(p){
   const text=String(p.architect||"")+" "+String(p.notes||"");
@@ -172,7 +172,7 @@ function taskForGame(){
   );
   if(settings.architects){
     const people=[...new Set(all.flatMap(personNames))];
-    people.forEach(name=>pool.push({type:"person:"+name,category:"people",text:"Odwiedź miejsce zaprojektowane przez: "+name,test:p=>personMatch(p,name)}));
+    people.forEach(name=>pool.push({type:"person:"+name,category:"descriptions",text:"Znajdź miejsce powiązane z hasłem: "+name,test:p=>personMatch(p,name)}));
   }
   const usable=pool.filter(t=>all.some(t.test));
   for(let i=usable.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[usable[i],usable[j]]=[usable[j],usable[i]]}
@@ -180,6 +180,8 @@ function taskForGame(){
 }
 function reveal(p){
   const hits=activeTasks.filter(t=>!completed.has(t.type)&&t.test(p)).slice(0,1);
+  visitedHistory.push(p);
+  updateTagCloud();
   let html="<h2>"+esc(p.name)+"</h2>";
   if(p.date)html+="<p><b>Data:</b> "+esc(p.date)+"</p>";
   if(p.architect)html+="<p><b>Architekt:</b> "+esc(p.architect)+"</p>";
@@ -187,16 +189,18 @@ function reveal(p){
     html+="<div class='match'>✓ "+hits[0].text+"</div>";
     missionHits.set(p.id,[...(missionHits.get(p.id)||[]),hits[0].type]);
   }
-  revealEl.innerHTML=html+"<button id='continue' style='margin-top:12px;width:100%;padding:10px;border:0;border-radius:8px;background:#1976d2;color:#fff;font-weight:700'>DALEJ</button>";
+  revealEl.innerHTML=html+"<div class='reveal-auto'>Okno zamknie się automatycznie…</div>";
   revealEl.classList.remove("hidden");
-  document.getElementById("continue").onclick=()=>{
-    revealEl.classList.add("hidden");
+  choiceLocked=true;
+  window.setTimeout(()=>{
+    if(!revealEl.classList.contains("hidden"))revealEl.classList.add("hidden");
+    choiceLocked=false;
     updateProgress();
     if(current.id===target.id){if(completed.size===activeTasks.length)finish();else{statusEl.textContent="Jeszcze za szybko na metę, zalicz wszystkie misje";}}
-  };
+  },3000);
   hits.forEach(h=>completed.add(h.type))
 }
-function choose(p){choiceLocked=false;choiceEl.classList.add("hidden");candidateMarkers.forEach(m=>map.removeLayer(m));candidateMarkers=[];current=p;visited.add(p.id);moves++;movesEl.textContent="Ruchy: "+moves;routePoints.push(p);updateRoute();setCurrent(p);reveal(p)}
+function choose(p){choiceEl.classList.add("hidden");candidateMarkers.forEach(m=>map.removeLayer(m));candidateMarkers=[];current=p;visited.add(p.id);moves++;movesEl.textContent="Ruchy: "+moves;routePoints.push(p);updateRoute();setCurrent(p);reveal(p)}
 function finish(){
   const rows=[...visited].map(id=>points.find(p=>p.id===id)).filter(Boolean);
   if(routePoints.length>1)map.fitBounds(routePoints.map(p=>[p.lat,p.lon]),{padding:[70,70],maxZoom:15});
@@ -210,6 +214,21 @@ function finish(){
   });
   html+="</div><button id='restart' class='summary-restart'>NOWA GRA</button></div></div>";
   revealEl.innerHTML=html;revealEl.classList.remove("hidden");document.getElementById("restart").onclick=()=>location.reload();
+}
+function updateTagCloud(){
+  const years=[...new Set(visitedHistory.map(p=>year(p)).filter(y=>y!==null))].sort((a,b)=>b-a);
+  const cloud=document.getElementById("tagCloud");if(!cloud)return;
+  cloud.querySelector(".tag-list").innerHTML=years.map(y=>"<button class=\"year-tag\" data-year=\""+y+"\">"+y+"</button>").join("")||"<div class=\"tag-empty\">Odwiedzone daty pojawią się tutaj.</div>";
+  cloud.querySelectorAll(".year-tag").forEach(btn=>btn.onclick=()=>showYearObject(+btn.dataset.year));
+}
+function showYearObject(y){
+  const matches=visitedHistory.filter(p=>year(p)===y);
+  if(!matches.length)return;
+  let p=matches[matches.length-1];
+  if(current&&p.id===current.id&&matches.length>1)p=matches[matches.length-2];
+  map.panTo([p.lat,p.lon],{animate:true,duration:.5});
+  const html="<b>"+esc(p.name)+"</b><br><span>Data budowy: "+esc(p.date||"brak danych")+"</span>"+(p.architect?"<br><span>Architekt: "+esc(p.architect)+"</span>":"");
+  L.popup({closeButton:true,autoClose:true}).setLatLng([p.lat,p.lon]).setContent(html).openOn(map);
 }
 function missionHeat(t){
   if(!current||completed.has(t.type))return "";
@@ -227,7 +246,7 @@ function updateProgress(){
   }).join("");
 }
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
-function start(){document.getElementById("start").classList.add("hidden");moves=0;visited=new Set();completed=new Set();missionHits=new Map();const audited=chooseStartAndTarget();
-  if(!audited){statusEl.textContent="Nie udało się znaleźć gry dla wybranych ustawień. Wybierz inny zakres odległości lub miejsce startu.";document.getElementById("start").classList.remove("hidden");return}
-  current=audited.start;target=audited.target;gameDistance=distance(current,target);activeTasks=taskForGame();routePoints=[current];updateRoute();missionEl.innerHTML="<b>META:</b> "+esc(target.name);updateProgress();if(startMarker)map.removeLayer(startMarker);startMarker=L.marker([current.lat,current.lon],{icon:icon("start-marker"),zIndexOffset:1100}).addTo(map);setCurrent(current,true);if(targetMarker)map.removeLayer(targetMarker);targetMarker=L.marker([target.lat,target.lon],{icon:icon("target-marker")}).addTo(map).bindTooltip("META: "+esc(target.name),{permanent:true,direction:"top",className:"target-label"});statusEl.textContent="Wybierz kierunek strzałką."}
-async function init(){map=L.map("map",{zoomControl:false}).setView([54.38,18.62],12);L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap"}).addTo(map);try{const r=await fetch(DATA_URL);points=parseKml(await r.text());if(points.length<20)throw Error("Za mało punktów");statusEl.textContent="Załadowano "+points.length+" punktów historycznych."}catch(e){statusEl.textContent="Błąd danych: "+e.message}}loadSettings();document.getElementById("startBtn").onclick=start;document.getElementById("settingsBtn").onclick=openSettings;document.getElementById("saveSettings").onclick=()=>{const distanceChanged=saveSettings();document.getElementById("settings").classList.add("hidden");if(document.getElementById("start").classList.contains("hidden")){if(distanceChanged){start()}else{activeTasks=taskForGame();updateProgress()}}};document.querySelectorAll("[data-dir]").forEach(b=>b.onclick=()=>showCandidates(b.dataset.dir));document.addEventListener("keydown",e=>{const d={ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right"}[e.key];if(d){e.preventDefault();showCandidates(d)}});init();
+async function start(){if(choiceLocked)return;const startBtn=document.getElementById("startBtn");startBtn.disabled=true;startBtn.textContent="LOSOWANIE TRASY…";statusEl.textContent="Trwa przygotowanie gry i wyszukiwanie możliwej trasy…";await new Promise(r=>setTimeout(r,40));document.getElementById("start").classList.add("hidden");moves=0;visited=new Set();visitedHistory=[];completed=new Set();missionHits=new Map();const audited=chooseStartAndTarget();
+  if(!audited){statusEl.textContent="Nie udało się znaleźć gry dla wybranych ustawień. Wybierz inny zakres odległości lub miejsce startu.";document.getElementById("start").classList.remove("hidden");startBtn.disabled=false;startBtn.textContent="ROZPOCZNIJ GRĘ";return}
+  current=audited.start;gameStart=audited.start;target=audited.target;gameDistance=distance(current,target);activeTasks=taskForGame();routePoints=[current];updateRoute();missionEl.innerHTML="<b>META:</b> "+esc(target.name);updateProgress();if(startMarker)map.removeLayer(startMarker);startMarker=L.marker([current.lat,current.lon],{icon:icon("start-marker"),zIndexOffset:1100}).addTo(map);setCurrent(current,true);if(targetMarker)map.removeLayer(targetMarker);targetMarker=L.marker([target.lat,target.lon],{icon:icon("target-marker")}).addTo(map).bindTooltip("META: "+esc(target.name),{permanent:true,direction:"top",className:"target-label"});statusEl.textContent="Wybierz kierunek strzałką.";startBtn.disabled=false;startBtn.textContent="ROZPOCZNIJ GRĘ"}
+async function init(){map=L.map("map",{zoomControl:false}).setView([54.38,18.62],12);L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap"}).addTo(map);try{const r=await fetch(DATA_URL);points=parseKml(await r.text());if(points.length<20)throw Error("Za mało punktów");statusEl.textContent="Załadowano "+points.length+" punktów historycznych."}catch(e){statusEl.textContent="Błąd danych: "+e.message}}loadSettings();document.getElementById("startBtn").onclick=start;document.getElementById("settingsBtn").onclick=openSettings;document.getElementById("tagToggle").onclick=()=>document.getElementById("tagCloud").classList.toggle("closed");updateTagCloud();document.getElementById("saveSettings").onclick=async()=>{const btn=document.getElementById("saveSettings");btn.disabled=true;btn.textContent="ZAPISYWANIE…";statusEl.textContent="Trwa zapisywanie ustawień…";await new Promise(r=>setTimeout(r,350));const distanceChanged=saveSettings();document.getElementById("settings").classList.add("hidden");btn.disabled=false;btn.textContent="ZAPISZ";if(document.getElementById("start").classList.contains("hidden")){if(distanceChanged)await start();else{activeTasks=taskForGame();updateProgress();statusEl.textContent="Ustawienia zapisane."}}else statusEl.textContent="Ustawienia zapisane.";};document.querySelectorAll("[data-dir]").forEach(b=>b.onclick=()=>showCandidates(b.dataset.dir));document.addEventListener("keydown",e=>{const d={ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right"}[e.key];if(d){e.preventDefault();showCandidates(d)}});init();
