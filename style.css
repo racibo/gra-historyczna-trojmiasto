@@ -143,3 +143,5 @@ html,body,#map{height:100%;margin:0}body{font-family:system-ui,sans-serif;overfl
     font-size:10px;
   }
 }
+
+.settings-actions{display:flex;gap:8px;margin-top:10px}.settings-actions button{flex:1;margin-top:0!important}.settings-actions #newGameSettings{background:#455a64}.settings-actions #newGameSettings:hover{background:#37474f}
