@@ -227,3 +227,11 @@ html,body,#map{height:100%;margin:0}body{font-family:system-ui,sans-serif;overfl
 .premium-heat{font-size:18px;line-height:1;}
 .premium-hot{display:block;margin-top:5px;font-size:10px;color:#8bc34a;font-weight:800;letter-spacing:.4px;}
 @media(max-width:600px){.game-instruction{color:#bdbdbd!important}.heat-range{font-size:8px}.premium-target{font-size:13px}}
+
+/* V44.2 */
+/* Instrukcja jest niezależna od nagłówka i ma ciemną, stonowaną czcionkę. */
+.game-instruction{top:46px!important;bottom:auto!important;left:10px!important;right:10px!important;transform:none!important;width:auto!important;max-width:none!important;background:rgba(20,20,20,.82)!important;color:#888!important;font-size:11px!important;font-weight:500!important;padding:5px 9px!important;line-height:1.25!important;border-radius:6px!important;box-shadow:none!important;text-align:center!important;}
+@media(max-width:600px){
+  .game-instruction{top:43px!important;bottom:auto!important;left:7px!important;right:7px!important;width:auto!important;font-size:10px!important;padding:4px 7px!important;background:rgba(20,20,20,.78)!important;color:#777!important;}
+  .mission{top:72px!important;}
+}
