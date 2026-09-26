@@ -148,3 +148,6 @@ html,body,#map{height:100%;margin:0}body{font-family:system-ui,sans-serif;overfl
 
 /* Wersja 41 — akcje przy misjach */
 .mission #tasks div{display:flex;align-items:center;flex-wrap:wrap;gap:4px}.task-action{border:0;border-radius:5px;padding:2px 5px;font-size:9px;font-weight:800;cursor:pointer;color:#fff}.task-hint{background:#455a64}.task-answer{background:#8b5a00}.task-action:hover{filter:brightness(1.12)}
+
+/* V42 */
+.heat{display:inline-block;line-height:1;vertical-align:middle;margin-left:2px;cursor:help}.heat-small{font-size:13px}.heat-medium{font-size:17px}.heat-large{font-size:22px}.finish-comment{padding:9px 10px;border-radius:9px;background:#eef7ee;color:#245b2a;font-size:13px!important}.start-wait-note{margin:10px 0 14px;padding:9px 11px;border-radius:9px;background:#303030;color:#ddd!important;font-size:12px!important;line-height:1.4}
