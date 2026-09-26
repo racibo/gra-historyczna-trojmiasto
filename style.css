@@ -393,3 +393,7 @@ routeLine{}\n/* V44.5 — automatyczne kadrowanie uwzględnia panel wyboru na do
   cursor:pointer;
 }
 .secondary-start-btn:hover{background:rgba(255,255,255,.14)}
+
+
+/* V45.4 — ustawienia otwierane z ekranu startowego muszą być nad ekranem startowym */
+#settings{z-index:10000!important}
