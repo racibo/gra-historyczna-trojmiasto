@@ -309,3 +309,37 @@ html,body,#map{height:100%;margin:0}body{font-family:system-ui,sans-serif;overfl
     padding:8px 11px!important;
   }
 }
+
+
+/* V44.5 — wybór punktu na dole, sterowanie kierunkiem ukryte podczas wyboru */
+.controls.direction-hidden{display:none!important}
+.choice{
+  bottom:14px!important;
+  width:min(94vw,430px);
+}
+.choice-title{
+  font-size:12px;
+  font-weight:700;
+  opacity:.9;
+}
+@media(max-width:600px){
+  .choice{
+    bottom:10px!important;
+    width:calc(100vw - 20px)!important;
+    padding:8px!important;
+  }
+}
+
+routeLine{}\n/* V44.5 — automatyczne kadrowanie uwzględnia panel wyboru na dole i panel misji u góry. */
+.game-instruction{pointer-events:auto!important}
+
+/* Daty odwiedzonych punktów jeszcze mniejsze. */
+.visited-label-marker>div{
+  font-size:7px!important;
+  padding:2px 4px!important;
+  min-width:0!important;
+  max-width:140px!important;
+}
+.visited-label-marker>div b{font-size:8px!important}
+
+/* Zielona trasa: kropkowana zamiast kreskowanej. */
