@@ -265,3 +265,47 @@ html,body,#map{height:100%;margin:0}body{font-family:system-ui,sans-serif;overfl
   .settings-card select{font-size:11px;min-width:105px;}
   .settings-card .settings-subtitle{margin-top:6px;font-size:9px;}
 }
+
+
+/* V44.4 — komunikaty instruktażowe na środku ekranu, z automatycznym wygaszaniem */
+.game-instruction{
+  top:50%!important;
+  left:50%!important;
+  right:auto!important;
+  bottom:auto!important;
+  transform:translate(-50%,-50%)!important;
+  width:min(82vw,520px)!important;
+  box-sizing:border-box;
+  background:rgba(20,20,20,.88)!important;
+  color:#888!important;
+  padding:9px 14px!important;
+  border-radius:9px!important;
+  text-align:center!important;
+  font-size:13px!important;
+  line-height:1.35!important;
+  font-weight:500!important;
+  pointer-events:auto!important;
+  cursor:pointer;
+  opacity:0;
+  visibility:hidden;
+  transition:opacity .25s ease,visibility 0s linear .25s;
+}
+.game-instruction.instruction-visible{
+  opacity:1;
+  visibility:visible;
+  transition:opacity .25s ease;
+}
+.game-instruction.instruction-hidden{
+  opacity:0;
+  visibility:hidden;
+}
+@media(max-width:600px){
+  .game-instruction{
+    top:50%!important;
+    left:50%!important;
+    right:auto!important;
+    width:calc(100vw - 44px)!important;
+    font-size:12px!important;
+    padding:8px 11px!important;
+  }
+}
