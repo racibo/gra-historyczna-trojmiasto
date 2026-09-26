@@ -213,3 +213,14 @@ html,body,#map{height:100%;margin:0}body{font-family:system-ui,sans-serif;overfl
     bottom:145px;
   }
 }
+
+/* V44 */
+.game-instruction{color:#bdbdbd!important;}
+.heat-range{font-size:9px;font-weight:500;opacity:.72;white-space:nowrap;margin-left:1px;vertical-align:middle;}
+.mission #tasks div{gap:3px 4px;}
+.premium-title{font-size:10px;letter-spacing:1.3px;font-weight:900;color:#8bc34a;margin-bottom:3px;}
+.premium-target{font-size:14px;line-height:1.35;margin-top:2px;}
+.premium-distance{display:flex;align-items:center;gap:5px;margin-top:7px;font-size:11px;color:#ccc;}
+.premium-heat{font-size:18px;line-height:1;}
+.premium-hot{display:block;margin-top:5px;font-size:10px;color:#8bc34a;font-weight:800;letter-spacing:.4px;}
+@media(max-width:600px){.game-instruction{color:#bdbdbd!important}.heat-range{font-size:8px}.premium-target{font-size:13px}}
