@@ -364,10 +364,13 @@ function showSolution(){
       if(targets.length)p=targets.reduce((a,b)=>distance(current,a)<distance(current,b)?a:b);
     }
     if(p){
-      solved.push({task:t,point:p,done:completed.has(t.type)});
-      const marker=L.marker([p.lat,p.lon],{icon:icon(completed.has(t.type)?"summary-mission-marker":"summary-solution-marker"),zIndexOffset:1300+i}).addTo(map);
-      marker.bindPopup("<div class='summary-popup'><h3>Rozwiązanie misji "+(i+1)+"</h3><p><b>"+esc(t.text)+"</b></p><p>Pasujący obiekt: <b>"+esc(p.name)+"</b></p></div>",{maxWidth:360});
-      solutionMarkers.push(marker);
+      const done=completed.has(t.type);
+      solved.push({task:t,point:p,done});
+      if(!done){
+        const marker=L.marker([p.lat,p.lon],{icon:icon("summary-solution-marker"),zIndexOffset:1300+i}).addTo(map);
+        marker.bindPopup("<div class='summary-popup'><h3>Rozwiązanie misji "+(i+1)+"</h3><p><b>"+esc(t.text)+"</b></p><p>Pasujący obiekt: <b>"+esc(p.name)+"</b></p></div>",{maxWidth:360});
+        solutionMarkers.push(marker);
+      }
     }
   });
   if(target){
