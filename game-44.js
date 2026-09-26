@@ -641,7 +641,7 @@ function updateMoveInfo(stage){
 function updateProgress(){
   const done=activeTasks.filter(t=>completed.has(t.type)).length;
   progressEl.textContent="Zadania: "+done+"/"+activeTasks.length+" • Odwiedzone: "+visited.size;
-  const autoHintTask=settings.hints?activeTasks.find(t=>!completed.has(t.type)&&taskAwayStreak(t)>=3):null;
+  const autoHintTask=settings.hints?activeTasks.find(t=>!completed.has(t.type)&&taskAwayStreak(t)===3):null;
   tasksEl.innerHTML=activeTasks.map(t=>{
     const doneTask=completed.has(t.type);
     const hint=!doneTask&&t===autoHintTask?taskHintHtml(t):"";
