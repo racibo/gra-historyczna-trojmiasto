@@ -1,4 +1,4 @@
-const SHEET_ID="1TmRHJDv6IMlGwg761JV50M8vS4zXTdWBtjDziAleSQI",DATA_URL=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;let map,points=[],current=null,gameStart=null,target=null,visited=new Set(),moves=0,choiceLocked=false,premiumShown=false,candidateMarkers=[],currentMarker,startMarker,targetMarker,routeLine=null,routePoints=[],visitedHistory=[],visitedMarkers=[],summaryMarkers=[];const missionEl=document.getElementById("mission"),tasksEl=document.getElementById("tasks"),progressEl=document.getElementById("progress"),movesEl=document.getElementById("moves"),choiceEl=document.getElementById("choice"),revealEl=document.getElementById("reveal"),statusEl=document.getElementById("status");let activeTasks=[],completed=new Set(),missionHits=new Map(),gameDistance=0,searchZone=null,instructionTimer=null,settings={count:4,age:true,periods:true,architects:true,people:true,functions:true,names:true,history:true,institutions:true,creators:true,hints:true,revealAnswer:true,distanceRange:"random",startCity:"random"},pathGraph=null;
+const SHEET_ID="1TmRHJDv6IMlGwg761JV50M8vS4zXTdWBtjDziAleSQI",DATA_URL=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;let map,points=[],current=null,gameStart=null,target=null,visited=new Set(),moves=0,choiceLocked=false,premiumShown=false,candidateMarkers=[],currentMarker,startMarker,targetMarker,routeLine=null,routePoints=[],visitedHistory=[],visitedMarkers=[],summaryMarkers=[],solutionMarkers=[];const missionEl=document.getElementById("mission"),tasksEl=document.getElementById("tasks"),progressEl=document.getElementById("progress"),movesEl=document.getElementById("moves"),choiceEl=document.getElementById("choice"),revealEl=document.getElementById("reveal"),statusEl=document.getElementById("status");let activeTasks=[],completed=new Set(),missionHits=new Map(),gameDistance=0,searchZone=null,instructionTimer=null,settings={count:4,age:true,periods:true,architects:true,people:true,functions:true,names:true,history:true,institutions:true,creators:true,hints:true,revealAnswer:true,distanceRange:"random",startCity:"random"},pathGraph=null;
 function getSheetVal(obj,searchStrings){const keys=Object.keys(obj||{});for(const search of searchStrings){const clean=search.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"");const exact=keys.find(k=>k.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"")===clean);if(exact&&String(obj[exact]??"").trim()!=="")return String(obj[exact]).trim()}for(const search of searchStrings){const clean=search.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"");const partial=keys.find(k=>k.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"").includes(clean));if(partial&&String(obj[partial]??"").trim()!=="")return String(obj[partial]).trim()}return""}
 function parseSheetRows(data){return data.map((item,i)=>{const name=getSheetVal(item,["adres","nazwa","obiekt","name"])||"Nieznany",date=getSheetVal(item,["datawybudowania","rokbudowy","data","rok","czas","wiek"])||"",notes=getSheetVal(item,["uwagi","opis","informacje","info","inne"]),architect=getSheetVal(item,["architekt","arch.","arch","projektant","proj.","proj","autor"])||String(Object.values(item)[3]??"").trim(),gps=getSheetVal(item,["pozycjagps","gps","wspolrzedne","współrzędne","lokalizacja"]);let lat,lng;if(gps){const matches=String(gps).replace(/;/g,",").match(/-?\d+[\.,]\d+/g)||[];if(matches.length>=2){lat=parseFloat(matches[0].replace(",","."));lng=parseFloat(matches[1].replace(",","."))}}if(!Number.isFinite(lat)||!Number.isFinite(lng))return null;return{id:i,name,lat,lon:lng,raw:notes,date,architect,notes}}).filter(Boolean).filter(p=>p.lat>53.9&&p.lat<54.7&&p.lon>18.2&&p.lon<19.1)}
 function year(p){const m=p.date.match(/(1[0-9]{3}|20[0-9]{2})/);return m?+m[1]:null}function distance(a,b){const R=6371000,dLat=(b.lat-a.lat)*Math.PI/180,dLon=(b.lon-a.lon)*Math.PI/180,x=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(x))}function bearing(a,b){const y=Math.sin((b.lon-a.lon)*Math.PI/180)*Math.cos(b.lat*Math.PI/180),x=Math.cos(a.lat*Math.PI/180)*Math.sin(b.lat*Math.PI/180)-Math.sin(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.cos((b.lon-a.lon)*Math.PI/180);return(Math.atan2(y,x)*180/Math.PI+360)%360}function dirAngle(d){return{up:0,right:90,down:180,left:270}[d]}function angleDiff(a,b){const d=Math.abs(a-b)%360;return d>180?360-d:d}function icon(cls){return L.divIcon({className:cls,iconSize:[28,28],iconAnchor:[14,14]})}
@@ -312,17 +312,30 @@ function taskSolutionDistance(t,p){
   if(!targets.length)return null;
   return Math.min(...targets.map(x=>distance(p,x)));
 }
+function taskSolutionDistanceAt(t,index){
+  const seen=new Set(visitedHistory.slice(0,index+1).map(p=>p.id));
+  const p=visitedHistory[index];
+  const targets=points.filter(x=>x.id!==p.id&&!seen.has(x.id)&&t.test(x));
+  if(!targets.length)return null;
+  return Math.min(...targets.map(x=>distance(p,x)));
+}
 function taskAwayStreak(t){
-  if(visitedHistory.length<4)return 0;
+  if(visitedHistory.length<2)return 0;
   let streak=0;
   for(let i=visitedHistory.length-1;i>0;i--){
-    const before=taskSolutionDistance(t,visitedHistory[i-1]);
-    const after=taskSolutionDistance(t,visitedHistory[i]);
+    const before=taskSolutionDistanceAt(t,i-1);
+    const after=taskSolutionDistanceAt(t,i);
     if(before===null||after===null)break;
-    if(after-before>1)streak++;
-    else break;
+    if(after-before>1)streak++; else break;
   }
   return streak;
+}
+function taskHintHtml(t){
+  const targets=points.filter(p=>p.id!==current.id&&!visited.has(p.id)&&t.test(p));
+  if(!targets.length)return "";
+  const d=Math.min(...targets.map(p=>distance(current,p)));
+  const text=d<1000?Math.round(d)+" m":(d/1000).toFixed(2)+" km";
+  return ' <span class="automatic-hint">PODPOWIEDŹ: '+text+'</span>';
 }
 function taskHint(t){
   const targets=points.filter(p=>p.id!==current.id&&!visited.has(p.id)&&t.test(p));
@@ -330,24 +343,54 @@ function taskHint(t){
   const p=targets.reduce((a,b)=>distance(current,a)<distance(current,b)?a:b),d=distance(current,p);
   return "Najbliższy punkt rozwiązania jest dokładnie "+(d<1000?Math.round(d)+" m":(d/1000).toFixed(2)+" km")+" stąd.";
 }
-function revealAnswerForTask(t){
-  const targets=points.filter(p=>p.id!==current.id&&!visited.has(p.id)&&t.test(p));
-  if(!targets.length){statusEl.textContent="Nie ma obecnie dostępnej odpowiedzi dla tej misji.";return}
-  const p=targets.reduce((a,b)=>distance(current,a)<distance(current,b)?a:b);
-  if(targetMarker)map.removeLayer(targetMarker);
-  targetMarker=L.marker([p.lat,p.lon],{icon:icon("target-marker")}).addTo(map).bindTooltip("ODPOWIEDŹ: "+esc(p.name),{permanent:true,direction:"top",className:"target-label"});
-  map.panTo([p.lat,p.lon],{animate:true,duration:.7});
-  revealEl.innerHTML="<h2>Odpowiedź</h2><p><b>"+esc(t.text)+"</b></p><p>Pasujący obiekt: <b>"+esc(p.name)+"</b></p><p>Gra została zakończona na Twoje życzenie.</p><button id='answerRestart' class='summary-restart'>NOWA GRA</button>";
-  revealEl.className="reveal";revealEl.classList.remove("hidden");
-  document.getElementById("answerRestart").onclick=()=>location.reload();choiceLocked=true;
+function clearSolutionMarkers(){
+  solutionMarkers.forEach(m=>{try{map.removeLayer(m)}catch(e){}});
+  solutionMarkers=[];
 }
-function taskActions(t){
-  let h="";
-  if(settings.hints&&taskAwayStreak(t)>=3)h+=" <button class='task-action task-hint' data-task='"+esc(t.type)+"'>PODPOWIEDŹ</button>";
-  if(settings.revealAnswer)h+=" <button class='task-action task-answer' data-task='"+esc(t.type)+"'>PODDAJĘ SIĘ</button>";
-  return h;
+function showSolution(){
+  choiceLocked=true;
+  choiceEl.classList.add("hidden");
+  candidateMarkers.forEach(m=>map.removeLayer(m));
+  candidateMarkers=[];
+  clearSearchZone();
+  document.querySelector(".controls").classList.remove("direction-hidden");
+  renderSummaryMap();
+  clearSolutionMarkers();
+  const solved=[];
+  activeTasks.forEach((t,i)=>{
+    let p=visitedHistory.find(x=>(missionHits.get(x.id)||[]).includes(t.type));
+    if(!p){
+      const targets=points.filter(x=>x.id!==current.id&&!visited.has(x.id)&&t.test(x));
+      if(targets.length)p=targets.reduce((a,b)=>distance(current,a)<distance(current,b)?a:b);
+    }
+    if(p){
+      solved.push({task:t,point:p,done:completed.has(t.type)});
+      const marker=L.marker([p.lat,p.lon],{icon:icon(completed.has(t.type)?"summary-mission-marker":"summary-solution-marker"),zIndexOffset:1300+i}).addTo(map);
+      marker.bindPopup("<div class='summary-popup'><h3>Rozwiązanie misji "+(i+1)+"</h3><p><b>"+esc(t.text)+"</b></p><p>Pasujący obiekt: <b>"+esc(p.name)+"</b></p></div>",{maxWidth:360});
+      solutionMarkers.push(marker);
+    }
+  });
+  if(target){
+    const marker=L.marker([target.lat,target.lon],{icon:icon("summary-meta"),zIndexOffset:1400}).addTo(map);
+    marker.bindPopup("<div class='summary-popup'><h3>Cel końcowy</h3><p><b>"+esc(target.name)+"</b></p></div>",{maxWidth:360});
+    solutionMarkers.push(marker);
+  }
+  const allMapPoints=[...routePoints,...solved.map(x=>x.point),target].filter(Boolean);
+  if(allMapPoints.length>1)map.fitBounds(allMapPoints.map(p=>[p.lat,p.lon]),{padding:[70,70],maxZoom:15});
+  const rows=solved.map(x=>"<div class='summary-mission-row'><b>"+esc(x.point.name)+"</b><span>"+esc(x.task.text)+(x.done?" · ✓ zaliczona":" · rozwiązanie")+"</span></div>").join("");
+  revealEl.innerHTML="<div class='finish-message'><div class='finish-kicker'>PODDAŁEŚ SIĘ</div><h2>Rozwiązanie gry</h2><p class='solution-note'>Na mapie pokazano Twoją trasę oraz punkty będące rozwiązaniami misji i punkt końcowy.</p><div class='summary-missions-list'>"+rows+"</div><div class='finish-actions'><button id='hideSolution' class='summary-hide'>UKRYJ ROZWIĄZANIE</button><button id='restart' class='summary-restart'>NOWA GRA</button></div></div>";
+  revealEl.className="reveal finish-reveal";
+  revealEl.style.zIndex="1400";
+  revealEl.style.bottom="auto";
+  revealEl.style.top="50%";
+  document.getElementById("hideSolution").onclick=()=>{
+    revealEl.classList.add("hidden");
+    revealEl.classList.remove("finish-reveal");
+    revealEl.style.zIndex="";revealEl.style.top="";revealEl.style.bottom="";
+    clearSolutionMarkers();
+  };
+  document.getElementById("restart").onclick=()=>location.reload();
 }
-
 function findTaskByType(type){return activeTasks.find(t=>t.type===type)}
 function shortestGamePath(start,target,maxDepth=10){
   if(!start||!target)return null;
@@ -595,9 +638,11 @@ function updateMoveInfo(stage){
 function updateProgress(){
   const done=activeTasks.filter(t=>completed.has(t.type)).length;
   progressEl.textContent="Zadania: "+done+"/"+activeTasks.length+" • Odwiedzone: "+visited.size;
+  const autoHintTask=settings.hints?activeTasks.find(t=>!completed.has(t.type)&&taskAwayStreak(t)>=3):null;
   tasksEl.innerHTML=activeTasks.map(t=>{
     const doneTask=completed.has(t.type);
-    return "<div class=\""+(doneTask?"task-done":"")+"\">"+(doneTask?"✓":"▸")+" "+esc(t.text)+(doneTask?"":missionHeat(t))+(!doneTask?taskActions(t):"")+"</div>";
+    const hint=!doneTask&&t===autoHintTask?taskHintHtml(t):"";
+    return "<div class=\""+(doneTask?"task-done":"")+"\">"+(doneTask?"✓":"▸")+" "+esc(t.text)+(doneTask?"":(hint||missionHeat(t)))+(!doneTask?taskActions(t):"")+"</div>";
   }).join("");
 }
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
@@ -614,6 +659,5 @@ async function init(){try{if(typeof L==="undefined")throw new Error("Leaflet nie
 document.getElementById("tasks").addEventListener("click",e=>{
   const btn=e.target.closest(".task-action"); if(!btn)return;
   const t=findTaskByType(btn.dataset.task); if(!t)return;
-  if(btn.classList.contains("task-hint"))statusEl.textContent=taskHint(t);
-  else if(btn.classList.contains("task-answer"))revealAnswerForTask(t);
+  if(btn.classList.contains("task-answer"))showSolution();
 });document.getElementById("startSettingsBtn").onclick=openSettings;movesEl.addEventListener("click",()=>{if(instructionTimer){clearTimeout(instructionTimer);instructionTimer=null}movesEl.classList.remove("instruction-visible");movesEl.classList.add("instruction-hidden")});document.getElementById("newGameSettings").onclick=async()=>{document.getElementById("settings").classList.add("hidden");choiceLocked=false;await start()};const tagToggle=document.getElementById("tagToggle"),tagCloud=document.getElementById("tagCloud");if(tagToggle&&tagCloud)tagToggle.onclick=()=>tagCloud.classList.toggle("closed");updateTagCloud();statusEl.addEventListener("click",()=>{if(!searchZone)return;searchZone.setStyle({fillOpacity:searchZone.options.fillOpacity>0?0:.14,opacity:searchZone.options.opacity>0?0:.9})});document.getElementById("saveSettings").onclick=async()=>{const btn=document.getElementById("saveSettings");btn.disabled=true;btn.textContent="ZAPISYWANIE…";statusEl.textContent="Trwa zapisywanie ustawień…";await new Promise(r=>setTimeout(r,350));saveSettings();document.getElementById("settings").classList.add("hidden");btn.disabled=false;btn.textContent="ZAPISZ";if(document.getElementById("start").classList.contains("hidden")){await start()}else statusEl.textContent="Ustawienia zapisane. Kliknij „ROZPOCZNIJ GRĘ”.";};document.querySelectorAll("[data-dir]").forEach(b=>b.onclick=()=>showCandidates(b.dataset.dir));document.addEventListener("keydown",e=>{const d={ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right"}[e.key];if(d){e.preventDefault();showCandidates(d)}});try{if(typeof Papa==="undefined")throw Error("Nie załadowano parsera CSV");const r=await fetch(DATA_URL,{cache:"no-store"});if(!r.ok)throw Error("Arkusz Google zwrócił HTTP "+r.status);const csv=await r.text();const parsed=Papa.parse(csv,{header:true,skipEmptyLines:true});if(parsed.errors?.length)console.warn("Ostrzeżenia CSV:",parsed.errors);points=parseSheetRows(parsed.data);updateCategoryCounts();if(points.length<20)throw Error("Za mało poprawnych punktów GPS w arkuszu");statusEl.textContent="Załadowano "+points.length+" punktów z Google Sheets (wierszy CSV: "+parsed.data.length+")."}catch(e){console.error("Błąd ładowania Google Sheets:",e);statusEl.textContent="Błąd danych: "+e.message}try{if(L.control&&L.control.scale) L.control.scale({imperial:false,metric:true,position:"bottomleft"}).addTo(map)}catch(e){console.warn("Kontrolka skali pominięta:",e)} }catch(e){console.error("Błąd inicjalizacji gry:",e);statusEl.textContent="BŁĄD MAPY: "+e.message;statusEl.title=e.stack||"";document.getElementById("start").classList.remove("hidden")}}init();
