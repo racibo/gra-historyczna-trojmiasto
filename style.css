@@ -518,3 +518,7 @@ routeLine{}\n/* V44.5 — automatyczne kadrowanie uwzględnia panel wyboru na do
 .automatic-hint{display:inline-block;margin-left:6px;padding:3px 7px;border-radius:6px;background:#fff3b0;color:#8a4b00;font-size:10px;font-weight:900;box-shadow:0 0 0 1px #e0a800 inset;vertical-align:middle}
 .summary-solution-marker{background:#7b1fa2!important;border:3px solid #fff!important;border-radius:50%;box-shadow:0 1px 5px #0009!important;width:24px!important;height:24px!important}
 .solution-note{margin:7px 0 10px;color:#444;font-size:12px;line-height:1.45}
+
+/* V50 — przycisk zakończenia gry */
+.surrender-game{display:block;width:100%;margin:12px 0 4px;padding:9px 10px;border:0;border-radius:8px;background:#8b1e1e;color:#fff;font-size:11px;font-weight:900;letter-spacing:.2px;cursor:pointer}.surrender-game:hover{filter:brightness(1.1)}
+.settings-help-note{margin:7px 0;padding:8px 10px;border-radius:7px;background:#f3f3f3;color:#555;font-size:11px;line-height:1.4}
