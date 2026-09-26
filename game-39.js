@@ -171,22 +171,26 @@ function missionPoints(){
   return local.length>=8?local:points.filter(p=>p.id!==gameStart.id&&p.id!==target.id&&(distance(p,gameStart)<=8000||distance(p,target)<=8000));
 }
 function personNames(p){
-  const text=String(p.architect||"")+" "+String(p.notes||"");
+  const text=String(p.architect||"").replace(/\s+/g," ").trim();
+  if(!text)return [];
   const names=[];
-  const matches=text.match(/[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż-]{2,}(?:\s+[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż-]{2,})+/g)||[];
-  matches.forEach(name=>{
-    if(!/studio|pracownia|biuro|architektoniczne|architektura|projektowe|projekty|firma/i.test(name))names.push(name.trim());
+  text.split(/\s*(?:,|;|\/|\\|\s+i\s+|\s+oraz\s+)\s*/i).forEach(part=>{
+    const name=part.replace(/^(architekt|projektant|autor)\s*[:\-]?\s*/i,"").trim();
+    const words=name.split(/\s+/).filter(Boolean);
+    if(words.length>=2 && words.every(w=>/^[A-ZĄĆĘŁŃÓŚŹŻ][A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż'-]*$/.test(w))) names.push(name);
   });
   return [...new Set(names)];
 }
 function personMatch(p,name){
-  const text=String(p.architect||"")+" "+String(p.notes||"");
-  return text.toLowerCase().includes(name.toLowerCase());
+  return String(p.architect||"").toLowerCase().includes(name.toLowerCase());
 }
 function descriptionLabel(p){
   const architect=String(p.architect||"").trim();
   if(architect)return architect.length>90?architect.slice(0,87)+"…":architect;
   const note=String(p.notes||"").replace(/\s+/g," ").trim();
+  if(!note || note.length<18)return "";
+  if(/^(wg|według|uwaga|uwagi|data|daty|sprawdzić|sprawdź|brak|nie ma|do poprawy|do uzupełnienia|w windzie|winda)\b/i.test(note))return "";
+  if(/\b(wg|według)\s+(daty|roku|numeru)\b/i.test(note))return "";
   return note.length>90?note.slice(0,87)+"…":note;
 }
 function taskForGame(){
