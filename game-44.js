@@ -302,6 +302,11 @@ function reveal(p){
   window.setTimeout(()=>{
     if(!revealEl.classList.contains("hidden"))revealEl.classList.add("hidden");
     choiceLocked=false;
+    if(current&&target&&current.id!==target.id&&!revealEl.classList.contains("finish-reveal")){
+      document.querySelector(".choice-title").textContent="Wybierz kierunek wycieczki";
+      document.querySelector(".choice-buttons").classList.add("direction-choice-empty");
+      choiceEl.classList.remove("hidden");
+    }
     updateProgress();
     if(completed.size===activeTasks.length&&!premiumShown){
       premiumShown=true;
