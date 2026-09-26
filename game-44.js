@@ -179,6 +179,9 @@ function showCandidates(dir){
   });
   choiceEl.classList.remove("hidden");
   updateMoveInfo(1);
+  // Automatycznie dopasuj widok do bieżącego punktu i dwóch wariantów.
+  const bounds=L.latLngBounds([[current.lat,current.lon],[chosen[0].lat,chosen[0].lon],[chosen[1].lat,chosen[1].lon]]);
+  map.fitBounds(bounds,{paddingTopLeft:[20,95],paddingBottomRight:[20,230],maxZoom:16});
   document.getElementById("choiceA").onclick=()=>choose(chosen[0]);
   document.getElementById("choiceB").onclick=()=>choose(chosen[1]);
 }
