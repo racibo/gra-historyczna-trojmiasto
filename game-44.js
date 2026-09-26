@@ -182,7 +182,10 @@ function showCandidates(dir){
     btn.innerHTML='<span class="letter">'+(i?"B":"A")+'</span> '+(p.isTarget?"META":"okolice "+esc(placeLabel(p)));
   });
   choiceEl.classList.remove("hidden");
-  updateMoveInfo(1);
+  // Instrukcja wyboru punktu jest w dolnym panelu; nie pokazujemy dodatkowego komunikatu na środku.
+  if(instructionTimer){clearTimeout(instructionTimer);instructionTimer=null}
+  movesEl.classList.remove("instruction-visible");
+  movesEl.classList.add("instruction-hidden");
   // Automatycznie dopasuj widok do bieżącego punktu i dwóch wariantów.
   const bounds=L.latLngBounds([[current.lat,current.lon],[chosen[0].lat,chosen[0].lon],[chosen[1].lat,chosen[1].lon]]);
   map.fitBounds(bounds,{paddingTopLeft:[20,150],paddingBottomRight:[20,115],maxZoom:16});
@@ -303,11 +306,6 @@ function reveal(p){
   window.setTimeout(()=>{
     if(!revealEl.classList.contains("hidden"))revealEl.classList.add("hidden");
     choiceLocked=false;
-    if(current&&target&&current.id!==target.id&&!revealEl.classList.contains("finish-reveal")){
-      document.querySelector(".choice-title").textContent="Wybierz kierunek wycieczki";
-      document.querySelector(".choice-buttons").classList.add("direction-choice-empty");
-      choiceEl.classList.remove("hidden");
-    }
     updateProgress();
     if(completed.size===activeTasks.length&&!premiumShown){
       premiumShown=true;
@@ -336,7 +334,7 @@ function reveal(p){
   hits.forEach(h=>completed.add(h.type));
   updateTagCloud();
 }
-function choose(p){choiceEl.classList.add("hidden");candidateMarkers.forEach(m=>map.removeLayer(m));candidateMarkers=[];clearSearchZone();document.querySelector(".controls").classList.remove("direction-hidden");statusEl.style.cursor="";statusEl.title="";current=p;visited.add(p.id);moves++;routePoints.push(p);updateVisitedLabels();updateMoveInfo(moves===1?2:3);updateRoute();setCurrent(p);reveal(p);updatePremiumHint();if(!choiceLocked){document.querySelector(".choice-title").textContent="Wybierz kierunek wycieczki";document.querySelector(".choice-buttons").classList.add("direction-choice-empty");choiceEl.classList.remove("hidden")}}
+function choose(p){choiceEl.classList.add("hidden");candidateMarkers.forEach(m=>map.removeLayer(m));candidateMarkers=[];clearSearchZone();document.querySelector(".controls").classList.remove("direction-hidden");statusEl.style.cursor="";statusEl.title="";current=p;visited.add(p.id);moves++;routePoints.push(p);updateVisitedLabels();updateRoute();setCurrent(p);reveal(p);updatePremiumHint();if(!choiceLocked){document.querySelector(".choice-title").textContent="Wybierz kierunek wycieczki";document.querySelector(".choice-buttons").classList.add("direction-choice-empty");choiceEl.classList.remove("hidden")}}
 function finish(){
   document.querySelectorAll(".summary-overlay,.summary-card").forEach(el=>el.remove());
   document.querySelectorAll(".summary-overlay,.summary-card").forEach(el=>{el.removeAttribute("style");});
@@ -399,8 +397,7 @@ function updateMoveInfo(stage){
   movesEl.classList.add("instruction-hidden");
   let text="";
   if(stage===0)text="Teraz za pomocą strzałek wybierz kierunek.";
-  else if(stage===1)text="Teraz wybierz jeden z dwóch wariantów pierwszego etapu podróży.";
-  else if(stage===2)text="Teraz za pomocą strzałek wybierz kierunek kolejnego etapu podróży.";
+  else if(stage===1 || stage===2)return;
   else {movesEl.textContent="Ruchy: "+moves;return}
   movesEl.textContent=text;
   requestAnimationFrame(()=>movesEl.classList.add("instruction-visible"));
@@ -422,6 +419,6 @@ async function start(){if(choiceLocked)return;choiceLocked=true;const startBtn=d
     choiceLocked=false;
     statusEl.textContent="Nie udało się przygotować żadnej misji. Włącz co najmniej jedną kategorię misji w ustawieniach i rozpocznij nową grę.";
     document.getElementById("settings").classList.remove("hidden");
-  }else{statusEl.textContent="Wybierz kierunek strzałką.";updateMoveInfo(0);choiceLocked=false}
+  }else{statusEl.textContent="Wybierz kierunek strzałką.";document.querySelector(".choice-title").textContent="Wybierz kierunek wycieczki";document.querySelector(".choice-buttons").classList.add("direction-choice-empty");choiceEl.classList.remove("hidden");updateMoveInfo(0);choiceLocked=false}
   startBtn.disabled=false;startBtn.textContent="ROZPOCZNIJ GRĘ"}
 async function init(){try{if(typeof L==="undefined")throw new Error("Leaflet nie został załadowany");const mapEl=document.getElementById("map");if(!mapEl)throw new Error("Brak elementu mapy");map=L.map(mapEl,{zoomControl:false}).setView([54.38,18.62],12);if(!map||typeof map.addLayer!=="function")throw new Error("Nie udało się utworzyć mapy Leaflet");L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap"}).addTo(map);loadSettings();updateMoveInfo(0);document.getElementById("startBtn").onclick=start;document.getElementById("settingsBtn").onclick=openSettings;movesEl.addEventListener("click",()=>{if(instructionTimer){clearTimeout(instructionTimer);instructionTimer=null}movesEl.classList.remove("instruction-visible");movesEl.classList.add("instruction-hidden")});document.getElementById("newGameSettings").onclick=async()=>{document.getElementById("settings").classList.add("hidden");choiceLocked=false;await start()};const tagToggle=document.getElementById("tagToggle"),tagCloud=document.getElementById("tagCloud");if(tagToggle&&tagCloud)tagToggle.onclick=()=>tagCloud.classList.toggle("closed");updateTagCloud();statusEl.addEventListener("click",()=>{if(!searchZone)return;searchZone.setStyle({fillOpacity:searchZone.options.fillOpacity>0?0:.14,opacity:searchZone.options.opacity>0?0:.9})});document.getElementById("saveSettings").onclick=async()=>{const btn=document.getElementById("saveSettings");btn.disabled=true;btn.textContent="ZAPISYWANIE…";statusEl.textContent="Trwa zapisywanie ustawień…";await new Promise(r=>setTimeout(r,350));saveSettings();document.getElementById("settings").classList.add("hidden");btn.disabled=false;btn.textContent="ZAPISZ";if(document.getElementById("start").classList.contains("hidden")){await start()}else statusEl.textContent="Ustawienia zapisane. Kliknij „ROZPOCZNIJ GRĘ”.";};document.querySelectorAll("[data-dir]").forEach(b=>b.onclick=()=>showCandidates(b.dataset.dir));document.addEventListener("keydown",e=>{const d={ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right"}[e.key];if(d){e.preventDefault();showCandidates(d)}});try{if(typeof Papa==="undefined")throw Error("Nie załadowano parsera CSV");const r=await fetch(DATA_URL,{cache:"no-store"});if(!r.ok)throw Error("Arkusz Google zwrócił HTTP "+r.status);const csv=await r.text();const parsed=Papa.parse(csv,{header:true,skipEmptyLines:true});if(parsed.errors?.length)console.warn("Ostrzeżenia CSV:",parsed.errors);points=parseSheetRows(parsed.data);if(points.length<20)throw Error("Za mało poprawnych punktów GPS w arkuszu");statusEl.textContent="Załadowano "+points.length+" punktów z Google Sheets (wierszy CSV: "+parsed.data.length+")."}catch(e){console.error("Błąd ładowania Google Sheets:",e);statusEl.textContent="Błąd danych: "+e.message}try{if(L.control&&L.control.scale) L.control.scale({imperial:false,metric:true,position:"bottomleft"}).addTo(map)}catch(e){console.warn("Kontrolka skali pominięta:",e)} }catch(e){console.error("Błąd inicjalizacji gry:",e);statusEl.textContent="BŁĄD MAPY: "+e.message;statusEl.title=e.stack||"";document.getElementById("start").classList.remove("hidden")}}init();
