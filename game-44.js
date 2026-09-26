@@ -161,10 +161,10 @@ function showCandidates(dir){
   let c=directionCandidates(current,visited,dir);
   const GOAL_UNLOCK=500;
   const goalDistance=distance(current,target),goalBearing=bearing(current,target),goalDiff=angleDiff(goalBearing,dirAngle(dir));
-  if(goalDistance<=GOAL_UNLOCK&&goalDiff<=45&&!visited.has(target.id)&&!c.some(p=>p.id===target.id))
+  if(goalDistance<=GOAL_UNLOCK&&goalDiff<=45&&!c.some(p=>p.id===target.id))
     c.push({...target,d:goalDistance,bd:goalBearing,ad:goalDiff,isTarget:true});
   let forcedTarget=null;
-  if(target&&!visited.has(target.id)){
+  if(target){
     const td=distance(current,target),tb=bearing(current,target),ta=angleDiff(tb,dirAngle(dir));
     if(td<=500&&ta<=45)forcedTarget={...target,d:td,bd:tb,ad:ta,isTarget:true};
   }
@@ -570,6 +570,10 @@ function reveal(p){
       updatePremiumHint();
       const premiumText="<b>Teraz część premium.</b><br>Możesz swobodnie eksplorować mapę. Znasz już adres celu, ale jego punkt pojawi się na mapie dopiero, gdy znajdziesz się w odległości 500 m.<br><b>Twój nowy cel: "+esc(target.name)+"</b>";
       missionEl.innerHTML=premiumText;
+      if(visited.has(target.id)){
+        finish();
+        return;
+      }
       if(current.id!==target.id){
         revealEl.innerHTML="<div class='premium-message'>"+premiumText+"</div>";
         revealEl.className="reveal premium-reveal";
