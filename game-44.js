@@ -1,4 +1,4 @@
-const SHEET_ID="1TmRHJDv6IMlGwg761JV50M8vS4zXTdWBtjDziAleSQI",DATA_URL=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;let map,points=[],current=null,gameStart=null,target=null,visited=new Set(),moves=0,choiceLocked=false,premiumShown=false,candidateMarkers=[],currentMarker,startMarker,targetMarker,routeLine=null,routePoints=[],visitedHistory=[],visitedMarkers=[];const missionEl=document.getElementById("mission"),tasksEl=document.getElementById("tasks"),progressEl=document.getElementById("progress"),movesEl=document.getElementById("moves"),choiceEl=document.getElementById("choice"),revealEl=document.getElementById("reveal"),statusEl=document.getElementById("status");let activeTasks=[],completed=new Set(),missionHits=new Map(),gameDistance=0,searchZone=null,instructionTimer=null,settings={count:4,age:true,periods:true,architects:true,people:true,functions:true,names:true,history:true,institutions:true,creators:true,hints:true,revealAnswer:true,distanceRange:"random",startCity:"random"},pathGraph=null;
+const SHEET_ID="1TmRHJDv6IMlGwg761JV50M8vS4zXTdWBtjDziAleSQI",DATA_URL=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;let map,points=[],current=null,gameStart=null,target=null,visited=new Set(),moves=0,choiceLocked=false,premiumShown=false,candidateMarkers=[],currentMarker,startMarker,targetMarker,routeLine=null,routePoints=[],visitedHistory=[],visitedMarkers=[],summaryMarkers=[];const missionEl=document.getElementById("mission"),tasksEl=document.getElementById("tasks"),progressEl=document.getElementById("progress"),movesEl=document.getElementById("moves"),choiceEl=document.getElementById("choice"),revealEl=document.getElementById("reveal"),statusEl=document.getElementById("status");let activeTasks=[],completed=new Set(),missionHits=new Map(),gameDistance=0,searchZone=null,instructionTimer=null,settings={count:4,age:true,periods:true,architects:true,people:true,functions:true,names:true,history:true,institutions:true,creators:true,hints:true,revealAnswer:true,distanceRange:"random",startCity:"random"},pathGraph=null;
 function getSheetVal(obj,searchStrings){const keys=Object.keys(obj||{});for(const search of searchStrings){const clean=search.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"");const exact=keys.find(k=>k.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"")===clean);if(exact&&String(obj[exact]??"").trim()!=="")return String(obj[exact]).trim()}for(const search of searchStrings){const clean=search.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"");const partial=keys.find(k=>k.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"").includes(clean));if(partial&&String(obj[partial]??"").trim()!=="")return String(obj[partial]).trim()}return""}
 function parseSheetRows(data){return data.map((item,i)=>{const name=getSheetVal(item,["adres","nazwa","obiekt","name"])||"Nieznany",date=getSheetVal(item,["datawybudowania","rokbudowy","data","rok","czas","wiek"])||"",notes=getSheetVal(item,["uwagi","opis","informacje","info","inne"]),architect=getSheetVal(item,["architekt","arch.","arch","projektant","proj.","proj","autor"])||String(Object.values(item)[3]??"").trim(),gps=getSheetVal(item,["pozycjagps","gps","wspolrzedne","współrzędne","lokalizacja"]);let lat,lng;if(gps){const matches=String(gps).replace(/;/g,",").match(/-?\d+[\.,]\d+/g)||[];if(matches.length>=2){lat=parseFloat(matches[0].replace(",","."));lng=parseFloat(matches[1].replace(",","."))}}if(!Number.isFinite(lat)||!Number.isFinite(lng))return null;return{id:i,name,lat,lon:lng,raw:notes,date,architect,notes}}).filter(Boolean).filter(p=>p.lat>53.9&&p.lat<54.7&&p.lon>18.2&&p.lon<19.1)}
 function year(p){const m=p.date.match(/(1[0-9]{3}|20[0-9]{2})/);return m?+m[1]:null}function distance(a,b){const R=6371000,dLat=(b.lat-a.lat)*Math.PI/180,dLon=(b.lon-a.lon)*Math.PI/180,x=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(x))}function bearing(a,b){const y=Math.sin((b.lon-a.lon)*Math.PI/180)*Math.cos(b.lat*Math.PI/180),x=Math.cos(a.lat*Math.PI/180)*Math.sin(b.lat*Math.PI/180)-Math.sin(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.cos((b.lon-a.lon)*Math.PI/180);return(Math.atan2(y,x)*180/Math.PI+360)%360}function dirAngle(d){return{up:0,right:90,down:180,left:270}[d]}function angleDiff(a,b){const d=Math.abs(a-b)%360;return d>180?360-d:d}function icon(cls){return L.divIcon({className:cls,iconSize:[28,28],iconAnchor:[14,14]})}
@@ -332,15 +332,87 @@ function taskActions(t){
   if(settings.revealAnswer)h+=" <button class='task-action task-answer' data-task='"+esc(t.type)+"'>POKAŻ ODPOWIEDŹ</button>";
   return h;
 }
+function findTaskByType(type){return activeTasks.find(t=>t.type===type)}
+function shortestGamePath(start,target,maxDepth=10){
+  if(!start||!target)return null;
+  const queue=[{p:start,seen:new Set([start.id]),depth:0}],seenStates=new Set();
+  let examined=0;
+  while(queue.length&&examined<5000){
+    const state=queue.shift(),key=state.p.id+"|"+[...state.seen].sort((a,b)=>a-b).join(",");
+    if(seenStates.has(key))continue;
+    seenStates.add(key);examined++;
+    if(state.p.id===target.id)return state.depth;
+    if(state.depth>=maxDepth)continue;
+    for(const next of moveCandidates(state.p,state.seen)){
+      if(state.seen.has(next.id))continue;
+      const seen=new Set(state.seen);seen.add(next.id);
+      queue.push({p:next,seen,depth:state.depth+1});
+    }
+  }
+  return null;
+}
+function summaryPointPopup(p){
+  const hits=(missionHits.get(p.id)||[]).map(type=>findTaskByType(type)).filter(Boolean);
+  let h="<div class='summary-popup'><h3>"+esc(p.name)+"</h3>";
+  if(hits.length){
+    h+="<div class='summary-missions'><b>Zaliczone misje:</b>";
+    hits.forEach(t=>{h+="<div class='summary-mission'>✓ "+esc(t.text)+"</div>"});
+    h+="</div>";
+  }
+  if(p.date)h+="<p><b>Data budowy:</b> "+esc(p.date)+"</p>";
+  if(p.architect)h+="<p><b>Architekt / projektant:</b> "+esc(p.architect)+"</p>";
+  if(p.notes)h+="<p><b>Informacje:</b><br>"+esc(p.notes).replace(/\n/g,"<br>")+"</p>";
+  return h+"</div>";
+}
+function renderSummaryMap(){
+  summaryMarkers.forEach(m=>{try{map.removeLayer(m)}catch(e){}});
+  summaryMarkers=[];
+  visitedMarkers.forEach(m=>{try{map.removeLayer(m)}catch(e){}});
+  visitedMarkers=[];
+  if(currentMarker){map.removeLayer(currentMarker);currentMarker=null}
+  if(startMarker){map.removeLayer(startMarker);startMarker=null}
+  if(targetMarker){map.removeLayer(targetMarker);targetMarker=null}
+  visitedHistory.forEach((p,i)=>{
+    const isStart=p.id===gameStart?.id;
+    const isMeta=p.id===target?.id;
+    const isMission=(missionHits.get(p.id)||[]).length>0;
+    let cls=isStart?"summary-start":isMeta?"summary-meta":isMission?"summary-mission-marker":"summary-point";
+    const marker=L.marker([p.lat,p.lon],{icon:icon(cls),zIndexOffset:isStart||isMeta?1200:isMission?900:500+i}).addTo(map);
+    if(!isStart&&!isMeta)marker.bindPopup(summaryPointPopup(p),{maxWidth:360});
+    summaryMarkers.push(marker);
+  });
+  if(target&&(!visitedHistory.some(p=>p.id===target.id))){
+    const marker=L.marker([target.lat,target.lon],{icon:icon("summary-meta"),zIndexOffset:1200}).addTo(map);
+    summaryMarkers.push(marker);
+  }
+}
+function summaryStats(travelledDistance){
+  const straight=gameStart&&target?distance(gameStart,target):0;
+  const shortest=shortestGamePath(gameStart,target,10);
+  const extra=shortest!==null?Math.max(0,moves-shortest):null;
+  const detour=straight>0?travelledDistance/straight:null;
+  let h="<div class='summary-stats'><div class='summary-stats-title'>Jak przebiegła trasa?</div>";
+  h+="<div><b>"+moves+"</b> ruchów";
+  if(shortest!==null)h+=" · najkrótsza znaleziona trasa w zasadach gry: <b>"+shortest+"</b>";
+  h+="</div>";
+  if(extra!==null)h+=extra===0?"<div class='summary-good'>✓ Bez dodatkowych ruchów względem znalezionej trasy minimalnej.</div>":"<div>"+extra+" dodatkowych "+(extra===1?"ruch":"ruchów")+" względem znalezionej trasy minimalnej.</div>";
+  h+="<div>Dystans trasy: <b>"+(travelledDistance/1000).toFixed(1)+" km</b>";
+  if(straight>0)h+=" · w linii prostej: <b>"+(straight/1000).toFixed(1)+" km</b>";
+  h+="</div>";
+  if(detour!==null)h+="<div>Współczynnik objazdu: <b>"+detour.toFixed(2)+"×</b> <span class='summary-muted'>(1,00× = trasa tak krótka jak odległość w linii prostej)</span></div>";
+  h+="</div>";
+  return h;
+}
+
 function reveal(p){
-  const hits=activeTasks.filter(t=>!completed.has(t.type)&&t.test(p)).slice(0,1);
+  const hits=activeTasks.filter(t=>!completed.has(t.type)&&t.test(p));
   visitedHistory.push(p);
   let html="<h2>"+esc(p.name)+"</h2>";
   if(p.date)html+="<p><b>Data:</b> "+esc(p.date)+"</p>";
   if(p.architect)html+="<p><b>Architekt:</b> "+esc(p.architect)+"</p>";
   if(hits.length){
-    html+="<div class='match'>✓ "+hits[0].text+"</div>";
-    missionHits.set(p.id,[...(missionHits.get(p.id)||[]),hits[0].type]);
+    hits.forEach(h=>{html+="<div class='match'>✓ "+esc(h.text)+"</div>"});
+    missionHits.set(p.id,[...(missionHits.get(p.id)||[]),...hits.map(h=>h.type)]);
   }
   revealEl.innerHTML=html+"<div class='reveal-auto'>Okno zamknie się automatycznie…</div>";
   revealEl.classList.remove("hidden");
@@ -383,11 +455,17 @@ function finish(){
   choiceEl.classList.add("hidden");
   candidateMarkers.forEach(m=>map.removeLayer(m));
   candidateMarkers=[];
-  if(routePoints.length>1)map.fitBounds(routePoints.map(p=>[p.lat,p.lon]),{padding:[70,70],maxZoom:15});
   const travelledDistance=routePoints.reduce((sum,p,i)=>i?sum+distance(routePoints[i-1],p):0,0);
   const distanceKm=travelledDistance/1000;
-  const missionMoves=Math.max(0,moves-1);const finishComment=distanceKm>7?"Ta trasa nadaje się na wycieczkę rowerową. Znam jednego przewodnika, który robi tego typu trasy.":distanceKm>4?"To już dłuższa miejska wyprawa — po drodze można było zobaczyć sporo różnych miejsc.":distanceKm>2?"Całkiem przyjemna trasa miejska — dobra długość, żeby po drodze zwracać uwagę na mijane obiekty.":"Krótka trasa, ale każda taka wyprawa dokłada kolejne miejsca do poznania Trójmiasta.";
-  revealEl.innerHTML="<div class='finish-message'><div class='finish-kicker'>GRA ZALICZONA</div><h2>"+moves+" "+(moves===1?"ruch":"ruchów")+"</h2><p>W "+missionMoves+" "+(missionMoves===1?"ruchu":"ruchach")+" zaliczyłeś wszystkie misje. Łączny dystans od startu do mety: <b>"+distanceKm.toFixed(1)+" km</b>.</p><p class='finish-comment'>"+esc(finishComment)+"</p><div class='finish-actions'><button id='hideSummary' class='summary-hide'>UKRYJ PODSUMOWANIE</button><button id='restart' class='summary-restart'>NOWA GRA</button></div></div>";
+  const missionMoves=Math.max(0,moves-1);
+  const finishComment=distanceKm>7?"Ta trasa nadaje się na wycieczkę rowerową. Znam jednego przewodnika, który robi tego typu trasy.":distanceKm>4?"To już dłuższa miejska wyprawa — po drodze można było zobaczyć sporo różnych miejsc.":distanceKm>2?"Całkiem przyjemna trasa miejska — dobra długość, żeby po drodze zwracać uwagę na mijane obiekty.":"Krótka trasa, ale każda taka wyprawa dokłada kolejne miejsca do poznania Trójmiasta.";
+  renderSummaryMap();
+  if(routePoints.length>1)map.fitBounds(routePoints.map(p=>[p.lat,p.lon]),{padding:[70,70],maxZoom:15});
+  const missionSummary=activeTasks.filter(t=>completed.has(t.type)).map(t=>{
+    const p=visitedHistory.find(x=>(missionHits.get(x.id)||[]).includes(t.type));
+    return "<div class='summary-mission-row'><b>"+esc(p?.name||"Odwiedzony obiekt")+"</b><span>"+esc(t.text)+"</span></div>";
+  }).join("");
+  revealEl.innerHTML="<div class='finish-message'><div class='finish-kicker'>GRA ZALICZONA</div><h2>Odwiedzone miejsca i misje</h2><div class='summary-missions-list'>"+missionSummary+"</div>"+summaryStats(travelledDistance)+"<p class='finish-route'><b>"+moves+" "+(moves===1?"ruch":"ruchów")+"</b> · łączny dystans: <b>"+distanceKm.toFixed(1)+" km</b></p><p class='finish-comment'>"+esc(finishComment)+"</p><div class='finish-actions'><button id='hideSummary' class='summary-hide'>UKRYJ PODSUMOWANIE</button><button id='restart' class='summary-restart'>NOWA GRA</button></div></div>";
   revealEl.className="reveal finish-reveal";
   revealEl.style.zIndex="1400";
   revealEl.style.bottom="auto";
@@ -450,7 +528,7 @@ function updateProgress(){
   progressEl.textContent="Zadania: "+done+"/"+activeTasks.length+" • Odwiedzone: "+visited.size;
   tasksEl.innerHTML=activeTasks.map(t=>{
     const doneTask=completed.has(t.type);
-    return "<div class=\""+(doneTask?"task-done":"")+"\">"+(doneTask?"✓":"▸")+" "+esc(t.text)+(doneTask?"":missionHeat(t))+"</div>";
+    return "<div class=\""+(doneTask?"task-done":"")+"\">"+(doneTask?"✓":"▸")+" "+esc(t.text)+(doneTask?"":missionHeat(t))+(!doneTask?taskActions(t):"")+"</div>";
   }).join("");
 }
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
@@ -463,4 +541,10 @@ async function start(){if(choiceLocked)return;choiceLocked=true;const startBtn=d
     document.getElementById("settings").classList.remove("hidden");
   }else{statusEl.textContent="Wybierz kierunek strzałką.";document.querySelector(".choice-title").textContent="Wybierz kierunek wycieczki";choiceEl.classList.add("direction-choice-empty");document.querySelector(".choice-buttons").style.display="none";document.getElementById("choiceA").textContent="";document.getElementById("choiceB").textContent="";choiceEl.classList.remove("hidden");updateMoveInfo(0);choiceLocked=false}
   startBtn.disabled=false;startBtn.textContent="ROZPOCZNIJ GRĘ"}
-async function init(){try{if(typeof L==="undefined")throw new Error("Leaflet nie został załadowany");const mapEl=document.getElementById("map");if(!mapEl)throw new Error("Brak elementu mapy");map=L.map(mapEl,{zoomControl:false}).setView([54.38,18.62],12);if(!map||typeof map.addLayer!=="function")throw new Error("Nie udało się utworzyć mapy Leaflet");L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap"}).addTo(map);loadSettings();updateMoveInfo(0);document.getElementById("startBtn").onclick=start;document.getElementById("settingsBtn").onclick=openSettings;document.getElementById("startSettingsBtn").onclick=openSettings;movesEl.addEventListener("click",()=>{if(instructionTimer){clearTimeout(instructionTimer);instructionTimer=null}movesEl.classList.remove("instruction-visible");movesEl.classList.add("instruction-hidden")});document.getElementById("newGameSettings").onclick=async()=>{document.getElementById("settings").classList.add("hidden");choiceLocked=false;await start()};const tagToggle=document.getElementById("tagToggle"),tagCloud=document.getElementById("tagCloud");if(tagToggle&&tagCloud)tagToggle.onclick=()=>tagCloud.classList.toggle("closed");updateTagCloud();statusEl.addEventListener("click",()=>{if(!searchZone)return;searchZone.setStyle({fillOpacity:searchZone.options.fillOpacity>0?0:.14,opacity:searchZone.options.opacity>0?0:.9})});document.getElementById("saveSettings").onclick=async()=>{const btn=document.getElementById("saveSettings");btn.disabled=true;btn.textContent="ZAPISYWANIE…";statusEl.textContent="Trwa zapisywanie ustawień…";await new Promise(r=>setTimeout(r,350));saveSettings();document.getElementById("settings").classList.add("hidden");btn.disabled=false;btn.textContent="ZAPISZ";if(document.getElementById("start").classList.contains("hidden")){await start()}else statusEl.textContent="Ustawienia zapisane. Kliknij „ROZPOCZNIJ GRĘ”.";};document.querySelectorAll("[data-dir]").forEach(b=>b.onclick=()=>showCandidates(b.dataset.dir));document.addEventListener("keydown",e=>{const d={ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right"}[e.key];if(d){e.preventDefault();showCandidates(d)}});try{if(typeof Papa==="undefined")throw Error("Nie załadowano parsera CSV");const r=await fetch(DATA_URL,{cache:"no-store"});if(!r.ok)throw Error("Arkusz Google zwrócił HTTP "+r.status);const csv=await r.text();const parsed=Papa.parse(csv,{header:true,skipEmptyLines:true});if(parsed.errors?.length)console.warn("Ostrzeżenia CSV:",parsed.errors);points=parseSheetRows(parsed.data);updateCategoryCounts();if(points.length<20)throw Error("Za mało poprawnych punktów GPS w arkuszu");statusEl.textContent="Załadowano "+points.length+" punktów z Google Sheets (wierszy CSV: "+parsed.data.length+")."}catch(e){console.error("Błąd ładowania Google Sheets:",e);statusEl.textContent="Błąd danych: "+e.message}try{if(L.control&&L.control.scale) L.control.scale({imperial:false,metric:true,position:"bottomleft"}).addTo(map)}catch(e){console.warn("Kontrolka skali pominięta:",e)} }catch(e){console.error("Błąd inicjalizacji gry:",e);statusEl.textContent="BŁĄD MAPY: "+e.message;statusEl.title=e.stack||"";document.getElementById("start").classList.remove("hidden")}}init();
+async function init(){try{if(typeof L==="undefined")throw new Error("Leaflet nie został załadowany");const mapEl=document.getElementById("map");if(!mapEl)throw new Error("Brak elementu mapy");map=L.map(mapEl,{zoomControl:false}).setView([54.38,18.62],12);if(!map||typeof map.addLayer!=="function")throw new Error("Nie udało się utworzyć mapy Leaflet");L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap"}).addTo(map);loadSettings();updateMoveInfo(0);document.getElementById("startBtn").onclick=start;document.getElementById("settingsBtn").onclick=openSettings;
+document.getElementById("tasks").addEventListener("click",e=>{
+  const btn=e.target.closest(".task-action"); if(!btn)return;
+  const t=findTaskByType(btn.dataset.task); if(!t)return;
+  if(btn.classList.contains("task-hint"))statusEl.textContent=taskHint(t);
+  else if(btn.classList.contains("task-answer"))revealAnswerForTask(t);
+});document.getElementById("startSettingsBtn").onclick=openSettings;movesEl.addEventListener("click",()=>{if(instructionTimer){clearTimeout(instructionTimer);instructionTimer=null}movesEl.classList.remove("instruction-visible");movesEl.classList.add("instruction-hidden")});document.getElementById("newGameSettings").onclick=async()=>{document.getElementById("settings").classList.add("hidden");choiceLocked=false;await start()};const tagToggle=document.getElementById("tagToggle"),tagCloud=document.getElementById("tagCloud");if(tagToggle&&tagCloud)tagToggle.onclick=()=>tagCloud.classList.toggle("closed");updateTagCloud();statusEl.addEventListener("click",()=>{if(!searchZone)return;searchZone.setStyle({fillOpacity:searchZone.options.fillOpacity>0?0:.14,opacity:searchZone.options.opacity>0?0:.9})});document.getElementById("saveSettings").onclick=async()=>{const btn=document.getElementById("saveSettings");btn.disabled=true;btn.textContent="ZAPISYWANIE…";statusEl.textContent="Trwa zapisywanie ustawień…";await new Promise(r=>setTimeout(r,350));saveSettings();document.getElementById("settings").classList.add("hidden");btn.disabled=false;btn.textContent="ZAPISZ";if(document.getElementById("start").classList.contains("hidden")){await start()}else statusEl.textContent="Ustawienia zapisane. Kliknij „ROZPOCZNIJ GRĘ”.";};document.querySelectorAll("[data-dir]").forEach(b=>b.onclick=()=>showCandidates(b.dataset.dir));document.addEventListener("keydown",e=>{const d={ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right"}[e.key];if(d){e.preventDefault();showCandidates(d)}});try{if(typeof Papa==="undefined")throw Error("Nie załadowano parsera CSV");const r=await fetch(DATA_URL,{cache:"no-store"});if(!r.ok)throw Error("Arkusz Google zwrócił HTTP "+r.status);const csv=await r.text();const parsed=Papa.parse(csv,{header:true,skipEmptyLines:true});if(parsed.errors?.length)console.warn("Ostrzeżenia CSV:",parsed.errors);points=parseSheetRows(parsed.data);updateCategoryCounts();if(points.length<20)throw Error("Za mało poprawnych punktów GPS w arkuszu");statusEl.textContent="Załadowano "+points.length+" punktów z Google Sheets (wierszy CSV: "+parsed.data.length+")."}catch(e){console.error("Błąd ładowania Google Sheets:",e);statusEl.textContent="Błąd danych: "+e.message}try{if(L.control&&L.control.scale) L.control.scale({imperial:false,metric:true,position:"bottomleft"}).addTo(map)}catch(e){console.warn("Kontrolka skali pominięta:",e)} }catch(e){console.error("Błąd inicjalizacji gry:",e);statusEl.textContent="BŁĄD MAPY: "+e.message;statusEl.title=e.stack||"";document.getElementById("start").classList.remove("hidden")}}init();
