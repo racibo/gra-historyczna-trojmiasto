@@ -343,3 +343,7 @@ routeLine{}\n/* V44.5 — automatyczne kadrowanie uwzględnia panel wyboru na do
 .visited-label-marker>div b{font-size:8px!important}
 
 /* Zielona trasa: kropkowana zamiast kreskowanej. */
+
+/* V44.7 — panel kierunku nie pokazuje starych przycisków A/B */
+.choice.direction-choice-empty .choice-buttons{display:none!important}
+.choice.direction-choice-empty .choice-title{margin-bottom:0}
