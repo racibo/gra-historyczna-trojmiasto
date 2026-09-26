@@ -377,3 +377,19 @@ routeLine{}\n/* V44.5 — automatyczne kadrowanie uwzględnia panel wyboru na do
 /* V45.2 — liczba obiektów dostępnych w każdej kategorii misji */
 .category-count{font-size:10px;color:#888;margin-left:4px;white-space:nowrap}
 @media(max-width:600px){.category-count{font-size:9px}}
+
+
+/* V45.3 — przycisk ustawień dostępny również na ekranie startowym */
+.secondary-start-btn{
+  display:block;
+  width:100%;
+  margin:10px 0 0;
+  padding:9px 14px;
+  border:1px solid rgba(255,255,255,.28);
+  border-radius:8px;
+  background:rgba(255,255,255,.08);
+  color:inherit;
+  font-size:13px;
+  cursor:pointer;
+}
+.secondary-start-btn:hover{background:rgba(255,255,255,.14)}
