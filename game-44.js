@@ -307,13 +307,28 @@ function taskForGame(){
   for(let i=usable.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[usable[i],usable[j]]=[usable[j],usable[i]]}
   return usable.slice(0,Math.min(settings.count,usable.length));
 }
+function taskSolutionDistance(t,p){
+  const targets=points.filter(x=>x.id!==p.id&&!visited.has(x.id)&&t.test(x));
+  if(!targets.length)return null;
+  return Math.min(...targets.map(x=>distance(p,x)));
+}
+function taskAwayStreak(t){
+  if(visitedHistory.length<4)return 0;
+  let streak=0;
+  for(let i=visitedHistory.length-1;i>0;i--){
+    const before=taskSolutionDistance(t,visitedHistory[i-1]);
+    const after=taskSolutionDistance(t,visitedHistory[i]);
+    if(before===null||after===null)break;
+    if(after-before>1)streak++;
+    else break;
+  }
+  return streak;
+}
 function taskHint(t){
   const targets=points.filter(p=>p.id!==current.id&&!visited.has(p.id)&&t.test(p));
   if(!targets.length)return "Brak jeszcze dostępnego punktu spełniającego tę misję.";
-  const p=targets.reduce((a,b)=>distance(current,a)<distance(current,b)?a:b),d=distance(current,p),dir=bearing(current,p);
-  const dirs=[["północ",337.5,360],["północ",0,22.5],["północny wschód",22.5,67.5],["wschód",67.5,112.5],["południowy wschód",112.5,157.5],["południe",157.5,202.5],["południowy zachód",202.5,247.5],["zachód",247.5,292.5],["północny zachód",292.5,337.5]];
-  const label=dirs.find(x=>dir>=x[1]&&dir<x[2])?.[0]||"";
-  return "Najbliższy pasujący obiekt jest około "+(d<1000?Math.round(d)+" m":(d/1000).toFixed(1)+" km")+" stąd, w kierunku: "+label+".";
+  const p=targets.reduce((a,b)=>distance(current,a)<distance(current,b)?a:b),d=distance(current,p);
+  return "Najbliższy punkt rozwiązania jest dokładnie "+(d<1000?Math.round(d)+" m":(d/1000).toFixed(2)+" km")+" stąd.";
 }
 function revealAnswerForTask(t){
   const targets=points.filter(p=>p.id!==current.id&&!visited.has(p.id)&&t.test(p));
@@ -328,10 +343,11 @@ function revealAnswerForTask(t){
 }
 function taskActions(t){
   let h="";
-  if(settings.hints)h+=" <button class='task-action task-hint' data-task='"+esc(t.type)+"'>PODPOWIEDŹ</button>";
-  if(settings.revealAnswer)h+=" <button class='task-action task-answer' data-task='"+esc(t.type)+"'>POKAŻ ODPOWIEDŹ</button>";
+  if(settings.hints&&taskAwayStreak(t)>=3)h+=" <button class='task-action task-hint' data-task='"+esc(t.type)+"'>PODPOWIEDŹ</button>";
+  if(settings.revealAnswer)h+=" <button class='task-action task-answer' data-task='"+esc(t.type)+"'>PODDAJĘ SIĘ</button>";
   return h;
 }
+
 function findTaskByType(type){return activeTasks.find(t=>t.type===type)}
 function shortestGamePath(start,target,maxDepth=10){
   if(!start||!target)return null;
