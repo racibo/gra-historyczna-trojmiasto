@@ -218,29 +218,42 @@ function missionPoints(){
 function personNames(p){
   const text=String(p.architect||"").replace(/\s+/g," ").trim();
   if(!text)return [];
-  const names=[];
-  text.split(/\s*(?:,|;|\/|\\|\s+i\s+|\s+oraz\s+)\s*/i).forEach(part=>{
-    const name=part.replace(/^(architekt|projektant|autor|architekci|projektanci)\s*[:\\-]?\s*/i,"").trim();
-    const words=name.split(/\s+/).filter(Boolean);
-    if(words.length>=2 && words.every(w=>/^[A-ZĄĆĘŁŃÓŚŹŻ][A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż'-]*$/.test(w))) names.push(name);
-  });
-  return [...new Set(names)];
+  const cleaned=text.replace(/^(architekt|projektant|autor|architekci|projektanci)\s*[:\-]?\s*/i,"").trim();
+  const parts=cleaned.split(/\s*(?:,|;|\/|\\|\s+i\s+|\s+oraz\s+)\s*/i)
+    .map(x=>x.trim()).filter(Boolean);
+  return [...new Set(parts)];
 }
 function cleanNote(p){return String(p.notes||"").replace(/\s+/g," ").trim()}
 function noteHas(p,re){return re.test(cleanNote(p))}
 function missionData(p){
   const n=cleanNote(p), a=String(p.architect||"").trim();
+  const lower=n.toLowerCase();
+
+  // Każda kategoria jest niezależna. Ten sam obiekt może należeć do kilku kategorii.
+  // Klasyfikacja opiera się przede wszystkim na treści pola „Uwagi”.
+  const functionsRe=/\b(?:dawna|dawny|dawne|dawniej|wcześniej|uprzednio|pierwotnie|była tu|był tu|mieścił(?:a)? się tu|znajdowała się tu|znajdował się tu|pełnił(?:a)? funkcję|służył(?:a)? jako|wykorzystywany jako|przeznaczony na|zamieniono na|przekształcono na|przebudowano na|zajezdnia|łaźnia|szpital|hotel|kotłownia|gazownia|biurowiec|hala|ujeżdżalnia|więzienie|komisariat|posterunek|straż pożarna|biblioteka|dworzec|instytut|dom handlowy|dom technika|internat|schronisko|hangar|kino|pensjonat|dom wczasowy|szkoła|klasztor|kościół|magazyn|fabryka|warsztat|ratusz|poczta)\b/i;
+
+  const namesRe=/\b(?:dawna nazwa|dawne nazwy|dawniej nazywan[ay]|wcześniej nazywan[ay]|nos[iłła] nazwę|pod nazwą|znan[ay] jako|występuje pod nazwą|nosił nazwę|koloni[ae]|osiedl[ae]|dzielnic[ae]|kwartał|zespół mieszkaniowy|falkhof|meeresstern|bratniak|zieleniec|ochota|berg|praca|jordana|schichau|przybyszewskiego|lieblingsruh|nowych szkoców|żniwne|dożynki|rzeszy|fińskich domków|słomianych wdów)\b/i;
+
+  const historyRe=/\b(?:histori[ae]|historyczn|powstał[ay]?|założon[ay]|założeni[ae]|zbudowan[ay]|wzniesion[ay]|wybudowan[ay]|odbudow|rozbudow|przebudow|zniszcz|spłon[ąał]|pożar|wojn[ay]|bombard|okupacj|wyzwol|wyburzon|rozebr|zachował|zachowało się|oryginał|pierwotn|najstarsz|pierwsz[ay]|średniowiecz|gotyck|renesans|barok|neogot|modernizm|secesj|eklektyzm|fundacj|konserwacj|restauracj|rewitalizacj|w 1[0-9]{3}|w 20[0-9]{2}|w XIX wieku|w XX wieku|w XXI wieku)\b/i;
+
+  const institutionsRe=/\b(?:spółdzielni[ae]|fundacj[ae]|przedsiębiorstw[oa]|instytut[emu]?|uniwersytet[emu]?|szkoł[ay]|stoczni[ae]|telekomunikacj[ae]|poczt[ay]|zakład(?:y|ów)?|kombinat[emu]?|depot|policj[ai]|marynarki|wojsk[ao]?|straż[ay]|związek(?:u)? zawodow(?:y|ego)|towarzystw[oa]|organizacj[ae]|bractw[oa]|cech[emu]?|parafi[ae]|diecezj[ae]|zakon(?:u|em)?|klasztor[emu]?|urząd[emu]?|ministerstw[oa]|kolej[ae]|przedsiębiorstw[oa]|pzu|nfz|orange|centromor|ppts|koga|gemeinnützige)\b/i;
+
+  const creatorsRe=/\b(?:pomnik(?:a|iem)?|mural(?:u|em)?|sgraffit(?:o|a)|rzeźb[ay]|rzeźbiarz|autor(?:em|ka|ką)?|autorstwa|twórc(?:a|y|ą)|wykonał|wykonan[ay] przez|zaprojektował(?:a)?|projekt(?:u|em)?|dzieł(?:o|a|em)|artyst(?:a|y|ą)|malarz|malowidł(?:o|a)|mozaik[ai]|tablic(?:a|ę)|fontann[ay]|instalacj[ae])\b/i;
+
+  // Osoby i rodziny: szukamy relacji człowiek–obiekt, a nie przypadkowego nazwiska.
+  const peopleRe=/\b(?:mieszkał(?:a|y)?|zamieszkiwał(?:a|y)?|urodził(?:a|y) się|żył(?:a|y)|zmarł(?:a|y)|właściciel(?:em|ka|ką)?|właściciel[ae]?|fundator(?:em|ka|ką)?|ufundował|należał do|należała do|dla rodziny|dla pracowników|siedziba rodziny|rodzina|małżeństw[oa]|książę|król|prezydent|burmistrz|profesor|inżynier|artyst[ay]|pisarz|lekarz|przedsiębiorc[ay])\b/i;
+
   return {
     architects:a?personNames(p):[],
-    people:n.match(/(?:mieszkał(?:a)?(?: tu)?|dla rodziny|dla [A-ZĄĆĘŁŃÓŚŹŻ][A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż'-]+|właściciel(?:a|ka)?|fundator(?:a|em)?|dla pracowników|dla [^,;]+)[^.;]*/i)?.[0]||"",
-    functions:noteHas(p,/\\b(dawna|dawny|dawne|była tu|był tu|wcześniej|potem|później|przebudowana? w .*na|zajezdnia|łaźnia|szpital|hotel|kotłownia|gazownia|biurowiec|hala|ujężdżalnia|ujeżdżalnia|więzienie|policja|straż pożarna|biblioteka|dworzec|instytut|dom handlowy|dom technika|internat|schron|hangar|taksi|kino|pensjonat|dom wczasowy|zespół szkół)/i),
-    names:noteHas(p,/\\b(kolonia|osiedle|falkhof|meeresstern|bratniak|zieleniec|ochota|berg|praca|jordana|schichau|przybyszewskiego|lieblingsruh|nowych szkoców|żniwne|dożynki|rzeszy|fińskich domków|słomianych wdów)/i),
-    history:noteHas(p,/\\b(odbudow|oryginał|średniowie|gotyck|renesans|zniszcz|fundacj|z 1[0-9]{2}|z 14[0-9]{2}|z 15[0-9]{2}|z 16[0-9]{2}|przebudow|rozbudow|najstarsz|dawniej|wcześniej|właściwie|poprzedniczk|pierwotn)/i),
-    institutions:noteHas(p,/\\b(spółdzielnia|fundacja|przedsiębiorstwo|instytut|uniwersytet|szkoła|stoczni|telekomunikacja|orange|nauczyciel|gdyńska spółdzielnia|gemeinnützige|koga|fort|centromor|pzu|nfz|ppts|poczt|zakład|zakładów|depot|kombinat|policji|marynarki|związek zawodowy)/i),
-    creators:noteHas(p,/\\b(pomnik|mural|sgraffito|autor(?:zy)?|twórca|rzeźb|artysta|wykonanie|dzieło|maszty|tablicę stworzył)/i)
+    people:peopleRe.test(lower)?n:"",
+    functions:functionsRe.test(lower)?n:"",
+    names:namesRe.test(lower)?n:"",
+    history:historyRe.test(lower)?n:"",
+    institutions:institutionsRe.test(lower)?n:"",
+    creators:creatorsRe.test(lower)?n:""
   };
 }
-function personMatch(p,name){return personNames(p).some(n=>n.toLowerCase()===name.toLowerCase())}
 function missionLabel(p,category){
   const d=missionData(p),n=cleanNote(p);
   if(category==="architects"&&d.architects.length)return d.architects.join(", ");
