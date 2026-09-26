@@ -218,14 +218,16 @@ function missionPoints(){
   return local.length>=8?local:points.filter(p=>p.id!==gameStart.id&&p.id!==target.id&&(distance(p,gameStart)<=8000||distance(p,target)<=8000));
 }
 function architectText(p){
-  const direct=String(p.architect||"").replace(/\s+/g," ").trim();
-  if(direct)return direct;
-  const note=cleanNote(p);
+  const text=String(p.architect||"").replace(/\s+/g," ").trim();
+  if(!text)return "";
   const matches=[];
-  const re=/(?:^|[;,.]\s*)(?:architekt(?:ka)?|arch\.?|projektant(?:ka)?|proj\.?)\s*[:\-]?\s*([^;.\n]+)/gi;
+  const re=/(?:^|[;,.|])\s*(?:architekt(?:ka)?|architekci|arch\.?|projektant(?:ka)?|projektanci|proj\.?)\s*[:\-]?\s*([^;,.|\n]+)/gi;
   let m;
-  while((m=re.exec(note))) if(m[1].trim()) matches.push(m[1].trim());
-  return matches.join(", ");
+  while((m=re.exec(text))) {
+    const value=m[1].trim();
+    if(value && !/^\d{3,4}$/.test(value)) matches.push(value);
+  }
+  return [...new Set(matches)].join(", ");
 }
 function personNames(p){
   const text=architectText(p);
