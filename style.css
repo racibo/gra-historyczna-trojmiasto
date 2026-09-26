@@ -235,3 +235,33 @@ html,body,#map{height:100%;margin:0}body{font-family:system-ui,sans-serif;overfl
   .game-instruction{top:43px!important;bottom:auto!important;left:7px!important;right:7px!important;width:auto!important;font-size:10px!important;padding:4px 7px!important;background:rgba(20,20,20,.78)!important;color:#777!important;}
   .mission{top:72px!important;}
 }
+
+
+/* V44.3 — ustawienia zawsze mieszczą się na ekranie, z przewijaniem */
+.settings-card{
+  max-height:calc(100vh - 24px);
+  max-height:calc(100dvh - 24px);
+  overflow-y:auto;
+  box-sizing:border-box;
+  overscroll-behavior:contain;
+}
+.settings-card h2{font-size:18px;margin-bottom:10px;}
+.settings-card label{margin:6px 0;padding:6px 8px;font-size:12px;}
+.settings-card .settings-subtitle{margin-top:8px;padding:5px 2px 1px;font-size:10px;}
+.settings-card select{font-size:12px;padding:3px 5px;min-width:115px;}
+.settings-actions{position:sticky;bottom:0;padding-top:8px;margin-top:8px;background:#202020;}
+.game-instruction{top:46px!important;bottom:auto!important;left:10px!important;right:10px!important;transform:none!important;width:auto!important;}
+@media(max-width:600px){
+  .game-instruction{top:43px!important;left:7px!important;right:7px!important;font-size:10px!important;}
+  .mission{top:72px!important;}
+  .settings-card{
+    width:calc(100vw - 20px);
+    max-height:calc(100vh - 20px);
+    max-height:calc(100dvh - 20px);
+    padding:12px;
+  }
+  .settings-card h2{font-size:16px;margin-bottom:7px;}
+  .settings-card label{margin:4px 0;padding:5px 7px;font-size:11px;}
+  .settings-card select{font-size:11px;min-width:105px;}
+  .settings-card .settings-subtitle{margin-top:6px;font-size:9px;}
+}
