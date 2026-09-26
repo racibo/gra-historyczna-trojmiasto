@@ -386,20 +386,76 @@ function renderSummaryMap(){
     summaryMarkers.push(marker);
   }
 }
-function summaryStats(travelledDistance){
-  const straight=gameStart&&target?distance(gameStart,target):0;
-  const shortest=shortestGamePath(gameStart,target,10);
-  const extra=shortest!==null?Math.max(0,moves-shortest):null;
-  const detour=straight>0?travelledDistance/straight:null;
-  let h="<div class='summary-stats'><div class='summary-stats-title'>Jak przebiegła trasa?</div>";
-  h+="<div><b>"+moves+"</b> ruchów";
-  if(shortest!==null)h+=" · najkrótsza znaleziona trasa w zasadach gry: <b>"+shortest+"</b>";
-  h+="</div>";
-  if(extra!==null)h+=extra===0?"<div class='summary-good'>✓ Bez dodatkowych ruchów względem znalezionej trasy minimalnej.</div>":"<div>"+extra+" dodatkowych "+(extra===1?"ruch":"ruchów")+" względem znalezionej trasy minimalnej.</div>";
-  h+="<div>Dystans trasy: <b>"+(travelledDistance/1000).toFixed(1)+" km</b>";
-  if(straight>0)h+=" · w linii prostej: <b>"+(straight/1000).toFixed(1)+" km</b>";
-  h+="</div>";
-  if(detour!==null)h+="<div>Współczynnik objazdu: <b>"+detour.toFixed(2)+"×</b> <span class='summary-muted'>(1,00× = trasa tak krótka jak odległość w linii prostej)</span></div>";
+function approachAnalysis(startIndex,endIndex,goal){
+  const route=[gameStart,...visitedHistory];
+  if(!goal||startIndex<0||endIndex<=startIndex||endIndex>=route.length)return null;
+  let toward=0,away=0,flat=0;
+  const startDistance=distance(route[startIndex],goal);
+  const endDistance=distance(route[endIndex],goal);
+  for(let i=startIndex+1;i<=endIndex;i++){
+    const before=distance(route[i-1],goal),after=distance(route[i],goal),delta=before-after;
+    if(delta>1)toward++;
+    else if(delta<-1)away++;
+    else flat++;
+  }
+  const counted=toward+away;
+  const towardPct=counted?Math.round(toward/counted*100):100;
+  let verdict;
+  if(away===0&&toward>0)verdict="Cały czas zbliżanie się";
+  else if(toward>away)verdict="Przeważało zbliżanie się";
+  else if(away>toward)verdict="Przeważało oddalanie się";
+  else verdict="Tyle samo zbliżeń co oddaleń";
+  return {startDistance,endDistance,toward,away,flat,towardPct,verdict,moves:endIndex-startIndex};
+}
+function summaryProgress(){
+  const route=[gameStart,...visitedHistory];
+  const stages=[];
+  let lastIndex=0;
+  const doneTasks=activeTasks.filter(t=>completed.has(t.type));
+  doneTasks.forEach(t=>{
+    const hitIndex=visitedHistory.findIndex(p=>(missionHits.get(p.id)||[]).includes(t.type));
+    if(hitIndex<0)return;
+    const endIndex=hitIndex+1;
+    const previous=stages.length?stages[stages.length-1].endIndex:lastIndex;
+    if(endIndex<previous)return;
+    const point=route[endIndex];
+    const existing=stages.find(s=>s.endIndex===endIndex);
+    if(existing){
+      existing.tasks.push(t.text);
+      return;
+    }
+    const analysis=approachAnalysis(previous,endIndex,point);
+    stages.push({endIndex,tasks:[t.text],point,analysis});
+    lastIndex=endIndex;
+  });
+  if(!stages.length)return "";
+  let h="<div class='summary-progress'><div class='summary-progress-title'>Czy zbliżałeś się do rozwiązań?</div>";
+  stages.forEach((s,i)=>{
+    const a=s.analysis;
+    if(!a)return;
+    h+="<div class='summary-progress-row'>";
+    h+="<b>Misja "+(i+1)+" · "+esc(s.point.name)+"</b>";
+    h+="<span class='summary-progress-task'>"+s.tasks.map(esc).join("<br>")+"</span>";
+    h+="<span>↗ Zbliżenie: <b>"+a.toward+"</b> · ↘ Oddalenie: <b>"+a.away+"</b>";
+    if(a.flat)h+=" · ↔ bez wyraźnej zmiany: <b>"+a.flat+"</b>";
+    h+="</span>";
+    h+="<span class='summary-progress-verdict'>"+esc(a.verdict)+" · "+a.towardPct+"% ruchów prowadziło bliżej celu</span>";
+    h+="</div>";
+  });
+  const last=stages[stages.length-1];
+  const targetIndex=route.findIndex(p=>p.id===target?.id);
+  if(targetIndex>last.endIndex){
+    const a=approachAnalysis(last.endIndex,targetIndex,target);
+    if(a){
+      h+="<div class='summary-progress-row summary-premium-row'>";
+      h+="<b>Część premium · "+esc(target.name)+"</b>";
+      h+="<span>↗ Zbliżenie: <b>"+a.toward+"</b> · ↘ Oddalenie: <b>"+a.away+"</b>";
+      if(a.flat)h+=" · ↔ bez wyraźnej zmiany: <b>"+a.flat+"</b>";
+      h+="</span>";
+      h+="<span class='summary-progress-verdict'>"+esc(a.verdict)+" · "+a.towardPct+"% ruchów prowadziło bliżej mety</span>";
+      h+="</div>";
+    }
+  }
   h+="</div>";
   return h;
 }
@@ -455,17 +511,13 @@ function finish(){
   choiceEl.classList.add("hidden");
   candidateMarkers.forEach(m=>map.removeLayer(m));
   candidateMarkers=[];
-  const travelledDistance=routePoints.reduce((sum,p,i)=>i?sum+distance(routePoints[i-1],p):0,0);
-  const distanceKm=travelledDistance/1000;
-  const missionMoves=Math.max(0,moves-1);
-  const finishComment=distanceKm>7?"Ta trasa nadaje się na wycieczkę rowerową. Znam jednego przewodnika, który robi tego typu trasy.":distanceKm>4?"To już dłuższa miejska wyprawa — po drodze można było zobaczyć sporo różnych miejsc.":distanceKm>2?"Całkiem przyjemna trasa miejska — dobra długość, żeby po drodze zwracać uwagę na mijane obiekty.":"Krótka trasa, ale każda taka wyprawa dokłada kolejne miejsca do poznania Trójmiasta.";
   renderSummaryMap();
   if(routePoints.length>1)map.fitBounds(routePoints.map(p=>[p.lat,p.lon]),{padding:[70,70],maxZoom:15});
   const missionSummary=activeTasks.filter(t=>completed.has(t.type)).map(t=>{
     const p=visitedHistory.find(x=>(missionHits.get(x.id)||[]).includes(t.type));
     return "<div class='summary-mission-row'><b>"+esc(p?.name||"Odwiedzony obiekt")+"</b><span>"+esc(t.text)+"</span></div>";
   }).join("");
-  revealEl.innerHTML="<div class='finish-message'><div class='finish-kicker'>GRA ZALICZONA</div><h2>Odwiedzone miejsca i misje</h2><div class='summary-missions-list'>"+missionSummary+"</div>"+summaryStats(travelledDistance)+"<p class='finish-route'><b>"+moves+" "+(moves===1?"ruch":"ruchów")+"</b> · łączny dystans: <b>"+distanceKm.toFixed(1)+" km</b></p><p class='finish-comment'>"+esc(finishComment)+"</p><div class='finish-actions'><button id='hideSummary' class='summary-hide'>UKRYJ PODSUMOWANIE</button><button id='restart' class='summary-restart'>NOWA GRA</button></div></div>";
+  revealEl.innerHTML="<div class='finish-message'><div class='finish-kicker'>GRA ZALICZONA</div><h2>Odwiedzone miejsca i misje</h2><div class='summary-missions-list'>"+missionSummary+"</div>"+summaryProgress()+"<div class='finish-actions'><button id='hideSummary' class='summary-hide'>UKRYJ PODSUMOWANIE</button><button id='restart' class='summary-restart'>NOWA GRA</button></div></div>";
   revealEl.className="reveal finish-reveal";
   revealEl.style.zIndex="1400";
   revealEl.style.bottom="auto";
@@ -480,6 +532,7 @@ function finish(){
   };
   document.getElementById("restart").onclick=()=>location.reload();
 }
+
 function updateTagCloud(){
   const years=[...new Set(visitedHistory.map(p=>year(p)).filter(y=>y!==null))].sort((a,b)=>b-a);
   const cloud=document.getElementById("tagCloud");if(!cloud)return;
