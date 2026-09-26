@@ -3,7 +3,7 @@ function getSheetVal(obj,searchStrings){const keys=Object.keys(obj||{});for(cons
 function parseSheetRows(data){return data.map((item,i)=>{const name=getSheetVal(item,["adres","nazwa","obiekt","name"])||"Nieznany",date=getSheetVal(item,["datawybudowania","rokbudowy","data","rok","czas","wiek"])||"",notes=getSheetVal(item,["uwagi","opis","informacje","info","inne"]),architect=getSheetVal(item,["architekt","projektant","autor"]),gps=getSheetVal(item,["pozycjagps","gps","wspolrzedne","współrzędne","lokalizacja"]);let lat,lng;if(gps){const matches=String(gps).replace(/;/g,",").match(/-?\d+[\.,]\d+/g)||[];if(matches.length>=2){lat=parseFloat(matches[0].replace(",","."));lng=parseFloat(matches[1].replace(",","."))}}if(!Number.isFinite(lat)||!Number.isFinite(lng))return null;return{id:i,name,lat,lon:lng,raw:notes,date,architect,notes}}).filter(Boolean).filter(p=>p.lat>53.9&&p.lat<54.7&&p.lon>18.2&&p.lon<19.1)}
 function year(p){const m=p.date.match(/(1[0-9]{3}|20[0-9]{2})/);return m?+m[1]:null}function distance(a,b){const R=6371000,dLat=(b.lat-a.lat)*Math.PI/180,dLon=(b.lon-a.lon)*Math.PI/180,x=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(x))}function bearing(a,b){const y=Math.sin((b.lon-a.lon)*Math.PI/180)*Math.cos(b.lat*Math.PI/180),x=Math.cos(a.lat*Math.PI/180)*Math.sin(b.lat*Math.PI/180)-Math.sin(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.cos((b.lon-a.lon)*Math.PI/180);return(Math.atan2(y,x)*180/Math.PI+360)%360}function dirAngle(d){return{up:0,right:90,down:180,left:270}[d]}function angleDiff(a,b){const d=Math.abs(a-b)%360;return d>180?360-d:d}function icon(cls){return L.divIcon({className:cls,iconSize:[28,28],iconAnchor:[14,14]})}
 function setCurrent(p,showHere=true){if(currentMarker)map.removeLayer(currentMarker);currentMarker=L.marker([p.lat,p.lon],{icon:icon("current-marker"),zIndexOffset:1000}).addTo(map);if(showHere)currentMarker.bindTooltip("TU JESTEŚ",{permanent:true,direction:"top",className:"current-label"});map.panTo([p.lat,p.lon],{animate:true,duration:.5})}
-function updateRoute(){if(routeLine)map.removeLayer(routeLine);routeLine=L.polyline(routePoints.map(p=>[p.lat,p.lon]),{color:"#2e7d32",weight:4,opacity:.9,dashArray:"9 8",lineCap:"round"}).addTo(map)}
+function updateRoute(){if(routeLine)map.removeLayer(routeLine);routeLine=L.polyline(routePoints.map(p=>[p.lat,p.lon]),{color:"#2e7d32",weight:4,opacity:.9,dashArray:"2 8",lineCap:"round"}).addTo(map)}
 function visitedLabelHtml(p,index){
   let html="<div class='visited-full'><h3>"+esc(p.name)+"</h3>";
   if(p.date)html+="<p><b>Data budowy:</b> "+esc(p.date)+"</p>";
@@ -184,7 +184,7 @@ function showCandidates(dir){
   updateMoveInfo(1);
   // Automatycznie dopasuj widok do bieżącego punktu i dwóch wariantów.
   const bounds=L.latLngBounds([[current.lat,current.lon],[chosen[0].lat,chosen[0].lon],[chosen[1].lat,chosen[1].lon]]);
-  map.fitBounds(bounds,{paddingTopLeft:[20,95],paddingBottomRight:[20,230],maxZoom:16});
+  map.fitBounds(bounds,{paddingTopLeft:[20,150],paddingBottomRight:[20,115],maxZoom:16});
   document.getElementById("choiceA").onclick=()=>choose(chosen[0]);
   document.getElementById("choiceB").onclick=()=>choose(chosen[1]);
 }
@@ -330,7 +330,7 @@ function reveal(p){
   hits.forEach(h=>completed.add(h.type));
   updateTagCloud();
 }
-function choose(p){choiceEl.classList.add("hidden");candidateMarkers.forEach(m=>map.removeLayer(m));candidateMarkers=[];clearSearchZone();document.querySelector(".controls").classList.remove("direction-hidden");statusEl.style.cursor="";statusEl.title="";current=p;visited.add(p.id);moves++;routePoints.push(p);updateVisitedLabels();updateMoveInfo(moves===1?2:3);updateRoute();setCurrent(p);reveal(p);updatePremiumHint()}
+function choose(p){choiceEl.classList.add("hidden");candidateMarkers.forEach(m=>map.removeLayer(m));candidateMarkers=[];clearSearchZone();document.querySelector(".controls").classList.remove("direction-hidden");statusEl.style.cursor="";statusEl.title="";current=p;visited.add(p.id);moves++;routePoints.push(p);updateVisitedLabels();updateMoveInfo(moves===1?2:3);updateRoute();setCurrent(p);reveal(p);updatePremiumHint();if(!choiceLocked){document.querySelector(".choice-title").textContent="Wybierz kierunek wycieczki";document.querySelector(".choice-buttons").classList.add("direction-choice-empty");choiceEl.classList.remove("hidden")}}
 function finish(){
   document.querySelectorAll(".summary-overlay,.summary-card").forEach(el=>el.remove());
   document.querySelectorAll(".summary-overlay,.summary-card").forEach(el=>{el.removeAttribute("style");});
