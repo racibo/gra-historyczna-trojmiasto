@@ -169,6 +169,9 @@ function showCandidates(dir){
     return;
   }
   choiceLocked=true;
+  // Podczas wyboru punktu ukrywamy sterowanie kierunkowe — aktywne są tylko dwa punkty A/B.
+  document.querySelector(".controls").classList.add("direction-hidden");
+  document.querySelector(".choice-title").textContent="Wybierz punkt";
   chosen.forEach((p,i)=>{
     const m=L.marker([p.lat,p.lon],{icon:icon(i?"candidate-b":"candidate-a")}).addTo(map);
     candidateMarkers.push(m);
@@ -327,7 +330,7 @@ function reveal(p){
   hits.forEach(h=>completed.add(h.type));
   updateTagCloud();
 }
-function choose(p){choiceEl.classList.add("hidden");candidateMarkers.forEach(m=>map.removeLayer(m));candidateMarkers=[];clearSearchZone();statusEl.style.cursor="";statusEl.title="";current=p;visited.add(p.id);moves++;routePoints.push(p);updateVisitedLabels();updateMoveInfo(moves===1?2:3);updateRoute();setCurrent(p);reveal(p);updatePremiumHint()}
+function choose(p){choiceEl.classList.add("hidden");candidateMarkers.forEach(m=>map.removeLayer(m));candidateMarkers=[];clearSearchZone();document.querySelector(".controls").classList.remove("direction-hidden");statusEl.style.cursor="";statusEl.title="";current=p;visited.add(p.id);moves++;routePoints.push(p);updateVisitedLabels();updateMoveInfo(moves===1?2:3);updateRoute();setCurrent(p);reveal(p);updatePremiumHint()}
 function finish(){
   document.querySelectorAll(".summary-overlay,.summary-card").forEach(el=>el.remove());
   document.querySelectorAll(".summary-overlay,.summary-card").forEach(el=>{el.removeAttribute("style");});
