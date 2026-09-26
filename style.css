@@ -145,3 +145,6 @@ html,body,#map{height:100%;margin:0}body{font-family:system-ui,sans-serif;overfl
 }
 
 .settings-actions{display:flex;gap:8px;margin-top:10px}.settings-actions button{flex:1;margin-top:0!important}.settings-actions #newGameSettings{background:#455a64}.settings-actions #newGameSettings:hover{background:#37474f}
+
+/* Wersja 41 — akcje przy misjach */
+.mission #tasks div{display:flex;align-items:center;flex-wrap:wrap;gap:4px}.task-action{border:0;border-radius:5px;padding:2px 5px;font-size:9px;font-weight:800;cursor:pointer;color:#fff}.task-hint{background:#455a64}.task-answer{background:#8b5a00}.task-action:hover{filter:brightness(1.12)}
