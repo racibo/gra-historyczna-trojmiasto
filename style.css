@@ -352,3 +352,24 @@ routeLine{}\n/* V44.5 — automatyczne kadrowanie uwzględnia panel wyboru na do
 /* V44.9 — identyfikator wersji zawsze widoczny, także na telefonie */
 .version-badge{display:inline-block!important;font-size:10px!important;opacity:.9!important;white-space:nowrap!important}
 @media(max-width:600px){.topbar .version-badge{display:inline-block!important;font-size:9px!important;opacity:.9!important}}
+
+
+/* V45 — panel „Wybierz kierunek wycieczki” nie zasłania strzałek */
+.choice.direction-choice-empty{
+  bottom:92px!important;
+  padding:6px 10px!important;
+  width:min(94vw,430px)!important;
+  background:rgba(20,20,20,.88)!important;
+}
+.choice.direction-choice-empty .choice-title{
+  font-size:11px!important;
+  margin:0!important;
+}
+@media(max-width:600px){
+  .choice.direction-choice-empty{
+    bottom:92px!important;
+    width:calc(100vw - 20px)!important;
+    padding:5px 8px!important;
+  }
+  .choice.direction-choice-empty .choice-title{font-size:10px!important}
+}
