@@ -169,6 +169,7 @@ function showCandidates(dir){
     return;
   }
   choiceLocked=true;
+  document.querySelector(".choice-buttons").classList.remove("direction-choice-empty");
   // Podczas wyboru punktu ukrywamy sterowanie kierunkowe — aktywne są tylko dwa punkty A/B.
   document.querySelector(".controls").classList.add("direction-hidden");
   document.querySelector(".choice-title").textContent="Wybierz punkt";
