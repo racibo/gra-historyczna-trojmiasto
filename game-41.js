@@ -171,17 +171,17 @@ function missionPoints(){
   return local.length>=8?local:points.filter(p=>p.id!==gameStart.id&&p.id!==target.id&&(distance(p,gameStart)<=8000||distance(p,target)<=8000));
 }
 function personNames(p){
-  const text=String(p.architect||"").replace(/\\s+/g," ").trim();
+  const text=String(p.architect||"").replace(/\s+/g," ").trim();
   if(!text)return [];
   const names=[];
-  text.split(/\\s*(?:,|;|\\/|\\\\|\\s+i\\s+|\\s+oraz\\s+)\\s*/i).forEach(part=>{
-    const name=part.replace(/^(architekt|projektant|autor|architekci|projektanci)\\s*[:\\-]?\\s*/i,"").trim();
-    const words=name.split(/\\s+/).filter(Boolean);
+  text.split(/\s*(?:,|;|\/|\\|\s+i\s+|\s+oraz\s+)\s*/i).forEach(part=>{
+    const name=part.replace(/^(architekt|projektant|autor|architekci|projektanci)\s*[:\\-]?\s*/i,"").trim();
+    const words=name.split(/\s+/).filter(Boolean);
     if(words.length>=2 && words.every(w=>/^[A-ZĄĆĘŁŃÓŚŹŻ][A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż'-]*$/.test(w))) names.push(name);
   });
   return [...new Set(names)];
 }
-function cleanNote(p){return String(p.notes||"").replace(/\\s+/g," ").trim()}
+function cleanNote(p){return String(p.notes||"").replace(/\s+/g," ").trim()}
 function noteHas(p,re){return re.test(cleanNote(p))}
 function missionData(p){
   const n=cleanNote(p), a=String(p.architect||"").trim();
