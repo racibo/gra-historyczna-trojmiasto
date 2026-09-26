@@ -193,7 +193,7 @@ html,body,#map{height:100%;margin:0}body{font-family:system-ui,sans-serif;overfl
     background:none;
   }
   .game-instruction{
-    bottom:67px;
+    bottom:218px;
     width:calc(100vw - 28px);
     padding:9px 11px;
     font-size:12px;
@@ -216,6 +216,9 @@ html,body,#map{height:100%;margin:0}body{font-family:system-ui,sans-serif;overfl
 
 /* V44 */
 .game-instruction{color:#bdbdbd!important;}
+/* V44.1: instrukcja nie jest już elementem nagłówka — pozostaje nad panelem wyboru */
+.game-instruction{top:auto;bottom:178px;}
+
 .heat-range{font-size:9px;font-weight:500;opacity:.72;white-space:nowrap;margin-left:1px;vertical-align:middle;}
 .mission #tasks div{gap:3px 4px;}
 .premium-title{font-size:10px;letter-spacing:1.3px;font-weight:900;color:#8bc34a;margin-bottom:3px;}
