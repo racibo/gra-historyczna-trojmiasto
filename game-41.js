@@ -319,8 +319,8 @@ function finish(){
   if(routePoints.length>1)map.fitBounds(routePoints.map(p=>[p.lat,p.lon]),{padding:[70,70],maxZoom:15});
   const travelledDistance=routePoints.reduce((sum,p,i)=>i?sum+distance(routePoints[i-1],p):0,0);
   const distanceKm=travelledDistance/1000;
-  const missionMoves=Math.max(0,moves-1);
-  revealEl.innerHTML="<div class='finish-message'><div class='finish-kicker'>GRA ZALICZONA</div><h2>"+moves+" "+(moves===1?"ruch":"ruchów")+"</h2><p>W "+missionMoves+" "+(missionMoves===1?"ruchu":"ruchach")+" zaliczyłeś wszystkie misje. Łączny dystans od startu do mety: <b>"+distanceKm.toFixed(1)+" km</b>.</p><div class='finish-actions'><button id='hideSummary' class='summary-hide'>UKRYJ PODSUMOWANIE</button><button id='restart' class='summary-restart'>NOWA GRA</button></div></div>";
+  const missionMoves=Math.max(0,moves-1);const finishComment=distanceKm>7?"Ta trasa nadaje się na wycieczkę rowerową. Znam jednego przewodnika, który robi tego typu trasy.":distanceKm>4?"To już dłuższa miejska wyprawa — po drodze można było zobaczyć sporo różnych miejsc.":distanceKm>2?"Całkiem przyjemna trasa miejska — dobra długość, żeby po drodze zwracać uwagę na mijane obiekty.":"Krótka trasa, ale każda taka wyprawa dokłada kolejne miejsca do poznania Trójmiasta.";
+  revealEl.innerHTML="<div class='finish-message'><div class='finish-kicker'>GRA ZALICZONA</div><h2>"+moves+" "+(moves===1?"ruch":"ruchów")+"</h2><p>W "+missionMoves+" "+(missionMoves===1?"ruchu":"ruchach")+" zaliczyłeś wszystkie misje. Łączny dystans od startu do mety: <b>"+distanceKm.toFixed(1)+" km</b>.</p><p class="finish-comment">"+esc(finishComment)+"</p><div class='finish-actions'><button id='hideSummary' class='summary-hide'>UKRYJ PODSUMOWANIE</button><button id='restart' class='summary-restart'>NOWA GRA</button></div></div>";
   revealEl.className="reveal finish-reveal";
   revealEl.style.zIndex="1400";
   revealEl.style.bottom="auto";
