@@ -373,3 +373,7 @@ routeLine{}\n/* V44.5 — automatyczne kadrowanie uwzględnia panel wyboru na do
   }
   .choice.direction-choice-empty .choice-title{font-size:10px!important}
 }
+
+/* V45.2 — liczba obiektów dostępnych w każdej kategorii misji */
+.category-count{font-size:10px;color:#888;margin-left:4px;white-space:nowrap}
+@media(max-width:600px){.category-count{font-size:9px}}
