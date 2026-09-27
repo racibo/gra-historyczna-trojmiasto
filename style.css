@@ -709,3 +709,31 @@ routeLine{}\n/* V44.5 — automatyczne kadrowanie uwzględnia panel wyboru na do
 .trip-info-close{position:absolute;top:7px;right:8px;width:28px;height:28px;border:0;border-radius:50%;background:#eee;color:#222;font-size:20px;line-height:28px;cursor:pointer}
 .summary-progress{margin-top:7px!important;padding:7px 8px!important}.summary-progress-title{font-size:10px!important;margin-bottom:3px!important}.summary-progress-compact{font-size:10px!important;color:#444}
 @media(max-width:600px){.gameplay-active .mission{top:7px!important;left:7px!important;width:calc(100vw - 14px)!important;max-width:none!important}.map-footer{bottom:5px;max-width:94vw;gap:5px;padding:5px 7px;font-size:8px}.trip-info-popup{width:calc(100vw - 36px);padding:18px}.summary-trip-distance{font-size:11px}}
+
+/* V57.1 — ekran startowy mieści się na laptopach i ma własny scroll awaryjny */
+.start-card{
+  box-sizing:border-box;
+  max-height:calc(100vh - 24px);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+}
+.start-card .start-hero{max-height:24vh;overflow:hidden}
+.start-card .start-hero img{display:block;width:100%;max-height:24vh;object-fit:cover;object-position:center}
+@media (max-height:800px){
+  .start-card{padding:16px;width:min(92vw,430px)}
+  .start-card .start-hero{max-height:18vh}
+  .start-card .start-hero img{max-height:18vh}
+  .start-card h1{font-size:20px;margin:8px 0}
+  .start-card .rules{margin:8px 0 12px;padding:9px 11px}
+  .start-card .rules p{margin:5px 0;font-size:12px}
+  .start-card .start-wait-note{margin:8px 0}
+}
+@media (max-height:650px){
+  .start-card{padding:12px}
+  .start-card .start-hero,.start-card .start-hero img{max-height:13vh}
+  .start-card h1{font-size:18px;margin:5px 0}
+  .start-card .rules{margin:5px 0 8px}
+  .start-card .rules p{font-size:11px;line-height:1.3}
+  .start-card .secondary-start-btn,.start-card #startBtn{padding:10px}
+  .start-card .start-wait-note{font-size:10px;margin:5px 0}
+}
