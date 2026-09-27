@@ -86,7 +86,9 @@ async function auditPath(start,maxDepth=10,onProgress=null){
 function missionCoverageLimits(start,target){
   const d=distance(start,target);
   if((settings.distanceRange||"random")==="0-3"){
-    return {startMax:1500,targetMax:1500};
+    // Dla zakresu 0–3 km wszystkie rozwiązania misji muszą
+    // znajdować się w promieniu 3 km od punktu startowego.
+    return {startMax:3000,targetMax:Infinity};
   }
   return {startMax:d,targetMax:Math.max(d,1500)};
 }
@@ -108,7 +110,7 @@ function missionCoverageScore(tasks,start,target){
   if(!tasks?.length)return 0;
   return tasks.filter(t=>missionFitsGame(t,start,target)).length;
 }
-function missionsForRoute(tasks,start,target,path){
+function missionsForRoute(tasks,start,target){
   const usable=tasks.filter(t=>missionFitsGame(t,start,target));
   const limit=Math.min(settings.count||usable.length,usable.length);
   if(!settings.randomCategories)return shuffleArray(usable).slice(0,limit);
@@ -128,31 +130,6 @@ function missionsForRoute(tasks,start,target,path){
   selectedCategories.forEach(c=>selected.push(...shuffleArray(byCategory[c]).slice(0,quotas[c])));
   return shuffleArray(selected).slice(0,limit);
 }
-function missionSetForRoute(start,target,path){
-  const candidates=missionPoints();
-  const allTasks=taskPoolForGame();
-  const usable=allTasks.filter(t=>missionFitsGame(t,start,target,path));
-  const required=Math.min(settings.count||0,usable.length);
-  if(required<=0)return [];
-  if(!settings.randomCategories)return shuffleArray(usable).slice(0,required);
-  const byCategory={};
-  usable.forEach(t=>(byCategory[t.category]??=[]).push(t));
-  let cats=shuffleArray(Object.keys(byCategory));
-  if(cats.length>required)cats=cats.slice(0,required);
-  const quotas=Object.fromEntries(cats.map(cat=>[cat,1]));
-  let remaining=required-cats.length;
-  while(remaining>0){
-    const choices=cats.filter(cat=>(quotas[cat]||0)<byCategory[cat].length);
-    if(!choices.length)break;
-    const cat=choices[Math.floor(Math.random()*choices.length)];
-    quotas[cat]++;
-    remaining--;
-  }
-  const selected=[];
-  cats.forEach(cat=>selected.push(...shuffleArray(byCategory[cat]).slice(0,quotas[cat])));
-  return shuffleArray(selected).slice(0,required);
-}
-
 function cityMatch(p,city){
   if(city==="random")return true;
   const n=String(p.name||"").toLowerCase();
