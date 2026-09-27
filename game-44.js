@@ -155,21 +155,20 @@ async function chooseTargetForStart(start,candidateTasks,onProgress=null){
   const required=Math.min(settings.count||0,candidateTasks.length);
   if(!required)return null;
 
-  // Najpierw próbujemy losowych celów, ale nie kończymy na 40 próbach.
-  // Wcześniej losowy limit powodował sporadyczny powrót do ekranu startowego,
-  // mimo że dla wybranego startu istniała poprawna meta i komplet misji.
-  const firstPass=Math.min(40,targetPool.length);
+  // Sprawdzamy wszystkie możliwe cele. Dla własnego startu zapamiętujemy
+  // najlepszą znalezioną kombinację, aby pojedynczy brak pełnego zestawu
+  // misji nie wyrzucał gracza z powrotem do ekranu powitalnego.
+  let best=null;
   for(let i=0;i<targetPool.length;i++){
     const target=targetPool[i];
     const usable=missionCandidateTasks(candidateTasks,start,target);
     if(onProgress)onProgress(i+1,targetPool.length,target,usable.length);
-    if(usable.length>=required){
-      return {start,target,path:[start],auditMoves:0,auditedStates:0,score:missionCoverageScore(usable,start,target),usableTasks:usable};
-    }
+    const result={start,target,path:[start],auditMoves:0,auditedStates:0,score:missionCoverageScore(usable,start,target),usableTasks:usable};
+    if(!best||usable.length>best.usableTasks.length)best=result;
+    if(usable.length>=required)return result;
     if(i%8===7)await new Promise(r=>setTimeout(r,0));
-    if(i===firstPass-1 && targetPool.length>firstPass)await new Promise(r=>setTimeout(r,0));
   }
-  return null;
+  return best;
 }
 function missionCandidateTasks(tasks,start,target){
   const candidates=missionCandidatePoints(start,target);
@@ -1001,6 +1000,12 @@ async function start(){
         const usable=audited.usableTasks||missionCandidateTasks(candidateTasks,audited.start,audited.target);
         audited.usableTasks=usable;
         activeTasks=missionsForRoute(usable,audited.start,audited.target);
+        // Przy starcie zaznaczonym ręcznie zawsze uruchamiamy najlepszą znalezioną
+        // konfigurację. Dzięki temu brak pełnego losowego zestawu nie tworzy pętli
+        // „ekran startowy → zaznaczenie → ekran startowy”.
+        if(settings.startCity==="custom"&&activeTasks.length===0){
+          audited=null;
+        }
       }
     }
   }finally{
