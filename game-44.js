@@ -732,12 +732,12 @@ function showExactDateHintPopup(){
   if(exactDateHintSeen.has(key))return;
   exactDateHintSeen.add(key);
   const targetPoint=nearbyTargets[0].p;
-  const targetDate=exactBuildDate(targetPoint);
-  const d=distance(current,targetPoint);
-  const distanceText=d<1000?Math.round(d)+" m":(d/1000).toFixed(2)+" km";
+  const currentDate=exactBuildDate(current)||String(currentYear);
+  const targetDate=exactBuildDate(targetPoint)||String(year(targetPoint));
+  const d=Math.round(distance(current,targetPoint));
   const popup=document.createElement("div");
   popup.className="exact-date-hint-popup";
-  popup.innerHTML="<div class='exact-date-hint-title'>PODPOWIEDŹ</div><div>To budynek z podobnego okresu.</div><div>Szukaj daty <b>"+esc(targetDate)+"</b> — cel jest "+distanceText+" stąd.</div><div class='exact-date-hint-close'>Dotknij, aby zamknąć</div>";
+  popup.innerHTML="<div class='exact-date-hint-title'>PODPOWIEDŹ</div><div>Znalazłeś budynek z roku <b>"+esc(currentDate)+"</b>.</div><div>To bardzo blisko, ale chodziło mi o inny budynek z roku <b>"+esc(targetDate)+"</b>.</div><div>Znajduje się on dokładnie <b>"+d+" metrów</b> stąd.</div><div class='exact-date-hint-close'>Dotknij, aby zamknąć</div>";
   const close=()=>{
     if(!popup.isConnected)return;
     popup.classList.remove("visible");
@@ -954,6 +954,7 @@ function summaryProgress(){
 }
 function reveal(p){
   const hits=activeTasks.filter(t=>!completed.has(t.type)&&t.test(p)&&p.id!==target?.id);
+  const reachedFinish=!!(target&&p.id===target.id);
   visitedHistory.push(p);
   let html="<h2>"+esc(p.name)+"</h2>";
   if(p.date)html+="<p><b>Data:</b> "+esc(p.date)+"</p>";
@@ -962,9 +963,15 @@ function reveal(p){
     hits.forEach(h=>{html+="<div class='match'>✓ "+esc(h.text)+"</div>"});
     missionHits.set(p.id,[...(missionHits.get(p.id)||[]),...hits.map(h=>h.type)]);
   }
+  if(hits.length){
+    html="<div class='success-message'><div class='success-kicker'>BRAWO!</div><h2>Misja zaliczona</h2><p>Dotarłeś do <b>"+esc(p.name)+"</b>, który spełnia misję:</p>"+hits.map(h=>"<div class='success-mission'>"+esc(h.text)+"</div>").join("")+"</div>";
+  }else if(reachedFinish&&completed.size===activeTasks.length){
+    html="<div class='success-message'><div class='success-kicker'>BRAWO!</div><h2>Meta osiągnięta</h2><p>Dotarłeś do <b>"+esc(p.name)+"</b>, który jest metą.</p></div>";
+  }
   revealEl.innerHTML=html+"<div class='reveal-auto'>Okno zamknie się automatycznie…</div>";
   revealEl.classList.remove("hidden");
   choiceLocked=true;
+  const revealDuration=(hits.length||reachedFinish)?3000:1500;
   window.setTimeout(()=>{
     if(!revealEl.classList.contains("hidden"))revealEl.classList.add("hidden");
     choiceLocked=false;
@@ -996,7 +1003,7 @@ function reveal(p){
       }
     }
     if(current.id===target.id){if(completed.size===activeTasks.length)finish();else{statusEl.textContent="Jeszcze za szybko na metę, zalicz wszystkie misje";}}
-  },1500);
+  },revealDuration);
   hits.forEach(h=>completed.add(h.type));
   updateTagCloud();
 }
