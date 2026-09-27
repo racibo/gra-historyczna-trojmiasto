@@ -933,7 +933,7 @@ function summaryProgress(){
   return "<div class='summary-progress'><div class='summary-progress-title'>Czy zbliżałeś się do rozwiązań?</div><div class='summary-progress-compact'>W kolejnych etapach: <b>"+values.join("% · ")+"%</b></div></div>";
 }
 function reveal(p){
-  const hits=activeTasks.filter(t=>!completed.has(t.type)&&t.test(p));
+  const hits=activeTasks.filter(t=>!completed.has(t.type)&&t.test(p)&&p.id!==target?.id);
   visitedHistory.push(p);
   let html="<h2>"+esc(p.name)+"</h2>";
   if(p.date)html+="<p><b>Data:</b> "+esc(p.date)+"</p>";
@@ -1116,9 +1116,10 @@ function updateProgress(){
   const done=activeTasks.filter(t=>completed.has(t.type)).length;
   progressEl.textContent="Misje do zaliczenia · "+done+"/"+activeTasks.length;
   const autoHintTask=settings.hints?activeTasks.find(t=>!completed.has(t.type)&&taskAwayStreak(t)===3):null;
+  const exactDateHintTask=settings.hints?activeTasks.find(t=>!completed.has(t.type)&&t.exactDate&&current&&!t.test(current)&&taskHintHtml(t).includes("PODPOWIEDŹ")):null;
   tasksEl.innerHTML=activeTasks.map(t=>{
     const doneTask=completed.has(t.type);
-    const hint=!doneTask&&t===autoHintTask?taskHintHtml(t):"";
+    const hint=!doneTask&&(t===exactDateHintTask?taskHintHtml(t):t===autoHintTask?taskHintHtml(t):"");
     return "<div class=\""+(doneTask?"task-done":"")+"\"><span class=\"task-text\">"+(doneTask?"✓":"▸")+" "+esc(t.text)+"</span>"+(doneTask?"":(hint||missionHeat(t)))+"</div>";
   }).join("");
 }
