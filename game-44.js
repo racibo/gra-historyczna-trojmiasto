@@ -839,7 +839,7 @@ function updateProgress(){
   tasksEl.innerHTML=activeTasks.map(t=>{
     const doneTask=completed.has(t.type);
     const hint=!doneTask&&t===autoHintTask?taskHintHtml(t):"";
-    return "<div class=\""+(doneTask?"task-done":"")+"\">"+(doneTask?"✓":"▸")+" "+esc(t.text)+(doneTask?"":(hint||missionHeat(t)))+"</div>";
+    return "<div class=\""+(doneTask?"task-done":"")+"\"><span class=\"task-text\">"+(doneTask?"✓":"▸")+" "+esc(t.text)+"</span>"+(doneTask?"":(hint||missionHeat(t)))+"</div>";
   }).join("");
 }
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
