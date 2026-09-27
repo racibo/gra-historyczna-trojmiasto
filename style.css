@@ -656,3 +656,41 @@ routeLine{}\n/* V44.5 — automatyczne kadrowanie uwzględnia panel wyboru na do
 .mission #tasks div .task-text + .heat-range{
   flex:0 0 auto;
 }
+
+
+/* V56.1 — misje: pełny tekst bez obcinania przez układ flex */
+.mission #tasks div{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:start!important;
+  column-gap:6px!important;
+  row-gap:3px!important;
+  width:100%;
+  box-sizing:border-box;
+}
+.mission #tasks div .task-text{
+  display:block;
+  min-width:0!important;
+  width:auto;
+  white-space:normal!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  overflow-wrap:anywhere!important;
+  word-break:normal!important;
+  line-height:1.4;
+}
+.mission #tasks div .heat,
+.mission #tasks div .heat-range,
+.mission #tasks div .task-action{
+  grid-column:2;
+  flex:none!important;
+}
+@media(max-width:600px){
+  .mission #tasks div{
+    grid-template-columns:minmax(0,1fr) auto;
+    column-gap:5px!important;
+  }
+  .mission #tasks div .task-text{
+    line-height:1.45;
+  }
+}
