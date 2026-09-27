@@ -782,27 +782,56 @@ function taskHintHtml(t){
 }
 function showExactDateHintPopup(){
   if(!settings.hints||!current)return;
-  const task=activeTasks.find(t=>!completed.has(t.type)&&t.exactDate);
-  if(!task||task.test(current))return;
+
+  // Szukamy podpowiedzi we wszystkich aktywnych, niezaliczonych
+  // misjach dokładnej daty. Nie ograniczamy tutaj punktów do obszaru
+  // użytego przy losowaniu misji — podpowiedź ma informować o realnym
+  // pasującym obiekcie w bazie, a nie o tym, czy algorytm wybrał go
+  // wcześniej do puli gry.
   const currentYear=year(current);
   if(currentYear===null)return;
-  const limits=target?missionCoverageLimits(gameStart||current,target):null;
-  const targets=points.filter(p=>{
-    if(p.id===current.id||visited.has(p.id)||!task.test(p))return false;
-    if(!limits)return true;
-    return distance(gameStart||current,p)<=limits.startMax&&distance(p,target)<=limits.targetMax;
+  const currentDate=exactBuildDate(current);
+  if(!currentDate)return;
+
+  const candidates=[];
+  activeTasks.filter(t=>!completed.has(t.type)&&t.exactDate).forEach(task=>{
+    // Jeśli aktualny obiekt już spełnia tę konkretną misję, nie pokazujemy
+    // podpowiedzi dla niej.
+    if(task.test(current))return;
+
+    const targets=points.filter(p=>{
+      if(p.id===current.id||visited.has(p.id)||!task.test(p))return false;
+      const y=year(p);
+      if(y===null||Math.abs(y-currentYear)>10)return false;
+
+      // Nie pokazuj podpowiedzi dla identycznej dokładnej daty.
+      const targetDate=exactBuildDate(p);
+      if(!targetDate||exactBuildDateKey(p)===exactBuildDateKey(current))return false;
+      return true;
+    });
+
+    targets.forEach(p=>{
+      candidates.push({
+        task,
+        p,
+        distance:distance(current,p),
+        yearDiff:Math.abs(year(p)-currentYear)
+      });
+    });
   });
-  const nearbyTargets=targets.map(p=>({p,y:year(p)}))
-    .filter(x=>x.y!==null&&Math.abs(x.y-currentYear)<=10)
-    .sort((a,b)=>distance(current,a.p)-distance(current,b.p));
-  if(!nearbyTargets.length)return;
-  const key=task.type+"|"+current.id;
-  if(exactDateHintSeen.has(key))return;
+
+  if(!candidates.length)return;
+
+  candidates.sort((a,b)=>a.distance-b.distance);
+  const hit=candidates.find(x=>!exactDateHintSeen.has(x.task.type+"|"+current.id));
+  if(!hit)return;
+
+  const key=hit.task.type+"|"+current.id;
   exactDateHintSeen.add(key);
-  const targetPoint=nearbyTargets[0].p;
-  const currentDate=exactBuildDate(current)||String(currentYear);
+  const targetPoint=hit.p;
   const targetDate=exactBuildDate(targetPoint)||String(year(targetPoint));
-  const d=Math.round(distance(current,targetPoint));
+  const d=Math.round(hit.distance);
+
   const popup=document.createElement("div");
   popup.className="exact-date-hint-popup";
   popup.innerHTML="<div class='exact-date-hint-title'>PODPOWIEDŹ</div><div>Znalazłeś budynek z roku <b>"+esc(currentDate)+"</b>.</div><div>To bardzo blisko, ale chodziło mi o inny budynek z roku <b>"+esc(targetDate)+"</b>.</div><div>Znajduje się on dokładnie <b>"+d+" metrów</b> stąd.</div><div class='exact-date-hint-close'>Dotknij, aby zamknąć</div>";
