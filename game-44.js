@@ -61,7 +61,7 @@ function moveCandidates(from,seen){
   for(const dir of ["up","right","down","left"]){const pair=chooseBestPair(directionCandidates(from,seen,dir));if(pair.length===2)result.push(...pair)}
   return [...new Map(result.map(p=>[p.id,p])).values()];
 }
-function auditPath(start,maxDepth=10){
+async function auditPath(start,maxDepth=10,onProgress=null){
   const queue=[{p:start,seen:new Set([start.id]),path:[start]}],paths=[],stateKeys=new Set();
   let examined=0;
   while(queue.length&&examined<3500){
@@ -75,7 +75,12 @@ function auditPath(start,maxDepth=10){
       const seen=new Set(state.seen);seen.add(next.id);
       queue.push({p:next,seen,path:[...state.path,next]});
     }
+    if(examined%25===0){
+      if(onProgress)onProgress(examined,queue.length);
+      await new Promise(r=>setTimeout(r,0));
+    }
   }
+  if(onProgress)onProgress(examined,queue.length);
   return {paths,examined};
 }
 function missionPathDistance(p,path){
@@ -119,9 +124,9 @@ function distanceRangeMatch(m){
   if(r==="random")return true;
   return r==="0-3"?d<=3:r==="3-5"?d>3&&d<=5:r==="5-10"?d>5&&d<=10:r==="10-20"?d>10&&d<=20:d>20;
 }
-function chooseTargetForStart(start){
+async function chooseTargetForStart(start,onProgress=null){
   const matching=[];
-  const audit=auditPath(start,8);
+  const audit=await auditPath(start,8,onProgress);
   for(const path of audit.paths.filter(path=>path.length>=4&&path.length<=10)){
     const target=path[path.length-1];
     if(target.id!==start.id&&distanceRangeMatch({start,target})){
@@ -138,14 +143,13 @@ function chooseTargetForStart(start){
   }
   return null;
 }
-function chooseStartAndTarget(){
+async function chooseStartAndTarget(onProgress=null){
   const pool=points.filter(p=>cityMatch(p,settings.startCity||"random"));
   if(!pool.length)return null;
-  // Nie przeszukujemy setek punktów startowych — każda próba uruchamia kosztowny audyt grafu.
-  // Kilkanaście losowych prób daje wystarczającą różnorodność bez wielominutowego oczekiwania.
   for(let attempt=0;attempt<12;attempt++){
     const start=pool[Math.floor(Math.random()*pool.length)];
-    const result=chooseTargetForStart(start);
+    if(onProgress)onProgress(attempt+1,12,start);
+    const result=await chooseTargetForStart(start,(examined,queued)=>onProgress&&onProgress(attempt+1,12,start,examined,queued));
     if(result)return result;
   }
   return null;
@@ -921,15 +925,33 @@ async function start(){
   let audited=null;
   // Misje i meta są dobierane wspólnie. Przy „do 3 km” każda misja
   // musi mieć rozwiązanie blisko startu, mety i faktycznej trasy.
-  for(let taskAttempt=0;taskAttempt<6&&!audited;taskAttempt++){
-    activeTasks=taskForGame();
-    if(!activeTasks.length)break;
-    if(settings.startCity==="custom"){
-      if(!customStartSelected){beginCustomStartPick();startBtn.disabled=false;startBtn.textContent="ROZPOCZNIJ GRĘ";return}
-      audited=chooseTargetForStart(customStartSelected);
-    }else{
-      audited=chooseStartAndTarget();
+  const loadingStarted=Date.now();
+  const loadingTimer=setInterval(()=>{
+    const sec=Math.floor((Date.now()-loadingStarted)/1000);
+    const msg="Ładowanie misji i trasy… <b>"+sec+" s</b>";
+    missionEl.innerHTML="<div class='mission-loading'>"+msg+"</div>";
+    movesEl.textContent="Układanie trasy i sprawdzanie zagadek… "+sec+" s";
+  },250);
+  try{
+    for(let taskAttempt=0;taskAttempt<6&&!audited;taskAttempt++){
+      activeTasks=taskForGame();
+      if(!activeTasks.length)break;
+      missionEl.innerHTML="<div class='mission-loading'>Ładowanie misji i trasy… <b>"+Math.floor((Date.now()-loadingStarted)/1000)+" s</b><br><small>Próba "+(taskAttempt+1)+"/6</small></div>";
+      if(settings.startCity==="custom"){
+        if(!customStartSelected){beginCustomStartPick();startBtn.disabled=false;startBtn.textContent="ROZPOCZNIJ GRĘ";return}
+        audited=await chooseTargetForStart(customStartSelected,(examined,queued)=>{
+          const sec=Math.floor((Date.now()-loadingStarted)/1000);
+          missionEl.innerHTML="<div class='mission-loading'>Ładowanie misji i trasy… <b>"+sec+" s</b><br><small>Sprawdzono "+examined+" wariantów trasy…</small></div>";
+        });
+      }else{
+        audited=await chooseStartAndTarget((attempt,max,start,examined,queued)=>{
+          const sec=Math.floor((Date.now()-loadingStarted)/1000);
+          missionEl.innerHTML="<div class='mission-loading'>Ładowanie misji i trasy… <b>"+sec+" s</b><br><small>Sprawdzono "+(examined||0)+" wariantów • próba "+attempt+"/12</small></div>";
+        });
+      }
     }
+  }finally{
+    clearInterval(loadingTimer);
   }
   if(settings.startCity==="custom")customStartSelected=null;
   if(!audited){
