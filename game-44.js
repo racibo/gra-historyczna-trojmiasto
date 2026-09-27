@@ -295,22 +295,49 @@ function showCandidates(dir){
     premiumStats.lastDirectionGood=premiumDirectionIsGood(dir);
     if(premiumStats.lastDirectionGood)premiumStats.goodDirections++;
   }
+
+  // Gdy jesteśmy <=500 m od rozwiązania, dobry kierunek musi pokazać
+  // rzeczywiste rozwiązanie jako jeden z dwóch wyborów. Nie wolno go
+  // "przeskoczyć" przez pokazanie dwóch innych punktów mijających cel.
   const GOAL_UNLOCK=500;
-  const goalDistance=target?distance(current,target):Infinity;
-  const goalBearing=target?bearing(current,target):0;
-  const goalDiff=target?angleDiff(goalBearing,dirAngle(dir)):Infinity;
-  let forcedTarget=null;
-  if(target&&goalDistance<=GOAL_UNLOCK&&goalDiff<=45&&!visited.has(target.id)){
-    forcedTarget={...target,d:goalDistance,bd:goalBearing,ad:goalDiff,isTarget:true};
-    if(!c.some(p=>p.id===target.id))c.push(forcedTarget);
+  let forcedGoal=null;
+
+  // Najpierw szukamy odpowiedzi na niezakończone misje.
+  if(completed.size<activeTasks.length){
+    const missionSolutions=points
+      .filter(p=>p.id!==current.id&&!visited.has(p.id))
+      .filter(p=>activeTasks.some(t=>!completed.has(t.type)&&t.test(p)))
+      .map(p=>({...p,d:distance(current,p),bd:bearing(current,p),ad:angleDiff(bearing(current,p),dirAngle(dir))}))
+      .filter(p=>p.d<=GOAL_UNLOCK&&p.ad<=45)
+      .sort((x,y)=>x.d-y.d);
+    if(missionSolutions.length)forcedGoal={...missionSolutions[0],isMissionSolution:true};
   }
+
+  // Po zaliczeniu misji analogiczna zasada obowiązuje dla mety.
+  if(!forcedGoal&&target){
+    const goalDistance=distance(current,target);
+    const goalBearing=bearing(current,target);
+    const goalDiff=angleDiff(goalBearing,dirAngle(dir));
+    if(goalDistance<=GOAL_UNLOCK&&goalDiff<=45&&!visited.has(target.id)){
+      forcedGoal={...target,d:goalDistance,bd:goalBearing,ad:goalDiff,isTarget:true};
+    }
+  }
+
   let chosen;
-  if(forcedTarget){
-    const alternatives=c.filter(p=>p.id!==forcedTarget.id&&!visited.has(p.id));
+  if(forcedGoal){
+    const alternatives=c
+      .filter(p=>p.id!==forcedGoal.id&&!visited.has(p.id))
+      .sort((x,y)=>x.d-y.d);
     let second=chooseBestPair(alternatives)[0];
-    if(!second)second=points.filter(p=>p.id!==current.id&&p.id!==forcedTarget.id&&!visited.has(p.id)).map(p=>({...p,d:distance(current,p),bd:bearing(current,p),ad:angleDiff(bearing(current,p),dirAngle(dir))})).filter(p=>p.ad<=45).sort((x,y)=>x.d-y.d)[0];
-    if(!second)second=points.filter(p=>p.id!==current.id&&p.id!==forcedTarget.id&&!visited.has(p.id)).map(p=>({...p,d:distance(current,p),bd:bearing(current,p),ad:angleDiff(bearing(current,p),dirAngle(dir))})).sort((x,y)=>x.d-y.d)[0];
-    chosen=[forcedTarget,second].filter(Boolean);
+    if(!second){
+      second=points
+        .filter(p=>p.id!==current.id&&p.id!==forcedGoal.id&&!visited.has(p.id))
+        .map(p=>({...p,d:distance(current,p),bd:bearing(current,p),ad:angleDiff(bearing(current,p),dirAngle(dir))}))
+        .filter(p=>p.ad<=45)
+        .sort((x,y)=>x.d-y.d)[0];
+    }
+    if(!second)second=alternatives[0];
+    chosen=[forcedGoal,second].filter(Boolean);
   }else if(premiumActive&&target){
     const sorted=c.filter(p=>p.id!==target.id&&!visited.has(p.id)).sort((x,y)=>premiumChoiceScore(x)-premiumChoiceScore(y));
     const best=sorted[0];
@@ -319,6 +346,7 @@ function showCandidates(dir){
   }else{
     chosen=chooseBestPair(c);
   }
+
   if(chosen.length<2){
     const msg="W tym kierunku nie ma dwóch dostępnych punktów — wybierz inną strzałkę.";
     statusEl.textContent=msg;
@@ -340,7 +368,7 @@ function showCandidates(dir){
     const btn=document.getElementById(i?"choiceB":"choiceA");
     btn.className=i?"choice-b":"choice-a";
     const suffix="";
-    btn.innerHTML='<span class="letter">'+(i?"B":"A")+'</span> '+(p.isTarget?"META":"okolice "+esc(placeLabel(p)))+suffix;
+    btn.innerHTML='<span class="letter">'+(i?"B":"A")+'</span> '+(p.isTarget?"META":"okolice "+esc(placeLabel(p)));
   });
   choiceEl.classList.remove("hidden");
   document.getElementById("choiceA").onclick=()=>choose(chosen[0]);
