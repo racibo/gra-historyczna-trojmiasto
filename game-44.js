@@ -21,8 +21,7 @@ function updateRoute(){
 function visitedLabelHtml(p,index){
   let html="<div class='visited-full'><h3>"+esc(p.name)+"</h3>";
   if(p.date)html+="<p><b>Data budowy:</b> "+esc(p.date)+"</p>";
-  if(p.architect)html+="<p><b>Architekt / projektant:</b> "+esc(p.architect)+"</p>";
-  if(p.notes)html+="<p><b>Informacje:</b><br>"+esc(p.notes).replace(/\n/g,"<br>")+"</p>";
+  if(p.notes)html+="<p><b>Uwagi:</b><br>"+esc(p.notes).replace(/\n/g,"<br>")+"</p>";
   html+="</div>";
   return html;
 }
