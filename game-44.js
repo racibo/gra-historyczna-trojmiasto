@@ -6,6 +6,7 @@ function exactBuildDate(p){
   return String(p?.date||"").replace(/\\s*r\\.?\\s*$/i,"").replace(/\\s+/g," ").trim();
 }
 function exactBuildDateKey(p){return exactBuildDate(p).toLocaleLowerCase()}function distance(a,b){const R=6371000,dLat=(b.lat-a.lat)*Math.PI/180,dLon=(b.lon-a.lon)*Math.PI/180,x=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(x))}function bearing(a,b){const y=Math.sin((b.lon-a.lon)*Math.PI/180)*Math.cos(b.lat*Math.PI/180),x=Math.cos(a.lat*Math.PI/180)*Math.sin(b.lat*Math.PI/180)-Math.sin(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.cos((b.lon-a.lon)*Math.PI/180);return(Math.atan2(y,x)*180/Math.PI+360)%360}function dirAngle(d){return{up:0,right:90,down:180,left:270}[d]}function angleDiff(a,b){const d=Math.abs(a-b)%360;return d>180?360-d:d}function icon(cls){return L.divIcon({className:cls,iconSize:[28,28],iconAnchor:[14,14]})}
+function isTargetPoint(p){return !!(p&&target&&p.id===target.id);}
 function setCurrent(p,showHere=true){if(currentMarker)map.removeLayer(currentMarker);currentMarker=L.marker([p.lat,p.lon],{icon:icon("current-marker"),zIndexOffset:1000}).addTo(map);currentMarker.bindPopup(visitedLabelHtml(p),{closeButton:true,autoClose:true,maxWidth:340});if(showHere)currentMarker.bindTooltip("TU JESTEŚ",{permanent:true,direction:"top",className:"current-label"});map.panTo([p.lat,p.lon],{animate:true,duration:.5})}
 function updateRoute(){
   if(routeLine)map.removeLayer(routeLine);
@@ -396,7 +397,7 @@ function showCandidates(dir){
     const btn=document.getElementById(i?"choiceB":"choiceA");
     btn.className=i?"choice-b":"choice-a";
     const suffix="";
-    btn.innerHTML='<span class="letter">'+(i?"B":"A")+'</span> '+(p.isTarget?"META":"okolice "+esc(placeLabel(p)));
+    btn.innerHTML='<span class="letter">'+(i?"B":"A")+'</span> '+(isTargetPoint(p)?"META":"okolice "+esc(placeLabel(p)));
   });
   choiceEl.classList.remove("hidden");
   document.getElementById("choiceA").onclick=()=>choose(chosen[0]);
@@ -1001,7 +1002,7 @@ function reveal(p){
 }
 function choose(p){
   const premiumActive=completed.size===activeTasks.length&&!!target;
-  if(premiumActive&&target){premiumStats.choices++;if(p.premiumBest||p.isTarget)premiumStats.goodChoices++}
+  if(premiumActive&&target){premiumStats.choices++;if(p.premiumBest||isTargetPoint(p))premiumStats.goodChoices++}
   choiceEl.classList.add("hidden");candidateMarkers.forEach(m=>map.removeLayer(m));candidateMarkers=[];clearSearchZone();
   document.querySelector(".controls").classList.remove("direction-hidden");statusEl.style.cursor="";statusEl.title="";
   current=p;visited.add(p.id);moves++;routePoints.push(p);updateVisitedLabels();updateRoute();setCurrent(p);showExactDateHintPopup();
@@ -1013,7 +1014,7 @@ function choose(p){
 function showPremiumChoiceFeedback(p){
   if(!target||!current)return;
   const directionGood=premiumStats.lastDirectionGood;
-  const pointGood=!!(p.premiumBest||p.isTarget);
+  const pointGood=!!(p.premiumBest||isTargetPoint(p));
   const directionPct=premiumStats.directions?Math.round(premiumStats.goodDirections/premiumStats.directions*100):0;
   const choicePct=premiumStats.choices?Math.round(premiumStats.goodChoices/premiumStats.choices*100):0;
   let headline="",detail="";
