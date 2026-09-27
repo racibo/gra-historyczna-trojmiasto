@@ -643,3 +643,16 @@ routeLine{}\n/* V44.5 — automatyczne kadrowanie uwzględnia panel wyboru na do
   .summary-progress-compact{font-size:9px}
   .summary-restart-panel{padding:8px;font-size:9px}
 }
+
+
+/* V56 — tekst misji jest osobnym, elastycznym elementem; nie może ucinać początku */
+.mission #tasks div .task-text{
+  min-width:0;
+  flex:1 1 auto;
+  overflow-wrap:anywhere;
+  word-break:normal;
+}
+.mission #tasks div .task-text + .task-action,
+.mission #tasks div .task-text + .heat-range{
+  flex:0 0 auto;
+}
