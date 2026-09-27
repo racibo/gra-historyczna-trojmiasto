@@ -1,4 +1,4 @@
-const SHEET_ID="1TmRHJDv6IMlGwg761JV50M8vS4zXTdWBtjDziAleSQI",DATA_URL=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;let map,points=[],current=null,gameStart=null,target=null,visited=new Set(),moves=0,choiceLocked=false,premiumShown=false,candidateMarkers=[],currentMarker,startMarker,targetMarker,routeLine=null,routePoints=[],routePointMarkers=[],visitedHistory=[],visitedMarkers=[],summaryMarkers=[],summaryRouteLines=[],solutionMarkers=[],customStartMarker=null,customStartSelected=null,customStartPickHandler=null;const missionEl=document.getElementById("mission"),tasksEl=document.getElementById("tasks"),progressEl=document.getElementById("progress"),movesEl=document.getElementById("moves"),choiceEl=document.getElementById("choice"),revealEl=document.getElementById("reveal"),statusEl=document.getElementById("status");let activeTasks=[],completed=new Set(),missionHits=new Map(),gameDistance=0,searchZone=null,instructionTimer=null,missionSearchRadius=3000,missionSearchFallback=false,settings={count:2,countRandom:false,randomCategories:true,age:true,periods:true,architects:true,people:true,functions:true,names:true,history:true,institutions:true,creators:true,hints:true,distanceRange:"0-3",startCity:"random",defaultsVersion:55},pathGraph=null;
+const SHEET_ID="1TmRHJDv6IMlGwg761JV50M8vS4zXTdWBtjDziAleSQI",DATA_URL=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;let map,points=[],current=null,gameStart=null,target=null,visited=new Set(),moves=0,choiceLocked=false,premiumShown=false,candidateMarkers=[],currentMarker,startMarker,targetMarker,routeLine=null,routePoints=[],routePointMarkers=[],visitedHistory=[],visitedMarkers=[],summaryMarkers=[],summaryRouteLines=[],solutionMarkers=[],customStartMarker=null,customStartSelected=null,customStartPickHandler=null,gpsStartSelected=null,premiumStats={directions:0,goodDirections:0,choices:0,goodChoices:0,lastDirectionGood:false};const missionEl=document.getElementById("mission"),tasksEl=document.getElementById("tasks"),progressEl=document.getElementById("progress"),movesEl=document.getElementById("moves"),choiceEl=document.getElementById("choice"),revealEl=document.getElementById("reveal"),statusEl=document.getElementById("status");let activeTasks=[],completed=new Set(),missionHits=new Map(),gameDistance=0,searchZone=null,instructionTimer=null,missionSearchRadius=3000,missionSearchFallback=false,settings={count:2,countRandom:false,randomCategories:true,age:true,periods:true,architects:true,people:true,functions:true,names:true,history:true,institutions:true,creators:true,hints:true,distanceRange:"0-3",startCity:"random",defaultsVersion:55},pathGraph=null;
 function getSheetVal(obj,searchStrings){const keys=Object.keys(obj||{});for(const search of searchStrings){const clean=search.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"");const exact=keys.find(k=>k.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"")===clean);if(exact&&String(obj[exact]??"").trim()!=="")return String(obj[exact]).trim()}for(const search of searchStrings){const clean=search.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"");const partial=keys.find(k=>k.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"").includes(clean));if(partial&&String(obj[partial]??"").trim()!=="")return String(obj[partial]).trim()}return""}
 function parseSheetRows(data){return data.map((item,i)=>{const name=getSheetVal(item,["adres","nazwa","obiekt","name"])||"Nieznany",date=getSheetVal(item,["datawybudowania","rokbudowy","data","rok","czas","wiek"])||"",notes=getSheetVal(item,["uwagi","opis","informacje","info","inne"]),architect=getSheetVal(item,["architekt","arch.","arch","projektant","proj.","proj","autor"])||String(Object.values(item)[3]??"").trim(),gps=getSheetVal(item,["pozycjagps","gps","wspolrzedne","współrzędne","lokalizacja"]);let lat,lng;if(gps){const matches=String(gps).replace(/;/g,",").match(/-?\d+[\.,]\d+/g)||[];if(matches.length>=2){lat=parseFloat(matches[0].replace(",","."));lng=parseFloat(matches[1].replace(",","."))}}if(!Number.isFinite(lat)||!Number.isFinite(lng))return null;return{id:i,name,lat,lon:lng,raw:notes,date,architect,notes}}).filter(Boolean).filter(p=>p.lat>53.9&&p.lat<54.7&&p.lon>18.2&&p.lon<19.1)}
 function year(p){const m=p.date.match(/(1[0-9]{3}|20[0-9]{2})/);return m?+m[1]:null}function distance(a,b){const R=6371000,dLat=(b.lat-a.lat)*Math.PI/180,dLon=(b.lon-a.lon)*Math.PI/180,x=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(x))}function bearing(a,b){const y=Math.sin((b.lon-a.lon)*Math.PI/180)*Math.cos(b.lat*Math.PI/180),x=Math.cos(a.lat*Math.PI/180)*Math.sin(b.lat*Math.PI/180)-Math.sin(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.cos((b.lon-a.lon)*Math.PI/180);return(Math.atan2(y,x)*180/Math.PI+360)%360}function dirAngle(d){return{up:0,right:90,down:180,left:270}[d]}function angleDiff(a,b){const d=Math.abs(a-b)%360;return d>180?360-d:d}function icon(cls){return L.divIcon({className:cls,iconSize:[28,28],iconAnchor:[14,14]})}
@@ -287,25 +287,38 @@ function revealTarget(){
 function showCandidates(dir){
   if(choiceLocked)return;
   statusEl.textContent="";
-  candidateMarkers.forEach(m=>map.removeLayer(m));
-  candidateMarkers=[];
+  candidateMarkers.forEach(m=>map.removeLayer(m));candidateMarkers=[];
   let c=directionCandidates(current,visited,dir);
+  const premiumActive=completed.size===activeTasks.length&&!!target;
+  if(premiumActive){
+    premiumStats.directions++;
+    premiumStats.lastDirectionGood=premiumDirectionIsGood(dir);
+    if(premiumStats.lastDirectionGood)premiumStats.goodDirections++;
+  }
   const GOAL_UNLOCK=500;
-  const goalDistance=distance(current,target),goalBearing=bearing(current,target),goalDiff=angleDiff(goalBearing,dirAngle(dir));
-  if(goalDistance<=GOAL_UNLOCK&&goalDiff<=45&&!c.some(p=>p.id===target.id))
-    c.push({...target,d:goalDistance,bd:goalBearing,ad:goalDiff,isTarget:true});
+  const goalDistance=target?distance(current,target):Infinity;
+  const goalBearing=target?bearing(current,target):0;
+  const goalDiff=target?angleDiff(goalBearing,dirAngle(dir)):Infinity;
   let forcedTarget=null;
-  if(target){
-    const td=distance(current,target),tb=bearing(current,target),ta=angleDiff(tb,dirAngle(dir));
-    if(td<=500&&ta<=45)forcedTarget={...target,d:td,bd:tb,ad:ta,isTarget:true};
+  if(target&&goalDistance<=GOAL_UNLOCK&&goalDiff<=45&&!visited.has(target.id)){
+    forcedTarget={...target,d:goalDistance,bd:goalBearing,ad:goalDiff,isTarget:true};
+    if(!c.some(p=>p.id===target.id))c.push(forcedTarget);
   }
-  if(!forcedTarget){
-    const nearMission=activeTasks.filter(t=>!completed.has(t.type)).flatMap(t=>points.filter(p=>p.id!==current.id&&!visited.has(p.id)&&t.test(p)).map(p=>({...p,d:distance(current,p),bd:bearing(current,p),ad:angleDiff(bearing(current,p),dirAngle(dir)),missionTarget:true}))).filter(p=>p.d<=500&&p.ad<=45).sort((a,b)=>a.d-b.d)[0];
-    if(nearMission)forcedTarget=nearMission;
+  let chosen;
+  if(forcedTarget){
+    const alternatives=c.filter(p=>p.id!==forcedTarget.id&&!visited.has(p.id));
+    let second=chooseBestPair(alternatives)[0];
+    if(!second)second=points.filter(p=>p.id!==current.id&&p.id!==forcedTarget.id&&!visited.has(p.id)).map(p=>({...p,d:distance(current,p),bd:bearing(current,p),ad:angleDiff(bearing(current,p),dirAngle(dir))})).filter(p=>p.ad<=45).sort((x,y)=>x.d-y.d)[0];
+    if(!second)second=points.filter(p=>p.id!==current.id&&p.id!==forcedTarget.id&&!visited.has(p.id)).map(p=>({...p,d:distance(current,p),bd:bearing(current,p),ad:angleDiff(bearing(current,p),dirAngle(dir))})).sort((x,y)=>x.d-y.d)[0];
+    chosen=[forcedTarget,second].filter(Boolean);
+  }else if(premiumActive&&target){
+    const sorted=c.filter(p=>p.id!==target.id&&!visited.has(p.id)).sort((x,y)=>premiumChoiceScore(x)-premiumChoiceScore(y));
+    const best=sorted[0];
+    const pair=chooseBestPair(c.filter(p=>!best||p.id!==best.id));
+    chosen=best?[best,...pair.filter(p=>p.id!==best.id).slice(0,1)]:chooseBestPair(c);
+  }else{
+    chosen=chooseBestPair(c);
   }
-  let chosen=forcedTarget
-    ? [forcedTarget,chooseBestPair(c.filter(p=>p.id!==forcedTarget.id)).find(p=>p.id!==forcedTarget.id)||c.find(p=>p.id!==forcedTarget.id)].filter(Boolean)
-    : chooseBestPair(c);
   if(chosen.length<2){
     const msg="W tym kierunku nie ma dwóch dostępnych punktów — wybierz inną strzałkę.";
     statusEl.textContent=msg;
@@ -315,43 +328,24 @@ function showCandidates(dir){
   choiceLocked=true;
   choiceEl.classList.remove("direction-choice-empty");
   document.querySelector(".choice-buttons").style.display="flex";
-  // Podczas wyboru punktu ukrywamy sterowanie kierunkowe — aktywne są tylko dwa punkty A/B.
   document.querySelector(".controls").classList.add("direction-hidden");
   document.querySelector(".choice-title").textContent="Wybierz punkt";
+  if(premiumActive&&target){
+    const bestDistance=Math.min(...chosen.map(p=>premiumChoiceScore(p)));
+    chosen.forEach(p=>p.premiumBest=bestDistance===premiumChoiceScore(p));
+  }
   chosen.forEach((p,i)=>{
     const m=L.marker([p.lat,p.lon],{icon:icon(i?"candidate-b":"candidate-a")}).addTo(map);
-    candidateMarkers.push(m);
-    m.on("click",()=>choose(p));
+    candidateMarkers.push(m);m.on("click",()=>choose(p));
     const btn=document.getElementById(i?"choiceB":"choiceA");
     btn.className=i?"choice-b":"choice-a";
-    btn.innerHTML='<span class="letter">'+(i?"B":"A")+'</span> '+(p.isTarget?"META":"okolice "+esc(placeLabel(p)));
+    const suffix=p.premiumBest&&premiumActive?" ★ NAJKRÓTSZA DROGA":"";
+    btn.innerHTML='<span class="letter">'+(i?"B":"A")+'</span> '+(p.isTarget?"META":"okolice "+esc(placeLabel(p)))+suffix;
   });
   choiceEl.classList.remove("hidden");
-  // Instrukcja wyboru punktu jest w dolnym panelu; nie pokazujemy dodatkowego komunikatu na środku.
-  if(instructionTimer){clearTimeout(instructionTimer);instructionTimer=null}
-  movesEl.classList.remove("instruction-visible");
-  movesEl.classList.add("instruction-hidden");
-  // Automatycznie dopasuj widok do bieżącego punktu i dwóch wariantów.
-  const bounds=L.latLngBounds([[current.lat,current.lon],[chosen[0].lat,chosen[0].lon],[chosen[1].lat,chosen[1].lon]]);
-  map.fitBounds(bounds,{paddingTopLeft:[20,150],paddingBottomRight:[20,115],maxZoom:16});
   document.getElementById("choiceA").onclick=()=>choose(chosen[0]);
   document.getElementById("choiceB").onclick=()=>choose(chosen[1]);
 }
-function updateCategoryCounts(){
-  const counts={
-    age:points.filter(p=>{const y=year(p);return y>=1800&&y<=2099}).length,
-    periods:points.filter(p=>{const y=year(p);return (y>=1900&&y<=1914)||(y>=1918&&y<=1939)||(y>=1945&&y<=1989)||(y>=1990&&y<=1999)||(y>=2001&&y<=2099)}).length,
-    architects:points.filter(p=>missionData(p).architects.length).length,
-    people:points.filter(p=>missionData(p).people).length,
-    functions:points.filter(p=>missionData(p).functions).length,
-    names:points.filter(p=>missionData(p).names).length,
-    history:points.filter(p=>missionData(p).history).length,
-    institutions:points.filter(p=>missionData(p).institutions).length,
-    creators:points.filter(p=>missionData(p).creators).length
-  };
-  Object.entries(counts).forEach(([key,count])=>{const el=document.getElementById("count-"+key);if(el)el.textContent=count+" "+(count===1?"obiekt":"obiektów")});
-}
-function loadSettings(){try{const x=JSON.parse(localStorage.getItem("trojmiastoGameSettings")||"null");if(x)settings={...settings,...x};if(x&&!Object.prototype.hasOwnProperty.call(x,"countRandom"))settings.countRandom=false;if(!Object.prototype.hasOwnProperty.call(x,"distanceRange"))settings.distanceRange="0-3";if(!["random","0-3","3-5","5-10","10-20","20+"].includes(settings.distanceRange))settings.distanceRange="0-3";if(!["random","gdansk","sopot","gdynia","custom"].includes(settings.startCity))settings.startCity="random";if(settings.defaultsVersion!==55){settings.count=2;settings.countRandom=false;settings.distanceRange="0-3";settings.startCity="random";settings.defaultsVersion=55;localStorage.setItem("trojmiastoGameSettings",JSON.stringify(settings))}}catch(e){}}
 function saveSettings(){const oldRange=settings.distanceRange,oldCity=settings.startCity;settings.countRandom=document.getElementById("missionCount").value==="random";settings.count=settings.countRandom?(settings.count||4):+document.getElementById("missionCount").value;settings.age=document.getElementById("catAge").checked;settings.periods=document.getElementById("catPeriods").checked;settings.architects=document.getElementById("catArchitects").checked;settings.people=document.getElementById("catPeople").checked;settings.functions=document.getElementById("catFunctions").checked;settings.names=document.getElementById("catNames").checked;settings.history=document.getElementById("catHistory").checked;settings.institutions=document.getElementById("catInstitutions").checked;settings.creators=document.getElementById("catCreators").checked;settings.hints=document.getElementById("allowHints").checked;settings.randomCategories=document.getElementById("randomCategories").checked;if(settings.randomCategories){settings.age=settings.periods=settings.architects=settings.people=settings.functions=settings.names=settings.history=settings.institutions=settings.creators=false}else{if(![settings.age,settings.periods,settings.architects,settings.people,settings.functions,settings.names,settings.history,settings.institutions,settings.creators].some(Boolean))settings.age=true}settings.distanceRange=document.getElementById("distanceRange").value;settings.startCity=document.getElementById("startCity").value;settings.defaultsVersion=54;localStorage.setItem("trojmiastoGameSettings",JSON.stringify(settings));return oldRange!==settings.distanceRange||oldCity!==settings.startCity}
 function syncCategoryMode(){
   const random=document.getElementById("randomCategories").checked;
@@ -762,58 +756,17 @@ function approachAnalysis(startIndex,endIndex,goal){
   return {startDistance,endDistance,toward,away,flat,towardPct,verdict,moves:endIndex-startIndex};
 }
 function summaryProgress(){
-  const route=[gameStart,...visitedHistory];
-  const stages=[];
-  let lastIndex=0;
-  const doneTasks=activeTasks.filter(t=>completed.has(t.type));
-  doneTasks.forEach(t=>{
-    const hitIndex=visitedHistory.findIndex(p=>(missionHits.get(p.id)||[]).includes(t.type));
-    if(hitIndex<0)return;
-    const endIndex=hitIndex+1;
-    const previous=stages.length?stages[stages.length-1].endIndex:lastIndex;
-    if(endIndex<previous)return;
-    const point=route[endIndex];
-    const existing=stages.find(s=>s.endIndex===endIndex);
-    if(existing){
-      existing.tasks.push(t.text);
-      return;
-    }
-    const analysis=approachAnalysis(previous,endIndex,point);
-    stages.push({endIndex,tasks:[t.text],point,analysis});
-    lastIndex=endIndex;
+  const route=[gameStart,...visitedHistory],values=[];let lastIndex=0;
+  activeTasks.filter(t=>completed.has(t.type)).forEach(t=>{
+    const hit=visitedHistory.findIndex(p=>(missionHits.get(p.id)||[]).includes(t.type));if(hit<0)return;
+    const end=hit+1,previous=lastIndex,point=route[end];if(end<previous)return;
+    const a=approachAnalysis(previous,end,point);if(a)values.push(a.towardPct);lastIndex=end;
   });
-  if(!stages.length)return "";
-  let h="<div class='summary-progress'><div class='summary-progress-title'>Czy zbliżałeś się do rozwiązań?</div>";
-  stages.forEach((s,i)=>{
-    const a=s.analysis;
-    if(!a)return;
-    h+="<div class='summary-progress-row'>";
-    h+="<b>Misja "+(i+1)+" · "+esc(s.point.name)+"</b>";
-    h+="<span class='summary-progress-task'>"+s.tasks.map(esc).join("<br>")+"</span>";
-    h+="<span class='summary-progress-compact'>↗ "+a.toward+" · ↘ "+a.away+" · "+a.towardPct+"% bliżej";
-    if(a.flat)h+=" · ↔ bez wyraźnej zmiany: <b>"+a.flat+"</b>";
-    h+="</span>";
-    h+="<span class='summary-progress-verdict'>"+esc(a.verdict)+"</span>";
-    h+="</div>";
-  });
-  const last=stages[stages.length-1];
   const targetIndex=route.findIndex(p=>p.id===target?.id);
-  if(targetIndex>last.endIndex){
-    const a=approachAnalysis(last.endIndex,targetIndex,target);
-    if(a){
-      h+="<div class='summary-progress-row summary-premium-row'>";
-      h+="<b>Część premium · "+esc(target.name)+"</b>";
-      h+="<span class='summary-progress-compact'>↗ "+a.toward+" · ↘ "+a.away+" · "+a.towardPct+"% bliżej";
-      if(a.flat)h+=" · ↔ bez wyraźnej zmiany: <b>"+a.flat+"</b>";
-      h+="</span>";
-      h+="<span class='summary-progress-verdict'>"+esc(a.verdict)+"</span>";
-      h+="</div>";
-    }
-  }
-  h+="</div>";
-  return h;
+  if(targetIndex>lastIndex){const a=approachAnalysis(lastIndex,targetIndex,target);if(a)values.push(a.towardPct)}
+  if(!values.length)return "";
+  return "<div class='summary-progress'><div class='summary-progress-title'>Czy zbliżałeś się do rozwiązań?</div><div class='summary-progress-compact'>W kolejnych etapach: <b>"+values.join("% · ")+"%</b></div></div>";
 }
-
 function reveal(p){
   const hits=activeTasks.filter(t=>!completed.has(t.type)&&t.test(p));
   visitedHistory.push(p);
@@ -862,17 +815,26 @@ function reveal(p){
   hits.forEach(h=>completed.add(h.type));
   updateTagCloud();
 }
-function choose(p){choiceEl.classList.add("hidden");candidateMarkers.forEach(m=>map.removeLayer(m));candidateMarkers=[];clearSearchZone();document.querySelector(".controls").classList.remove("direction-hidden");statusEl.style.cursor="";statusEl.title="";current=p;visited.add(p.id);moves++;routePoints.push(p);updateVisitedLabels();updateRoute();setCurrent(p);document.querySelector(".choice-title").textContent="Wybierz kierunek wycieczki";choiceEl.classList.add("direction-choice-empty");document.querySelector(".choice-buttons").style.display="none";document.getElementById("choiceA").textContent="";document.getElementById("choiceB").textContent="";choiceEl.classList.remove("hidden");reveal(p);updatePremiumHint()}
+function choose(p){
+  const premiumActive=completed.size===activeTasks.length&&!!target;
+  if(premiumActive&&target){premiumStats.choices++;if(p.premiumBest||p.isTarget)premiumStats.goodChoices++}
+  choiceEl.classList.add("hidden");candidateMarkers.forEach(m=>map.removeLayer(m));candidateMarkers=[];clearSearchZone();
+  document.querySelector(".controls").classList.remove("direction-hidden");statusEl.style.cursor="";statusEl.title="";
+  current=p;visited.add(p.id);moves++;routePoints.push(p);updateVisitedLabels();updateRoute();setCurrent(p);
+  document.querySelector(".choice-title").textContent="Wybierz kierunek wycieczki";choiceEl.classList.add("direction-choice-empty");
+  document.querySelector(".choice-buttons").style.display="none";document.getElementById("choiceA").textContent="";document.getElementById("choiceB").textContent="";
+  choiceEl.classList.remove("hidden");reveal(p);updatePremiumHint();
+  if(premiumActive)statusEl.innerHTML=premiumLiveMessage();
+}
+function summaryTripDistance(){return routePoints.reduce((sum,p,i)=>i?sum+distance(routePoints[i-1],p):0,0)/1000}
+function openTripInfo(){
+  revealEl.innerHTML="<div class='trip-info-popup'><button id='closeTripInfo' class='trip-info-close' type='button' aria-label='Zamknij'>×</button><h3>🚲 O wycieczce</h3><p>Trasa naszej wycieczki nadaje się na wycieczkę rowerową.</p><p>Autor strony zna przewodnika, który może takie wycieczki zorganizować.</p></div>";
+  revealEl.className="reveal trip-info-reveal";revealEl.style.zIndex="1500";revealEl.style.bottom="auto";revealEl.style.top="50%";
+  document.getElementById("closeTripInfo").onclick=()=>{revealEl.className="reveal hidden";revealEl.style.zIndex="";revealEl.style.top="";revealEl.style.bottom=""};
+}
 function summaryMissionPanelHtml(){
-  const missionSummary=activeTasks.filter(t=>completed.has(t.type)).map(t=>{
-    const p=visitedHistory.find(x=>(missionHits.get(x.id)||[]).includes(t.type));
-    return "<div class='summary-mission-row'><b>"+esc(p?.name||"Odwiedzony obiekt")+"</b><span>"+esc(t.text)+"</span></div>";
-  }).join("");
-  const years=routePoints.map(year).filter(y=>y!==null);
-  const legend=years.length
-    ? "<div class='summary-color-legend'><span>starsze</span><div class='summary-color-bar'></div><span>nowsze</span></div>"
-    : "";
-  return "<div class='summary-panel-kicker'>GRA ZALICZONA</div><div class='summary-panel-title'>Podsumowanie gry</div>"+missionSummary+summaryProgress()+legend+"<button id='summaryRestart' class='summary-restart-panel' type='button'>ZACZNIJ OD NOWA</button>";
+  const missionSummary=activeTasks.filter(t=>completed.has(t.type)).map(t=>{const p=visitedHistory.find(x=>(missionHits.get(x.id)||[]).includes(t.type));return "<div class='summary-mission-row'><b>"+esc(p?.name||"Odwiedzony obiekt")+"</b><span>"+esc(t.text)+"</span></div>"}).join("");
+  return "<div class='summary-panel-kicker'>GRA ZALICZONA</div><div class='summary-panel-title'>Zaliczone misje:</div>"+missionSummary+"<div class='summary-trip-distance'>Odległość wycieczki: <b>"+summaryTripDistance().toFixed(1)+" km</b></div><button id='tripInfoBtn' class='trip-info-btn' type='button'>🚲 O trasie</button>"+summaryProgress()+"<button id='summaryRestart' class='summary-restart-panel' type='button'>ZACZNIJ OD NOWA</button>";
 }
 function showFinishInMissionPanel(){
   const missionPanel=document.querySelector(".mission");
@@ -897,7 +859,7 @@ function finish(){
   if(routePoints.length>1)map.fitBounds(routePoints.map(p=>[p.lat,p.lon]),{padding:[70,70],maxZoom:15});
   showFinishInMissionPanel();
   const restart=document.getElementById("summaryRestart");
-  if(restart)restart.onclick=()=>location.reload();
+  if(restart)restart.onclick=()=>location.reload();const tripInfo=document.getElementById("tripInfoBtn");if(tripInfo)tripInfo.onclick=openTripInfo;
 }
 
 function updateTagCloud(){
@@ -959,13 +921,40 @@ function updateProgress(){
   }).join("");
 }
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+async function getGpsStartPoint(){
+  if(!navigator.geolocation)throw new Error("Ta przeglądarka nie udostępnia lokalizacji GPS.");
+  statusEl.textContent="Pobieram lokalizację tylko na potrzeby wyboru startu…";
+  movesEl.textContent="Lokalizacja jest używana jednorazowo do znalezienia najbliższego punktu.";
+  const position=await new Promise((resolve,reject)=>{
+    navigator.geolocation.getCurrentPosition(resolve,reject,{enableHighAccuracy:true,maximumAge:0,timeout:10000});
+  });
+  const raw={lat:position.coords.latitude,lon:position.coords.longitude};
+  const nearest=nearestPointToMapClick({lat:raw.lat,lng:raw.lon});
+  if(!nearest)throw new Error("Nie znaleziono punktu startowego w bazie.");
+  const gpsDistance=distance(raw,nearest);
+  gpsStartSelected=nearest;
+  return {point:nearest,distance:gpsDistance};
+}
+function resetPremiumStats(){premiumStats={directions:0,goodDirections:0,choices:0,goodChoices:0,lastDirectionGood:false}}
+function premiumDirectionIsGood(dir){return !!(target&&current&&angleDiff(bearing(current,target),dirAngle(dir))<=45)}
+function premiumChoiceScore(p){return target&&p?distance(p,target):Infinity}
+function premiumLiveMessage(){
+  if(!target||!current)return "";
+  const directionPct=premiumStats.directions?Math.round(premiumStats.goodDirections/premiumStats.directions*100):0;
+  const choicePct=premiumStats.choices?Math.round(premiumStats.goodChoices/premiumStats.choices*100):0;
+  const d=distance(current,target);
+  if(d<=250)return "🔥 META JEST BARDZO BLISKO — wybieraj punkt prowadzący najkrótszą drogą.";
+  if(premiumStats.directions&&premiumStats.lastDirectionGood)return "👍 Dobry kierunek! Zgodność kierunków: <b>"+directionPct+"%</b> · dobry wybór punktu: <b>"+choicePct+"%</b>.";
+  if(premiumStats.directions)return "↪ Ten kierunek oddala od najlepszego kursu. Zgodność kierunków: <b>"+directionPct+"%</b> · dobry wybór punktu: <b>"+choicePct+"%</b>.";
+  return "🎯 Część premium: wybierz kierunek możliwie zgodny z kierunkiem do mety.";
+}
 async function start(){
   if(choiceLocked)return;
   choiceLocked=true;
   const startBtn=document.getElementById("startBtn");
   startBtn.disabled=true;
   startBtn.textContent="PRZYGOTOWYWANIE…";
-  const customMode=settings.startCity==="custom"&&!!customStartSelected;
+  const customMode=settings.startCity==="custom"&&!!customStartSelected;const gpsMode=settings.startCity==="gps";
   if(customMode){
     statusEl.textContent="✓ START ZAZNACZONY. Teraz układam trasę i dobieram misje w jego okolicy…";
     movesEl.textContent="Przygotowuję trasę od wybranego miejsca. Mapa za chwilę pokaże gotowy start.";
@@ -975,6 +964,17 @@ async function start(){
     movesEl.textContent="Przygotowanie gry — może potrwać około 10 sekund…";
   }
   await new Promise(r=>setTimeout(r,40));
+  if(gpsMode&&!gpsStartSelected){
+    try{
+      const gps=await getGpsStartPoint();
+      customStartSelected=gps.point;
+      statusEl.textContent="✓ Najbliższy punkt startowy: "+gps.point.name+" ("+(gps.distance<1000?Math.round(gps.distance)+" m":(gps.distance/1000).toFixed(1)+" km")+" od lokalizacji). GPS nie będzie już używany podczas gry.";
+      await new Promise(r=>setTimeout(r,250));
+    }catch(e){
+      choiceLocked=false;statusEl.textContent="Nie udało się pobrać lokalizacji: "+(e?.message||"brak dostępu do GPS")+".";movesEl.textContent="GPS jest używany tylko do jednorazowego wyboru startu.";
+      startBtn.disabled=false;startBtn.textContent="ROZPOCZNIJ GRĘ";return;
+    }
+  }
   document.getElementById("start").classList.add("hidden");
   candidateMarkers.forEach(m=>map.removeLayer(m));candidateMarkers=[];
   clearSearchZone();
@@ -986,7 +986,7 @@ async function start(){
   routePoints=[];
   routePointMarkers.forEach(m=>{try{map.removeLayer(m)}catch(e){}});
   routePointMarkers=[];
-  moves=0;visited=new Set();visitedHistory=[];completed=new Set();missionHits=new Map();activeTasks=[];
+  moves=0;visited=new Set();visitedHistory=[];completed=new Set();missionHits=new Map();activeTasks=[];resetPremiumStats();
   if(customStartPickHandler){map.off("click",customStartPickHandler);customStartPickHandler=null}
   map.getContainer().classList.remove("custom-start-pick");
   applyRandomGameSettings();
@@ -1022,7 +1022,7 @@ async function start(){
         const radiusInfo=radius?(" • promień "+(radius/1000)+" km"):"";
         missionEl.innerHTML="<div class='mission-loading'>Ładowanie gry… <b>"+sec+" s</b><br><small>Start "+attempt+"/"+max+" • sprawdzono "+(checked||0)+"/"+(total||0)+" celów"+radiusInfo+detail+count+"</small></div>";
       };
-      if(settings.startCity==="custom"){
+      if(settings.startCity==="custom"||settings.startCity==="gps"){
         audited=await chooseTargetForStart(customStartSelected,candidateTasks,progress);
       }else{
         audited=await chooseStartAndTarget(candidateTasks,progress);
@@ -1034,7 +1034,7 @@ async function start(){
         // Przy starcie zaznaczonym ręcznie zawsze uruchamiamy najlepszą znalezioną
         // konfigurację. Dzięki temu brak pełnego losowego zestawu nie tworzy pętli
         // „ekran startowy → zaznaczenie → ekran startowy”.
-        if(settings.startCity==="custom"&&activeTasks.length===0){
+        if((settings.startCity==="custom"||settings.startCity==="gps")&&activeTasks.length===0){
           audited=null;
         }
       }
@@ -1042,7 +1042,7 @@ async function start(){
   }finally{
     clearInterval(loadingTimer);
   }
-  if(settings.startCity==="custom")customStartSelected=null;
+  if(settings.startCity==="custom"||settings.startCity==="gps")customStartSelected=null;gpsStartSelected=null;
   if(!audited){
     choiceLocked=false;
     missionEl.innerHTML="";
@@ -1053,7 +1053,7 @@ async function start(){
     startBtn.disabled=false;startBtn.textContent="ROZPOCZNIJ GRĘ";
     return;
   }
-  current=audited.start;gameStart=audited.start;target=audited.target;gameDistance=distance(current,target);
+  current=audited.start;gameStart=audited.start;target=audited.target;gameDistance=distance(current,target);document.body.classList.add("gameplay-active");
   if(customStartMarker){try{map.removeLayer(customStartMarker)}catch(e){}customStartMarker=null}
   routePoints=[current];updateRoute();missionEl.innerHTML="";updateProgress();
   if(missionSearchFallback){
@@ -1076,7 +1076,8 @@ async function start(){
     choiceEl.classList.remove("hidden");updateMoveInfo(0);choiceLocked=false;
   }
   startBtn.disabled=false;startBtn.textContent="ROZPOCZNIJ GRĘ";
-}async function init(){try{if(typeof L==="undefined")throw new Error("Leaflet nie został załadowany");const mapEl=document.getElementById("map");if(!mapEl)throw new Error("Brak elementu mapy");map=L.map(mapEl,{zoomControl:false}).setView([54.38,18.62],12);if(!map||typeof map.addLayer!=="function")throw new Error("Nie udało się utworzyć mapy Leaflet");L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap"}).addTo(map);loadSettings();updateMoveInfo(0);document.getElementById("startBtn").onclick=start;document.getElementById("settingsBtn").onclick=openSettings;
+}function startFooterCycle(){const footer=document.getElementById("map-footer");if(!footer)return;setTimeout(()=>footer.classList.add("footer-hidden"),5000);setInterval(()=>{footer.classList.remove("footer-hidden");setTimeout(()=>footer.classList.add("footer-hidden"),5000)},180000)}
+async function init(){try{startFooterCycle();if(typeof L==="undefined")throw new Error("Leaflet nie został załadowany");const mapEl=document.getElementById("map");if(!mapEl)throw new Error("Brak elementu mapy");map=L.map(mapEl,{zoomControl:false}).setView([54.38,18.62],12);if(!map||typeof map.addLayer!=="function")throw new Error("Nie udało się utworzyć mapy Leaflet");L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap"}).addTo(map);loadSettings();updateMoveInfo(0);document.getElementById("startBtn").onclick=start;document.getElementById("settingsBtn").onclick=openSettings;
 document.getElementById("startSettingsBtn").onclick=openSettings;
 document.getElementById("randomCategories").addEventListener("change",syncCategoryMode);
 document.getElementById("surrenderSettings").onclick=showSolution;movesEl.addEventListener("click",()=>{if(instructionTimer){clearTimeout(instructionTimer);instructionTimer=null}movesEl.classList.remove("instruction-visible");movesEl.classList.add("instruction-hidden")});document.getElementById("newGameSettings").onclick=async()=>{document.getElementById("settings").classList.add("hidden");customStartSelected=null;clearCustomStartPick();choiceLocked=false;await start()};const tagToggle=document.getElementById("tagToggle"),tagCloud=document.getElementById("tagCloud");if(tagToggle&&tagCloud)tagToggle.onclick=()=>tagCloud.classList.toggle("closed");updateTagCloud();statusEl.addEventListener("click",()=>{if(!searchZone)return;searchZone.setStyle({fillOpacity:searchZone.options.fillOpacity>0?0:.14,opacity:searchZone.options.opacity>0?0:.9})});document.getElementById("saveSettings").onclick=async()=>{const btn=document.getElementById("saveSettings");btn.disabled=true;btn.textContent="ZAPISYWANIE…";statusEl.textContent="Trwa zapisywanie ustawień…";await new Promise(r=>setTimeout(r,350));saveSettings();document.getElementById("settings").classList.add("hidden");btn.disabled=false;btn.textContent="ZAPISZ";if(document.getElementById("start").classList.contains("hidden")){await start()}else statusEl.textContent="Ustawienia zapisane. Kliknij „ROZPOCZNIJ GRĘ”.";};document.querySelectorAll("[data-dir]").forEach(b=>b.onclick=()=>showCandidates(b.dataset.dir));document.addEventListener("keydown",e=>{const d={ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right"}[e.key];if(d){e.preventDefault();showCandidates(d)}});try{if(typeof Papa==="undefined")throw Error("Nie załadowano parsera CSV");const r=await fetch(DATA_URL,{cache:"no-store"});if(!r.ok)throw Error("Arkusz Google zwrócił HTTP "+r.status);const csv=await r.text();const parsed=Papa.parse(csv,{header:true,skipEmptyLines:true});if(parsed.errors?.length)console.warn("Ostrzeżenia CSV:",parsed.errors);points=parseSheetRows(parsed.data);updateCategoryCounts();if(points.length<20)throw Error("Za mało poprawnych punktów GPS w arkuszu");statusEl.textContent="Załadowano "+points.length+" punktów z Google Sheets (wierszy CSV: "+parsed.data.length+")."}catch(e){console.error("Błąd ładowania Google Sheets:",e);statusEl.textContent="Błąd danych: "+e.message}try{if(L.control&&L.control.scale) L.control.scale({imperial:false,metric:true,position:"bottomleft"}).addTo(map)}catch(e){console.warn("Kontrolka skali pominięta:",e)} }catch(e){console.error("Błąd inicjalizacji gry:",e);statusEl.textContent="BŁĄD MAPY: "+e.message;statusEl.title=e.stack||"";document.getElementById("start").classList.remove("hidden")}}init();
