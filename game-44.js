@@ -1,4 +1,4 @@
-const SHEET_ID="1TmRHJDv6IMlGwg761JV50M8vS4zXTdWBtjDziAleSQI",DATA_URL=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;let map,points=[],current=null,gameStart=null,target=null,visited=new Set(),moves=0,choiceLocked=false,premiumShown=false,candidateMarkers=[],currentMarker,startMarker,targetMarker,routeLine=null,routePoints=[],routePointMarkers=[],visitedHistory=[],visitedMarkers=[],summaryMarkers=[],summaryRouteLines=[],solutionMarkers=[],customStartMarker=null,customStartSelected=null,customStartPickHandler=null,gpsStartSelected=null,premiumStats={directions:0,goodDirections:0,choices:0,goodChoices:0,lastDirectionGood:false};const missionEl=document.getElementById("mission"),tasksEl=document.getElementById("tasks"),progressEl=document.getElementById("progress"),movesEl=document.getElementById("moves"),choiceEl=document.getElementById("choice"),revealEl=document.getElementById("reveal"),statusEl=document.getElementById("status");let activeTasks=[],completed=new Set(),missionHits=new Map(),gameDistance=0,searchZone=null,instructionTimer=null,missionSearchRadius=3000,missionSearchFallback=false,settings={count:2,countRandom:false,randomCategories:true,age:true,periods:true,architects:true,people:true,functions:true,names:true,history:true,institutions:true,creators:true,hints:true,distanceRange:"0-3",startCity:"gps",defaultsVersion:57},pathGraph=null;
+const SHEET_ID="1TmRHJDv6IMlGwg761JV50M8vS4zXTdWBtjDziAleSQI",DATA_URL=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;let map,points=[],current=null,gameStart=null,target=null,visited=new Set(),moves=0,choiceLocked=false,premiumShown=false,candidateMarkers=[],currentMarker,startMarker,targetMarker,routeLine=null,routePoints=[],routePointMarkers=[],visitedHistory=[],visitedMarkers=[],summaryMarkers=[],summaryRouteLines=[],solutionMarkers=[],customStartMarker=null,customStartSelected=null,customStartPickHandler=null,gpsStartSelected=null,premiumStats={directions:0,goodDirections:0,choices:0,goodChoices:0,lastDirectionGood:false};const missionEl=document.getElementById("mission"),tasksEl=document.getElementById("tasks"),progressEl=document.getElementById("progress"),movesEl=document.getElementById("moves"),choiceEl=document.getElementById("choice"),revealEl=document.getElementById("reveal"),statusEl=document.getElementById("status");let activeTasks=[],completed=new Set(),missionHits=new Map(),gameDistance=0,searchZone=null,instructionTimer=null,missionSearchRadius=3000,missionSearchFallback=false,exactDateHintSeen=new Set(),settings={count:2,countRandom:false,randomCategories:true,age:true,periods:true,architects:true,people:true,functions:true,names:true,history:true,institutions:true,creators:true,hints:true,distanceRange:"0-3",startCity:"gps",defaultsVersion:57},pathGraph=null;
 function getSheetVal(obj,searchStrings){const keys=Object.keys(obj||{});for(const search of searchStrings){const clean=search.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"");const exact=keys.find(k=>k.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"")===clean);if(exact&&String(obj[exact]??"").trim()!=="")return String(obj[exact]).trim()}for(const search of searchStrings){const clean=search.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"");const partial=keys.find(k=>k.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"").includes(clean));if(partial&&String(obj[partial]??"").trim()!=="")return String(obj[partial]).trim()}return""}
 function parseSheetRows(data){return data.map((item,i)=>{const name=getSheetVal(item,["adres","nazwa","obiekt","name"])||"Nieznany",date=getSheetVal(item,["datawybudowania","rokbudowy","data","rok","czas","wiek"])||"",notes=getSheetVal(item,["uwagi","opis","informacje","info","inne"]),architect=getSheetVal(item,["architekt","arch.","arch","projektant","proj.","proj","autor"])||String(Object.values(item)[3]??"").trim(),gps=getSheetVal(item,["pozycjagps","gps","wspolrzedne","współrzędne","lokalizacja"]);let lat,lng;if(gps){const matches=String(gps).replace(/;/g,",").match(/-?\d+[\.,]\d+/g)||[];if(matches.length>=2){lat=parseFloat(matches[0].replace(",","."));lng=parseFloat(matches[1].replace(",","."))}}if(!Number.isFinite(lat)||!Number.isFinite(lng))return null;return{id:i,name,lat,lon:lng,raw:notes,date,architect,notes}}).filter(Boolean).filter(p=>p.lat>53.9&&p.lat<54.7&&p.lon>18.2&&p.lon<19.1)}
 function year(p){const m=String(p.date||"").match(/(1[0-9]{3}|20[0-9]{2})/);return m?+m[1]:null}
@@ -709,24 +709,43 @@ function taskHintHtml(t){
   if(!targets.length)return "";
   const d=Math.min(...targets.map(p=>distance(current,p)));
   const text=d<1000?Math.round(d)+" m":(d/1000).toFixed(2)+" km";
-
-  // Dla misji „dokładna data budowy” pomagamy, gdy gracz trafi na
-  // budynek z podobnego okresu, ale nie na właściwy rok/datę.
-  if(t.exactDate&&current&&!t.test(current)){
-    const currentYear=year(current);
-    const nearbyTargets=targets
-      .map(p=>({p,y:year(p)}))
-      .filter(x=>currentYear!==null&&x.y!==null&&Math.abs(x.y-currentYear)<=10)
-      .sort((a,b)=>distance(current,a.p)-distance(current,b.p));
-    if(nearbyTargets.length){
-      const targetPoint=nearbyTargets[0].p;
-      const targetDate=exactBuildDate(targetPoint);
-      const targetDistance=distance(current,targetPoint);
-      const targetText=targetDistance<1000?Math.round(targetDistance)+" m":(targetDistance/1000).toFixed(2)+" km";
-      return ' <span class="automatic-hint">PODPOWIEDŹ: To budynek z podobnego okresu. Szukaj daty <b>'+esc(targetDate)+'</b> — cel jest '+targetText+' stąd.</span>';
-    }
-  }
   return ' <span class="automatic-hint">PODPOWIEDŹ: '+text+'</span>';
+}
+function showExactDateHintPopup(){
+  if(!settings.hints||!current)return;
+  const task=activeTasks.find(t=>!completed.has(t.type)&&t.exactDate);
+  if(!task||task.test(current))return;
+  const currentYear=year(current);
+  if(currentYear===null)return;
+  const limits=target?missionCoverageLimits(gameStart||current,target):null;
+  const targets=points.filter(p=>{
+    if(p.id===current.id||visited.has(p.id)||!task.test(p))return false;
+    if(!limits)return true;
+    return distance(gameStart||current,p)<=limits.startMax&&distance(p,target)<=limits.targetMax;
+  });
+  const nearbyTargets=targets.map(p=>({p,y:year(p)}))
+    .filter(x=>x.y!==null&&Math.abs(x.y-currentYear)<=10)
+    .sort((a,b)=>distance(current,a.p)-distance(current,b.p));
+  if(!nearbyTargets.length)return;
+  const key=task.type+"|"+current.id;
+  if(exactDateHintSeen.has(key))return;
+  exactDateHintSeen.add(key);
+  const targetPoint=nearbyTargets[0].p;
+  const targetDate=exactBuildDate(targetPoint);
+  const d=distance(current,targetPoint);
+  const distanceText=d<1000?Math.round(d)+" m":(d/1000).toFixed(2)+" km";
+  const popup=document.createElement("div");
+  popup.className="exact-date-hint-popup";
+  popup.innerHTML="<div class='exact-date-hint-title'>PODPOWIEDŹ</div><div>To budynek z podobnego okresu.</div><div>Szukaj daty <b>"+esc(targetDate)+"</b> — cel jest "+distanceText+" stąd.</div><div class='exact-date-hint-close'>Dotknij, aby zamknąć</div>";
+  const close=()=>{
+    if(!popup.isConnected)return;
+    popup.classList.remove("visible");
+    setTimeout(()=>popup.remove(),180);
+  };
+  popup.onclick=close;
+  document.body.appendChild(popup);
+  requestAnimationFrame(()=>popup.classList.add("visible"));
+  window.setTimeout(close,5000);
 }
 function taskHint(t){
   const limits=target?missionCoverageLimits(gameStart||current,target):null;
@@ -985,7 +1004,7 @@ function choose(p){
   if(premiumActive&&target){premiumStats.choices++;if(p.premiumBest||p.isTarget)premiumStats.goodChoices++}
   choiceEl.classList.add("hidden");candidateMarkers.forEach(m=>map.removeLayer(m));candidateMarkers=[];clearSearchZone();
   document.querySelector(".controls").classList.remove("direction-hidden");statusEl.style.cursor="";statusEl.title="";
-  current=p;visited.add(p.id);moves++;routePoints.push(p);updateVisitedLabels();updateRoute();setCurrent(p);
+  current=p;visited.add(p.id);moves++;routePoints.push(p);updateVisitedLabels();updateRoute();setCurrent(p);showExactDateHintPopup();
   document.querySelector(".choice-title").textContent="Wybierz kierunek wycieczki";choiceEl.classList.add("direction-choice-empty");
   document.querySelector(".choice-buttons").style.display="none";document.getElementById("choiceA").textContent="";document.getElementById("choiceB").textContent="";
   choiceEl.classList.remove("hidden");reveal(p);updatePremiumHint();
@@ -1116,11 +1135,10 @@ function updateProgress(){
   const done=activeTasks.filter(t=>completed.has(t.type)).length;
   progressEl.textContent="Misje do zaliczenia · "+done+"/"+activeTasks.length;
   const autoHintTask=settings.hints?activeTasks.find(t=>!completed.has(t.type)&&taskAwayStreak(t)===3):null;
-  const exactDateHintTask=settings.hints?activeTasks.find(t=>!completed.has(t.type)&&t.exactDate&&current&&!t.test(current)&&taskHintHtml(t).includes("PODPOWIEDŹ")):null;
   tasksEl.innerHTML=activeTasks.map(t=>{
     const doneTask=completed.has(t.type);
-    const hint=!doneTask&&(t===exactDateHintTask?taskHintHtml(t):t===autoHintTask?taskHintHtml(t):"");
-    return "<div class=\""+(doneTask?"task-done":"")+"\"><span class=\"task-text\">"+(doneTask?"✓":"▸")+" "+esc(t.text)+"</span>"+(doneTask?"":(hint||missionHeat(t)))+"</div>";
+    const hint=!doneTask&&t===autoHintTask?taskHintHtml(t):"";
+    return "<div class=\""+(doneTask?"task-done":"")+""><span class=\"task-text\">"+(doneTask?"✓":"▸")+" "+esc(t.text)+"</span>"+(doneTask?"":(hint||missionHeat(t)))+"</div>";
   }).join("");
 }
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
@@ -1189,7 +1207,7 @@ async function start(){
   routePoints=[];
   routePointMarkers.forEach(m=>{try{map.removeLayer(m)}catch(e){}});
   routePointMarkers=[];
-  moves=0;visited=new Set();visitedHistory=[];completed=new Set();missionHits=new Map();activeTasks=[];premiumShown=false;resetPremiumStats();
+  moves=0;visited=new Set();visitedHistory=[];completed=new Set();missionHits=new Map();activeTasks=[];premiumShown=false;exactDateHintSeen=new Set();resetPremiumStats();
   if(customStartPickHandler){map.off("click",customStartPickHandler);customStartPickHandler=null}
   map.getContainer().classList.remove("custom-start-pick");
   applyRandomGameSettings();
@@ -1283,4 +1301,4 @@ async function start(){
 async function init(){try{startFooterCycle();if(typeof L==="undefined")throw new Error("Leaflet nie został załadowany");const mapEl=document.getElementById("map");if(!mapEl)throw new Error("Brak elementu mapy");map=L.map(mapEl,{zoomControl:false}).setView([54.38,18.62],12);if(!map||typeof map.addLayer!=="function")throw new Error("Nie udało się utworzyć mapy Leaflet");L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap"}).addTo(map);loadSettings();updateMoveInfo(0);document.getElementById("startBtn").onclick=start;document.getElementById("settingsBtn").onclick=openSettings;
 document.getElementById("startSettingsBtn").onclick=openSettings;
 document.getElementById("randomCategories").addEventListener("change",syncCategoryMode);
-document.getElementById("surrenderSettings").onclick=showSolution;movesEl.addEventListener("click",()=>{if(instructionTimer){clearTimeout(instructionTimer);instructionTimer=null}movesEl.classList.remove("instruction-visible");movesEl.classList.add("instruction-hidden")});document.getElementById("newGameSettings").onclick=async()=>{document.getElementById("settings").classList.add("hidden");customStartSelected=null;clearCustomStartPick();choiceLocked=false;await start()};const tagToggle=document.getElementById("tagToggle"),tagCloud=document.getElementById("tagCloud");if(tagToggle&&tagCloud)tagToggle.onclick=()=>tagCloud.classList.toggle("closed");updateTagCloud();statusEl.addEventListener("click",()=>{if(!searchZone)return;searchZone.setStyle({fillOpacity:searchZone.options.fillOpacity>0?0:.14,opacity:searchZone.options.opacity>0?0:.9})});document.getElementById("saveSettings").onclick=async()=>{const btn=document.getElementById("saveSettings");btn.disabled=true;btn.textContent="ZAPISYWANIE…";statusEl.textContent="Trwa zapisywanie ustawień…";await new Promise(r=>setTimeout(r,350));saveSettings();document.getElementById("settings").classList.add("hidden");btn.disabled=false;btn.textContent="ZAPISZ";if(document.getElementById("start").classList.contains("hidden")){await start()}else statusEl.textContent="Ustawienia zapisane. Kliknij „ROZPOCZNIJ GRĘ”.";};document.querySelectorAll("[data-dir]").forEach(b=>b.onclick=()=>showCandidates(b.dataset.dir));document.addEventListener("keydown",e=>{const d={ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right"}[e.key];if(d){e.preventDefault();showCandidates(d)}});try{if(typeof Papa==="undefined")throw Error("Nie załadowano parsera CSV");const r=await fetch(DATA_URL,{cache:"no-store"});if(!r.ok)throw Error("Arkusz Google zwrócił HTTP "+r.status);const csv=await r.text();const parsed=Papa.parse(csv,{header:true,skipEmptyLines:true});if(parsed.errors?.length)console.warn("Ostrzeżenia CSV:",parsed.errors);points=parseSheetRows(parsed.data);updateCategoryCounts();if(points.length<20)throw Error("Za mało poprawnych punktów GPS w arkuszu");statusEl.textContent="Załadowano "+points.length+" punktów z Google Sheets (wierszy CSV: "+parsed.data.length+")."}catch(e){console.error("Błąd ładowania Google Sheets:",e);statusEl.textContent="Błąd danych: "+e.message}try{if(L.control&&L.control.scale) L.control.scale({imperial:false,metric:true,position:"bottomleft"}).addTo(map)}catch(e){console.warn("Kontrolka skali pominięta:",e)} }catch(e){console.error("Błąd inicjalizacji gry:",e);statusEl.textContent="BŁĄD MAPY: "+e.message;statusEl.title=e.stack||"";document.getElementById("start").classList.remove("hidden")}}init();
+document.getElementById("surrenderSettings").onclick=showSolution;movesEl.addEventListener("click",()=>{if(instructionTimer){clearTimeout(instructionTimer);instructionTimer=null}movesEl.classList.remove("instruction-visible");movesEl.classList.add("instruction-hidden")});const tagToggle=document.getElementById("tagToggle"),tagCloud=document.getElementById("tagCloud");if(tagToggle&&tagCloud)tagToggle.onclick=()=>tagCloud.classList.toggle("closed");updateTagCloud();statusEl.addEventListener("click",()=>{if(!searchZone)return;searchZone.setStyle({fillOpacity:searchZone.options.fillOpacity>0?0:.14,opacity:searchZone.options.opacity>0?0:.9})});document.getElementById("saveSettings").onclick=async()=>{const btn=document.getElementById("saveSettings");btn.disabled=true;btn.textContent="ZAPISYWANIE…";statusEl.textContent="Trwa zapisywanie ustawień…";await new Promise(r=>setTimeout(r,350));saveSettings();document.getElementById("settings").classList.add("hidden");btn.disabled=false;btn.textContent="ZAPISZ";if(document.getElementById("start").classList.contains("hidden")){await start()}else statusEl.textContent="Ustawienia zapisane. Kliknij „ROZPOCZNIJ GRĘ”.";};document.querySelectorAll("[data-dir]").forEach(b=>b.onclick=()=>showCandidates(b.dataset.dir));document.addEventListener("keydown",e=>{const d={ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right"}[e.key];if(d){e.preventDefault();showCandidates(d)}});try{if(typeof Papa==="undefined")throw Error("Nie załadowano parsera CSV");const r=await fetch(DATA_URL,{cache:"no-store"});if(!r.ok)throw Error("Arkusz Google zwrócił HTTP "+r.status);const csv=await r.text();const parsed=Papa.parse(csv,{header:true,skipEmptyLines:true});if(parsed.errors?.length)console.warn("Ostrzeżenia CSV:",parsed.errors);points=parseSheetRows(parsed.data);updateCategoryCounts();if(points.length<20)throw Error("Za mało poprawnych punktów GPS w arkuszu");statusEl.textContent="Załadowano "+points.length+" punktów z Google Sheets (wierszy CSV: "+parsed.data.length+")."}catch(e){console.error("Błąd ładowania Google Sheets:",e);statusEl.textContent="Błąd danych: "+e.message}try{if(L.control&&L.control.scale) L.control.scale({imperial:false,metric:true,position:"bottomleft"}).addTo(map)}catch(e){console.warn("Kontrolka skali pominięta:",e)} }catch(e){console.error("Błąd inicjalizacji gry:",e);statusEl.textContent="BŁĄD MAPY: "+e.message;statusEl.title=e.stack||"";document.getElementById("start").classList.remove("hidden")}}init();
