@@ -818,3 +818,31 @@ routeLine{}\n/* V44.5 — automatyczne kadrowanie uwzględnia panel wyboru na do
 .summary-mode .summary-progress-compact b{
   color:#8bc34a!important;
 }
+
+/* V58 — ustawienia zawsze dostępne na telefonie podczas gry */
+.gameplay-active #settingsBtn{
+  position:fixed!important;
+  top:7px!important;
+  right:7px!important;
+  z-index:2100!important;
+  display:block!important;
+  pointer-events:auto!important;
+  background:rgba(20,20,20,.94)!important;
+  color:#fff!important;
+  width:34px!important;
+  height:34px!important;
+  line-height:34px!important;
+  font-size:19px!important;
+  border:1px solid rgba(255,255,255,.3)!important;
+  box-shadow:0 2px 8px rgba(0,0,0,.55)!important;
+}
+@media(max-width:600px){
+  .gameplay-active #settingsBtn{
+    top:7px!important;
+    right:7px!important;
+    width:36px!important;
+    height:36px!important;
+    line-height:36px!important;
+    font-size:20px!important;
+  }
+}
