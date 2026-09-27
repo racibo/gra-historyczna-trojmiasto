@@ -694,3 +694,18 @@ routeLine{}\n/* V44.5 — automatyczne kadrowanie uwzględnia panel wyboru na do
     line-height:1.45;
   }
 }
+
+/* V57 */
+.map-footer{position:absolute;z-index:1250;left:50%;bottom:8px;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:7px;padding:6px 10px;max-width:92vw;background:rgba(20,20,20,.76);color:#aaa;border-radius:7px;font-size:9px;line-height:1.2;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.25);transition:opacity .6s ease,visibility .6s ease}
+.map-footer.footer-hidden{opacity:0;visibility:hidden;pointer-events:none}.map-footer a{color:#ddd;text-decoration:none}.map-footer .support-link{color:#ddd}
+.gameplay-active .game-title strong,.gameplay-active .game-title .version-badge{display:none!important}
+.gameplay-active .topbar{right:10px;left:auto}
+.gameplay-active .mission{top:10px!important;left:10px!important;right:auto!important;width:min(94vw,520px)!important;max-width:520px!important;border-radius:10px!important}
+.summary-trip-distance{margin:7px 0 5px;padding:7px 9px;border-radius:7px;background:#f0f2f3;color:#333;font-size:12px}
+.trip-info-btn{border:0;border-radius:7px;padding:6px 9px;background:#e4e8ea;color:#222;font-size:10px;font-weight:800;cursor:pointer}
+.trip-info-reveal{background:transparent!important;padding:0!important;box-shadow:none!important;width:auto!important}
+.trip-info-popup{position:relative;width:min(86vw,380px);box-sizing:border-box;background:#fff;color:#222;border-radius:14px;padding:20px 22px 18px;box-shadow:0 10px 40px rgba(0,0,0,.45)}
+.trip-info-popup h3{margin:0 28px 10px 0;font-size:17px}.trip-info-popup p{margin:7px 0;font-size:13px;line-height:1.45}
+.trip-info-close{position:absolute;top:7px;right:8px;width:28px;height:28px;border:0;border-radius:50%;background:#eee;color:#222;font-size:20px;line-height:28px;cursor:pointer}
+.summary-progress{margin-top:7px!important;padding:7px 8px!important}.summary-progress-title{font-size:10px!important;margin-bottom:3px!important}.summary-progress-compact{font-size:10px!important;color:#444}
+@media(max-width:600px){.gameplay-active .mission{top:7px!important;left:7px!important;width:calc(100vw - 14px)!important;max-width:none!important}.map-footer{bottom:5px;max-width:94vw;gap:5px;padding:5px 7px;font-size:8px}.trip-info-popup{width:calc(100vw - 36px);padding:18px}.summary-trip-distance{font-size:11px}}
