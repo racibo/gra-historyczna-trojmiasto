@@ -179,7 +179,6 @@ async function chooseTargetForStart(start,candidateTasks,onProgress=null){
       }
       if(i%8===7)await new Promise(r=>setTimeout(r,0));
     }
-    lastTargetCount=targetPool.length;
     if(!baseRadius||radius>=maxRadius)break;
     radius+=1000;
   }
@@ -198,8 +197,8 @@ async function chooseStartAndTarget(candidateTasks,onProgress=null){
   for(let attempt=0;attempt<maxStarts;attempt++){
     const start=pool[attempt];
     if(onProgress)onProgress(attempt+1,maxStarts,start,0,0);
-    const result=await chooseTargetForStart(start,candidateTasks,(checked,total,target,usable)=>{
-      if(onProgress)onProgress(attempt+1,maxStarts,start,checked,total,target,usable);
+    const result=await chooseTargetForStart(start,candidateTasks,(checked,total,target,usable,radius)=>{
+      if(onProgress)onProgress(attempt+1,maxStarts,start,checked,total,target,usable,radius);
     });
     if(result)return result;
   }
@@ -979,6 +978,8 @@ async function start(){
   if(customStartPickHandler){map.off("click",customStartPickHandler);customStartPickHandler=null}
   map.getContainer().classList.remove("custom-start-pick");
   applyRandomGameSettings();
+  missionSearchRadius=3000;
+  missionSearchFallback=false;
   missionEl.innerHTML="<div class='mission-loading'>Ładowanie misji do zaliczenia…</div>";
   await new Promise(r=>setTimeout(r,40));
   let audited=null;
