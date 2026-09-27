@@ -1,0 +1,13 @@
+{
+  "name": "Historyczna wyprawa — Trójmiasto",
+  "short_name": "Historyczna wyprawa",
+  "description": "Gra terenowa po historycznym Trójmieście.",
+  "lang": "pl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#07131d",
+  "theme_color": "#07131d",
+  "icons": [{"src":"pwa-icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
