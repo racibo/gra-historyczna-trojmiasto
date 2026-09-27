@@ -444,7 +444,33 @@ function missionLabel(p,category){
 }
 function categoryTasks(all,category,title,matcher){
   const groups=[];
-  all.filter(matcher).forEach(p=>{
+  const matching=all.filter(matcher);
+
+  // Misja architektoniczna dotyczy ARCHITEKTA, a nie jednego konkretnego budynku.
+  // Jeśli np. Kurt Arnheim zaprojektował 15 obiektów, wszystkie 15 jest
+  // poprawnym rozwiązaniem tej samej misji.
+  if(category==="architects"){
+    const byArchitect=new Map();
+    matching.forEach(p=>{
+      missionData(p).architects.forEach(name=>{
+        const label=String(name||"").trim();
+        if(!label)return;
+        const key=label.toLocaleLowerCase();
+        if(!byArchitect.has(key))byArchitect.set(key,label);
+      });
+    });
+    byArchitect.forEach((label,key)=>{
+      groups.push({
+        type:category+":"+key,
+        category,
+        text:title+": "+label,
+        test:q=>missionData(q).architects.some(name=>String(name||"").trim().toLocaleLowerCase()===key)
+      });
+    });
+    return groups;
+  }
+
+  matching.forEach(p=>{
     const label=missionLabel(p,category); if(!label)return;
     const id=category+":"+p.id;
     groups.push({type:id,category,text:title+": "+label,test:q=>q.id===p.id});
