@@ -90,30 +90,30 @@ function missionPathDistance(p,path){
 function missionCoverageLimits(start,target){
   const d=distance(start,target);
   if((settings.distanceRange||"random")==="0-3"){
-    return {startMax:1500,targetMax:1500,routeMax:1200};
+    return {startMax:1500,targetMax:1500};
   }
-  return {startMax:d,targetMax:Math.max(d,1500),routeMax:Math.max(1200,d)};
+  return {startMax:d,targetMax:Math.max(d,1500)};
 }
-function missionCandidatesForGame(t,start,target,path){
+function missionCandidatePoints(start,target){
   const limits=missionCoverageLimits(start,target);
   return points.filter(p=>{
-    if(p.id===start.id||p.id===target.id||visited.has(p.id)||!t.test(p))return false;
-    const ds=distance(start,p),dt=distance(p,target),dr=missionPathDistance(p,path);
-    return ds<=limits.startMax&&dt<=limits.targetMax&&dr<=limits.routeMax;
+    if(p.id===start.id||p.id===target.id||visited.has(p.id))return false;
+    return distance(start,p)<=limits.startMax&&distance(p,target)<=limits.targetMax;
   });
 }
-function missionFitsGame(t,start,target,path){
-  return missionCandidatesForGame(t,start,target,path).length>0;
+function missionCandidatesForGame(t,start,target){
+  const candidates=missionCandidatePoints(start,target);
+  return candidates.filter(p=>t.test(p));
 }
-function missionCoverageScore(tasks,start,target,path){
+function missionFitsGame(t,start,target){
+  return missionCandidatesForGame(t,start,target).length>0;
+}
+function missionCoverageScore(tasks,start,target){
   if(!tasks?.length)return 0;
-  let covered=0;
-  tasks.forEach(t=>{if(missionFitsGame(t,start,target,path))covered++});
-  const pathInside=path.filter(p=>distance(start,p)<=distance(start,target)+300).length/Math.max(path.length,1);
-  return covered*10+pathInside*2;
+  return tasks.filter(t=>missionFitsGame(t,start,target)).length;
 }
 function missionsForRoute(tasks,start,target,path){
-  const usable=tasks.filter(t=>missionFitsGame(t,start,target,path));
+  const usable=tasks.filter(t=>missionFitsGame(t,start,target));
   const limit=Math.min(settings.count||usable.length,usable.length);
   if(!settings.randomCategories)return shuffleArray(usable).slice(0,limit);
   const byCategory={};
@@ -133,9 +133,6 @@ function missionsForRoute(tasks,start,target,path){
   return shuffleArray(selected).slice(0,limit);
 }
 function missionSetForRoute(start,target,path){
-function auditMissionTasks(tasks,start,target,path){
-  return tasks.filter(t=>missionFitsGame(t,start,target,path));
-}
   const candidates=missionPoints();
   const allTasks=taskPoolForGame();
   const usable=allTasks.filter(t=>missionFitsGame(t,start,target,path));
@@ -170,32 +167,35 @@ function distanceRangeMatch(m){
   if(r==="random")return true;
   return r==="0-3"?d<=3:r==="3-5"?d>3&&d<=5:r==="5-10"?d>5&&d<=10:r==="10-20"?d>10&&d<=20:d>20;
 }
-async function chooseTargetForStart(start,onProgress=null){
-  const matching=[];
-  const audit=await auditPath(start,8,onProgress);
-  for(const path of audit.paths.filter(path=>path.length>=4&&path.length<=10)){
-    const target=path[path.length-1];
-    if(target.id!==start.id&&distanceRangeMatch({start,target})){
-      const usable=activeTasks.filter(t=>missionFitsGame(t,start,target,path));
-      if(usable.length>=Math.min(settings.count||0,activeTasks.length)){
-        matching.push({start,target,path,auditMoves:path.length-1,auditedStates:audit.examined,score:missionCoverageScore(usable,start,target,path),usableTasks:usable});
-      }
+async function chooseTargetForStart(start,candidateTasks,onProgress=null){
+  if(!start||!candidateTasks?.length)return null;
+  const targetPool=shuffleArray(points.filter(p=>p.id!==start.id&&distanceRangeMatch({start,target:p})));
+  const maxTargets=Math.min(40,targetPool.length);
+  for(let i=0;i<maxTargets;i++){
+    const target=targetPool[i];
+    const usable=missionCandidateTasks(candidateTasks,start,target);
+    if(onProgress)onProgress(i+1,maxTargets,target,usable.length);
+    if(usable.length>=Math.min(settings.count||0,candidateTasks.length)){
+      return {start,target,path:[start],auditMoves:0,auditedStates:0,score:missionCoverageScore(usable,start,target),usableTasks:usable};
     }
-  }
-  if(matching.length){
-    matching.sort((a,b)=>b.score-a.score);
-    const top=matching.slice(0,Math.min(12,matching.length));
-    return top[Math.floor(Math.random()*top.length)];
+    if(i%8===7)await new Promise(r=>setTimeout(r,0));
   }
   return null;
 }
-async function chooseStartAndTarget(onProgress=null){
-  const pool=points.filter(p=>cityMatch(p,settings.startCity||"random"));
+function missionCandidateTasks(tasks,start,target){
+  const candidates=missionCandidatePoints(start,target);
+  return tasks.filter(t=>candidates.some(p=>t.test(p)));
+}
+async function chooseStartAndTarget(candidateTasks,onProgress=null){
+  const pool=shuffleArray(points.filter(p=>cityMatch(p,settings.startCity||"random")));
   if(!pool.length)return null;
-  for(let attempt=0;attempt<12;attempt++){
-    const start=pool[Math.floor(Math.random()*pool.length)];
-    if(onProgress)onProgress(attempt+1,12,start);
-    const result=await chooseTargetForStart(start,(examined,queued)=>onProgress&&onProgress(attempt+1,12,start,examined,queued));
+  const maxStarts=Math.min(12,pool.length);
+  for(let attempt=0;attempt<maxStarts;attempt++){
+    const start=pool[attempt];
+    if(onProgress)onProgress(attempt+1,maxStarts,start,0,0);
+    const result=await chooseTargetForStart(start,candidateTasks,(checked,total,target,usable)=>{
+      if(onProgress)onProgress(attempt+1,maxStarts,start,checked,total,target,usable);
+    });
     if(result)return result;
   }
   return null;
@@ -512,8 +512,8 @@ function taskSolutionDistance(t,p){
   const limits=target?missionCoverageLimits(gameStart||p,target):null;
   const targets=points.filter(x=>{
     if(x.id===p.id||visited.has(x.id)||!t.test(x))return false;
-    if(!limits||!routePoints.length)return true;
-    return distance(gameStart||p,x)<=limits.startMax&&distance(x,target)<=limits.targetMax&&missionPathDistance(x,routePoints)<=limits.routeMax;
+    if(!limits)return true;
+    return distance(gameStart||p,x)<=limits.startMax&&distance(x,target)<=limits.targetMax;
   });
   if(!targets.length)return null;
   return Math.min(...targets.map(x=>distance(p,x)));
@@ -524,8 +524,8 @@ function taskSolutionDistanceAt(t,index){
   const limits=target?missionCoverageLimits(gameStart||p,target):null;
   const targets=points.filter(x=>{
     if(x.id===p.id||seen.has(x.id)||!t.test(x))return false;
-    if(!limits||!routePoints.length)return true;
-    return distance(gameStart||p,x)<=limits.startMax&&distance(x,target)<=limits.targetMax&&missionPathDistance(x,routePoints)<=limits.routeMax;
+    if(!limits)return true;
+    return distance(gameStart||p,x)<=limits.startMax&&distance(x,target)<=limits.targetMax;
   });
   if(!targets.length)return null;
   return Math.min(...targets.map(x=>distance(p,x)));
@@ -969,42 +969,41 @@ async function start(){
   missionEl.innerHTML="<div class='mission-loading'>Ładowanie misji do zaliczenia…</div>";
   await new Promise(r=>setTimeout(r,40));
   let audited=null;
-  // Misje i meta są dobierane wspólnie. Przy „do 3 km” każda misja
-  // musi mieć rozwiązanie blisko startu, mety i faktycznej trasy.
+  // Start, meta i misje są dobierane wyłącznie na podstawie odległości.
+  // Nie liczymy tutaj żadnej trasy, zakrętów ani grafu ruchów.
   const loadingStarted=Date.now();
   const loadingTimer=setInterval(()=>{
     const sec=Math.floor((Date.now()-loadingStarted)/1000);
-    missionEl.innerHTML="<div class='mission-loading'>Ładowanie misji i trasy… <b>"+sec+" s</b></div>";
-    movesEl.textContent="Układanie trasy i dobieranie zagadek… "+sec+" s";
+    missionEl.innerHTML="<div class='mission-loading'>Ładowanie gry… <b>"+sec+" s</b></div>";
+    movesEl.textContent="Dobieranie startu, mety i misji… "+sec+" s";
   },250);
   try{
     const candidateTasks=taskPoolForGame();
     if(!candidateTasks.length){
       activeTasks=[];
     }else{
-      for(let routeAttempt=0;routeAttempt<12&&!audited;routeAttempt++){
-        missionEl.innerHTML="<div class='mission-loading'>Ładowanie trasy… <b>"+Math.floor((Date.now()-loadingStarted)/1000)+" s</b><br><small>Próba trasy "+(routeAttempt+1)+"/12</small></div>";
-        if(settings.startCity==="custom"){
-          if(!customStartSelected){beginCustomStartPick();startBtn.disabled=false;startBtn.textContent="ROZPOCZNIJ GRĘ";return}
-          audited=await chooseTargetForStart(customStartSelected,(examined)=>{
-            const sec=Math.floor((Date.now()-loadingStarted)/1000);
-            missionEl.innerHTML="<div class='mission-loading'>Ładowanie trasy… <b>"+sec+" s</b><br><small>Sprawdzono "+examined+" wariantów</small></div>";
-          });
-        }else{
-          audited=await chooseStartAndTarget((attempt,max,start,examined)=>{
-            const sec=Math.floor((Date.now()-loadingStarted)/1000);
-            missionEl.innerHTML="<div class='mission-loading'>Ładowanie trasy… <b>"+sec+" s</b><br><small>Sprawdzono "+(examined||0)+" wariantów • start "+attempt+"/12</small></div>";
-          });
-        }
-        if(audited){
-          const usable=auditMissionTasks(candidateTasks,audited.start,audited.target,audited.path);
-          if(usable.length>=Math.min(settings.count||0,candidateTasks.length)){
-            audited.usableTasks=usable;
-            activeTasks=missionsForRoute(usable,audited.start,audited.target,audited.path);
-          }else{
-            audited=null;
-          }
-        }
+      if(settings.startCity==="custom"&&!customStartSelected){
+        clearInterval(loadingTimer);
+        beginCustomStartPick();
+        startBtn.disabled=false;
+        startBtn.textContent="ROZPOCZNIJ GRĘ";
+        return;
+      }
+      const progress=(attempt,max,start,checked,total,target,usable)=>{
+        const sec=Math.floor((Date.now()-loadingStarted)/1000);
+        const detail=target?(" • meta "+Math.round(distance(start,target))+" m"): "";
+        const count=typeof usable==="number"?(" • misje "+usable):"";
+        missionEl.innerHTML="<div class='mission-loading'>Ładowanie gry… <b>"+sec+" s</b><br><small>Start "+attempt+"/"+max+" • sprawdzono "+(checked||0)+"/"+(total||0)+" celów"+detail+count+"</small></div>";
+      };
+      if(settings.startCity==="custom"){
+        audited=await chooseTargetForStart(customStartSelected,candidateTasks,progress);
+      }else{
+        audited=await chooseStartAndTarget(candidateTasks,progress);
+      }
+      if(audited){
+        const usable=audited.usableTasks||missionCandidateTasks(candidateTasks,audited.start,audited.target);
+        audited.usableTasks=usable;
+        activeTasks=missionsForRoute(usable,audited.start,audited.target);
       }
     }
   }finally{
