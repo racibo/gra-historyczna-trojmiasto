@@ -1,4 +1,4 @@
-const SHEET_ID="1TmRHJDv6IMlGwg761JV50M8vS4zXTdWBtjDziAleSQI",DATA_URL=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;let map,points=[],current=null,gameStart=null,target=null,visited=new Set(),moves=0,choiceLocked=false,premiumShown=false,candidateMarkers=[],currentMarker,startMarker,targetMarker,routeLine=null,routePoints=[],visitedHistory=[],visitedMarkers=[],summaryMarkers=[],solutionMarkers=[];const missionEl=document.getElementById("mission"),tasksEl=document.getElementById("tasks"),progressEl=document.getElementById("progress"),movesEl=document.getElementById("moves"),choiceEl=document.getElementById("choice"),revealEl=document.getElementById("reveal"),statusEl=document.getElementById("status");let activeTasks=[],completed=new Set(),missionHits=new Map(),gameDistance=0,searchZone=null,instructionTimer=null,settings={count:"random",countRandom:true,randomCategories:true,age:true,periods:true,architects:true,people:true,functions:true,names:true,history:true,institutions:true,creators:true,hints:true,distanceRange:"random",startCity:"random"},pathGraph=null;
+const SHEET_ID="1TmRHJDv6IMlGwg761JV50M8vS4zXTdWBtjDziAleSQI",DATA_URL=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;let map,points=[],current=null,gameStart=null,target=null,visited=new Set(),moves=0,choiceLocked=false,premiumShown=false,candidateMarkers=[],currentMarker,startMarker,targetMarker,routeLine=null,routePoints=[],visitedHistory=[],visitedMarkers=[],summaryMarkers=[],summaryRouteLines=[],solutionMarkers=[];const missionEl=document.getElementById("mission"),tasksEl=document.getElementById("tasks"),progressEl=document.getElementById("progress"),movesEl=document.getElementById("moves"),choiceEl=document.getElementById("choice"),revealEl=document.getElementById("reveal"),statusEl=document.getElementById("status");let activeTasks=[],completed=new Set(),missionHits=new Map(),gameDistance=0,searchZone=null,instructionTimer=null,settings={count:"random",countRandom:true,randomCategories:true,age:true,periods:true,architects:true,people:true,functions:true,names:true,history:true,institutions:true,creators:true,hints:true,distanceRange:"random",startCity:"random"},pathGraph=null;
 function getSheetVal(obj,searchStrings){const keys=Object.keys(obj||{});for(const search of searchStrings){const clean=search.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"");const exact=keys.find(k=>k.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"")===clean);if(exact&&String(obj[exact]??"").trim()!=="")return String(obj[exact]).trim()}for(const search of searchStrings){const clean=search.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"");const partial=keys.find(k=>k.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"").includes(clean));if(partial&&String(obj[partial]??"").trim()!=="")return String(obj[partial]).trim()}return""}
 function parseSheetRows(data){return data.map((item,i)=>{const name=getSheetVal(item,["adres","nazwa","obiekt","name"])||"Nieznany",date=getSheetVal(item,["datawybudowania","rokbudowy","data","rok","czas","wiek"])||"",notes=getSheetVal(item,["uwagi","opis","informacje","info","inne"]),architect=getSheetVal(item,["architekt","arch.","arch","projektant","proj.","proj","autor"])||String(Object.values(item)[3]??"").trim(),gps=getSheetVal(item,["pozycjagps","gps","wspolrzedne","współrzędne","lokalizacja"]);let lat,lng;if(gps){const matches=String(gps).replace(/;/g,",").match(/-?\d+[\.,]\d+/g)||[];if(matches.length>=2){lat=parseFloat(matches[0].replace(",","."));lng=parseFloat(matches[1].replace(",","."))}}if(!Number.isFinite(lat)||!Number.isFinite(lng))return null;return{id:i,name,lat,lon:lng,raw:notes,date,architect,notes}}).filter(Boolean).filter(p=>p.lat>53.9&&p.lat<54.7&&p.lon>18.2&&p.lon<19.1)}
 function year(p){const m=p.date.match(/(1[0-9]{3}|20[0-9]{2})/);return m?+m[1]:null}function distance(a,b){const R=6371000,dLat=(b.lat-a.lat)*Math.PI/180,dLon=(b.lon-a.lon)*Math.PI/180,x=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(x))}function bearing(a,b){const y=Math.sin((b.lon-a.lon)*Math.PI/180)*Math.cos(b.lat*Math.PI/180),x=Math.cos(a.lat*Math.PI/180)*Math.sin(b.lat*Math.PI/180)-Math.sin(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.cos((b.lon-a.lon)*Math.PI/180);return(Math.atan2(y,x)*180/Math.PI+360)%360}function dirAngle(d){return{up:0,right:90,down:180,left:270}[d]}function angleDiff(a,b){const d=Math.abs(a-b)%360;return d>180?360-d:d}function icon(cls){return L.divIcon({className:cls,iconSize:[28,28],iconAnchor:[14,14]})}
@@ -452,6 +452,50 @@ function summaryPointPopup(p){
   if(p.notes)h+="<p><b>Informacje:</b><br>"+esc(p.notes).replace(/\n/g,"<br>")+"</p>";
   return h+"</div>";
 }
+function summaryYearColor(value,minYear,maxYear){
+  const stops=[
+    [0,[121,85,72]],
+    [.25,[211,47,47]],
+    [.5,[245,124,0]],
+    [.75,[251,192,45]],
+    [1,[67,160,71]]
+  ];
+  const t=maxYear===minYear?.5:Math.max(0,Math.min(1,(value-minYear)/(maxYear-minYear)));
+  for(let i=0;i<stops.length-1;i++){
+    const a=stops[i],b=stops[i+1];
+    if(t<=b[0]){
+      const q=(t-a[0])/(b[0]-a[0]),rgb=a[1].map((v,k)=>Math.round(v+(b[1][k]-v)*q));
+      return "rgb("+rgb.join(",")+")";
+    }
+  }
+  return "rgb(67,160,71)";
+}
+function renderSummaryAgeRoute(){
+  summaryRouteLines.forEach(m=>{try{map.removeLayer(m)}catch(e){}});
+  summaryRouteLines=[];
+  if(routeLine){try{map.removeLayer(routeLine)}catch(e){};routeLine=null}
+  if(routePoints.length<2)return;
+  const years=routePoints.map(year).filter(y=>y!==null);
+  if(!years.length){
+    const line=L.polyline(routePoints.map(p=>[p.lat,p.lon]),{color:"#795548",weight:5,opacity:.95,lineCap:"round"}).addTo(map);
+    summaryRouteLines.push(line);
+    return;
+  }
+  const minYear=Math.min(...years),maxYear=Math.max(...years),fallback=(minYear+maxYear)/2;
+  for(let i=1;i<routePoints.length;i++){
+    const a=routePoints[i-1],b=routePoints[i];
+    const ya=year(a),yb=year(b);
+    const segmentYear=ya!==null&&yb!==null?(ya+yb)/2:(ya!==null?ya:(yb!==null?yb:fallback));
+    const line=L.polyline([[a.lat,a.lon],[b.lat,b.lon]],{
+      color:summaryYearColor(segmentYear,minYear,maxYear),
+      weight:6,
+      opacity:.95,
+      lineCap:"round",
+      lineJoin:"round"
+    }).addTo(map);
+    summaryRouteLines.push(line);
+  }
+}
 function renderSummaryMap(){
   summaryMarkers.forEach(m=>{try{map.removeLayer(m)}catch(e){}});
   summaryMarkers=[];
@@ -460,6 +504,7 @@ function renderSummaryMap(){
   if(currentMarker){map.removeLayer(currentMarker);currentMarker=null}
   if(startMarker){map.removeLayer(startMarker);startMarker=null}
   if(targetMarker){map.removeLayer(targetMarker);targetMarker=null}
+  renderSummaryAgeRoute();
   visitedHistory.forEach((p,i)=>{
     const isStart=p.id===gameStart?.id;
     const isMeta=p.id===target?.id;
@@ -597,19 +642,40 @@ function reveal(p){
   updateTagCloud();
 }
 function choose(p){choiceEl.classList.add("hidden");candidateMarkers.forEach(m=>map.removeLayer(m));candidateMarkers=[];clearSearchZone();document.querySelector(".controls").classList.remove("direction-hidden");statusEl.style.cursor="";statusEl.title="";current=p;visited.add(p.id);moves++;routePoints.push(p);updateVisitedLabels();updateRoute();setCurrent(p);document.querySelector(".choice-title").textContent="Wybierz kierunek wycieczki";choiceEl.classList.add("direction-choice-empty");document.querySelector(".choice-buttons").style.display="none";document.getElementById("choiceA").textContent="";document.getElementById("choiceB").textContent="";choiceEl.classList.remove("hidden");reveal(p);updatePremiumHint()}
-function finish(){
-  document.querySelectorAll(".summary-overlay,.summary-card").forEach(el=>el.remove());
-  document.querySelectorAll(".summary-overlay,.summary-card").forEach(el=>{el.removeAttribute("style");});
-  choiceEl.classList.add("hidden");
-  candidateMarkers.forEach(m=>map.removeLayer(m));
-  candidateMarkers=[];
-  renderSummaryMap();
-  if(routePoints.length>1)map.fitBounds(routePoints.map(p=>[p.lat,p.lon]),{padding:[70,70],maxZoom:15});
+function summaryMissionPanelHtml(){
   const missionSummary=activeTasks.filter(t=>completed.has(t.type)).map(t=>{
     const p=visitedHistory.find(x=>(missionHits.get(x.id)||[]).includes(t.type));
     return "<div class='summary-mission-row'><b>"+esc(p?.name||"Odwiedzony obiekt")+"</b><span>"+esc(t.text)+"</span></div>";
   }).join("");
-  revealEl.innerHTML="<div class='finish-message'><div class='finish-kicker'>GRA ZALICZONA</div><h2>Odwiedzone miejsca i misje</h2><div class='summary-missions-list'>"+missionSummary+"</div>"+summaryProgress()+"<div class='finish-actions'><button id='hideSummary' class='summary-hide'>UKRYJ PODSUMOWANIE</button><button id='restart' class='summary-restart'>NOWA GRA</button></div></div>";
+  const years=routePoints.map(year).filter(y=>y!==null);
+  const legend=years.length
+    ? "<div class='summary-color-legend'><span>starsze</span><div class='summary-color-bar'></div><span>nowsze</span></div>"
+    : "";
+  return "<div class='summary-panel-kicker'>GRA ZALICZONA</div><div class='summary-panel-title'>Podsumowanie</div>"+missionSummary+summaryProgress()+legend;
+}
+function showFinishInMissionPanel(){
+  const missionPanel=document.querySelector(".mission");
+  if(!missionPanel)return;
+  missionPanel.classList.remove("hidden");
+  missionPanel.classList.add("summary-mode");
+  missionEl.innerHTML=summaryMissionPanelHtml();
+  tasksEl.innerHTML="<div class='summary-panel-note'>Kolor trasy pokazuje wiek odwiedzonych obiektów: od najstarszych do najnowszych.</div>";
+  progressEl.textContent="Odwiedzone: "+visited.size+" • Ruchy: "+moves;
+  const tagCloud=document.getElementById("tagCloud");
+  if(tagCloud)tagCloud.classList.add("hidden");
+}
+function finish(){
+  document.querySelectorAll(".summary-overlay,.summary-card").forEach(el=>el.remove());
+  choiceEl.classList.add("hidden");
+  candidateMarkers.forEach(m=>map.removeLayer(m));
+  candidateMarkers=[];
+  const missionPanel=document.querySelector(".mission");
+  if(missionPanel)missionPanel.classList.add("hidden");
+  const tagCloud=document.getElementById("tagCloud");
+  if(tagCloud)tagCloud.classList.add("hidden");
+  renderSummaryMap();
+  if(routePoints.length>1)map.fitBounds(routePoints.map(p=>[p.lat,p.lon]),{padding:[70,70],maxZoom:15});
+  revealEl.innerHTML="<div class='finish-message'><div class='finish-kicker'>GRA ZALICZONA</div><h2>Podsumowanie gry</h2><p>Sprawdź trasę na mapie. Po zamknięciu tego okna podsumowanie zostanie przeniesione do czarnego panelu misji.</p><div class='finish-actions'><button id='hideSummary' class='summary-hide'>ZAMKNIJ PODSUMOWANIE</button><button id='restart' class='summary-restart'>NOWA GRA</button></div></div>";
   revealEl.className="reveal finish-reveal";
   revealEl.style.zIndex="1400";
   revealEl.style.bottom="auto";
@@ -620,7 +686,7 @@ function finish(){
     revealEl.style.zIndex="";
     revealEl.style.top="";
     revealEl.style.bottom="";
-    updateVisitedLabels();
+    showFinishInMissionPanel();
   };
   document.getElementById("restart").onclick=()=>location.reload();
 }
