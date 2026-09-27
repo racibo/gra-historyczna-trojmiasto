@@ -89,13 +89,17 @@ function missionCoverageLimits(start,target){
   }
   return {startMax:d,targetMax:Math.max(d,1500),routeMax:Math.max(1200,d)};
 }
+function missionCandidatesForGame(t,start,target){
+  const limits=missionCoverageLimits(start,target);
+  return points.filter(p=>{
+    if(p.id===start.id||p.id===target.id||visited.has(p.id)||!t.test(p))return false;
+    const ds=distance(start,p),dt=distance(p,target);
+    return ds<=limits.startMax&&dt<=limits.targetMax;
+  });
+}
 function missionFitsGame(t,start,target,path){
   const limits=missionCoverageLimits(start,target);
-  return points.some(p=>{
-    if(p.id===start.id||p.id===target.id||visited.has(p.id)||!t.test(p))return false;
-    const ds=distance(start,p),dt=distance(p,target),dr=missionPathDistance(p,path);
-    return ds<=limits.startMax&&dt<=limits.targetMax&&dr<=limits.routeMax;
-  });
+  return missionCandidatesForGame(t,start,target).some(p=>missionPathDistance(p,path)<=limits.routeMax);
 }
 function missionCoverageScore(start,target,path){
   if(!activeTasks.length)return 0;
@@ -117,7 +121,7 @@ function distanceRangeMatch(m){
 }
 function chooseTargetForStart(start){
   const matching=[];
-  const audit=auditPath(start,10);
+  const audit=auditPath(start,8);
   for(const path of audit.paths.filter(path=>path.length>=4&&path.length<=10)){
     const target=path[path.length-1];
     if(target.id!==start.id&&distanceRangeMatch({start,target})){
@@ -137,7 +141,9 @@ function chooseTargetForStart(start){
 function chooseStartAndTarget(){
   const pool=points.filter(p=>cityMatch(p,settings.startCity||"random"));
   if(!pool.length)return null;
-  for(let attempt=0;attempt<100;attempt++){
+  // Nie przeszukujemy setek punktów startowych — każda próba uruchamia kosztowny audyt grafu.
+  // Kilkanaście losowych prób daje wystarczającą różnorodność bez wielominutowego oczekiwania.
+  for(let attempt=0;attempt<12;attempt++){
     const start=pool[Math.floor(Math.random()*pool.length)];
     const result=chooseTargetForStart(start);
     if(result)return result;
@@ -915,7 +921,7 @@ async function start(){
   let audited=null;
   // Misje i meta są dobierane wspólnie. Przy „do 3 km” każda misja
   // musi mieć rozwiązanie blisko startu, mety i faktycznej trasy.
-  for(let taskAttempt=0;taskAttempt<30&&!audited;taskAttempt++){
+  for(let taskAttempt=0;taskAttempt<6&&!audited;taskAttempt++){
     activeTasks=taskForGame();
     if(!activeTasks.length)break;
     if(settings.startCity==="custom"){
