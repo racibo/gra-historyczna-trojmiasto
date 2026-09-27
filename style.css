@@ -550,3 +550,70 @@ routeLine{}\n/* V44.5 — automatyczne kadrowanie uwzględnia panel wyboru na do
   .finish-actions{flex-direction:row!important;gap:7px!important}
   .finish-actions button{min-height:42px;padding:9px 7px!important;font-size:10px}
 }
+
+
+/* V54 — start z mapy, interaktywny TU JESTEŚ, kompaktowy nagłówek misji i PWA */
+.start-card{
+  width:min(92vw,760px)!important;
+  overflow:hidden;
+}
+.start-hero{
+  margin:-18px -18px 14px;
+  border-radius:14px 14px 0 0;
+  overflow:hidden;
+  background:#07131d;
+  aspect-ratio:1200/760;
+}
+.start-hero img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.mission-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+#progress{
+  margin-left:auto;
+  color:#bdbdbd;
+  font-size:10px;
+  font-weight:700;
+  white-space:nowrap;
+}
+.custom-start-pick{
+  cursor:crosshair!important;
+}
+.custom-start-pick .leaflet-interactive{
+  cursor:crosshair!important;
+}
+.custom-start-label{
+  background:#111!important;
+  border:1px solid #fbc02d!important;
+  color:#fff!important;
+  font-weight:800!important;
+}
+.custom-start-label:before{
+  border-top-color:#111!important;
+}
+.settings-card input[type="checkbox"]:disabled{
+  opacity:.4;
+}
+.settings-card label:has(input[type="checkbox"]:disabled){
+  color:#777;
+}
+@media(max-width:600px){
+  .start-card{
+    width:calc(100vw - 20px)!important;
+    padding:12px!important;
+  }
+  .start-hero{
+    margin:-12px -12px 11px;
+    aspect-ratio:1.72/1;
+  }
+  #progress{
+    font-size:9px;
+  }
+}
