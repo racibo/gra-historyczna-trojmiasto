@@ -334,7 +334,7 @@ function showCandidates(dir){
   // Najpierw szukamy odpowiedzi na niezakończone misje.
   if(completed.size<activeTasks.length){
     const missionSolutions=points
-      .filter(p=>p.id!==current.id&&!visited.has(p.id))
+      .filter(p=>p.id!==current.id&&p.id!==target?.id&&!visited.has(p.id))
       .filter(p=>activeTasks.some(t=>!completed.has(t.type)&&t.test(p)))
       .map(p=>({...p,d:distance(current,p),bd:bearing(current,p),ad:angleDiff(bearing(current,p),dirAngle(dir))}))
       .filter(p=>p.d<=GOAL_UNLOCK&&p.ad<=45)
