@@ -530,6 +530,51 @@ function categoryTasks(all,category,title,matcher){
     return groups;
   }
 
+  // Historia może dotyczyć kilku obiektów jednocześnie. Jeżeli kilka wpisów
+  // opisuje ten sam konkretny epizod (np. „Kombinat Budowy Domów nr 3 w Leningradzie”),
+  // wszystkie te obiekty są prawidłowymi rozwiązaniami jednej misji.
+  if(category==="history"){
+    const byAnswer=new Map();
+    const normalize=s=>String(s||"").replace(/[„”«»"]/g,"").replace(/\\s+/g," ").trim();
+    const addAnswer=(label)=>{
+      const clean=normalize(label);
+      if(!clean||clean.length<8)return;
+      const key=clean.toLocaleLowerCase();
+      if(!byAnswer.has(key))byAnswer.set(key,clean);
+    };
+    const entityRe=/\\b(?:Kombinat|Towarzystwo|Spółdzielnia|Przedsiębiorstwo|Zakład(?:y)?|Stocznia|Fabryka|Instytut|Uniwersytet|Politechnika|Ministerstwo|Przedsiębiorstwo|Zjednoczenie|Osiedle|Kolonia|Zespół|Dom Kultury|Dom Towarowy|Biuro|Komitet|Związek|Organizacja|Liga|Klub|Bractwo|Cech|Parafia|Drużyna|Jednostka)\\b[^.;!?\\n]{5,100}/g;
+    matching.forEach(p=>{
+      const n=cleanNote(p);
+      const quoted=n.match(/[„«"][^„”»"]{8,120}[”»"]/g)||[];
+      quoted.forEach(addAnswer);
+      (n.match(entityRe)||[]).forEach(addAnswer);
+    });
+    // Zachowujemy tylko kotwice, które rzeczywiście występują w co najmniej
+    // dwóch obiektach. Pojedynczy opis pozostaje klasyczną misją punktową.
+    const counts=new Map();
+    byAnswer.forEach((label,key)=>{
+      counts.set(key,matching.filter(p=>normalize(cleanNote(p)).toLocaleLowerCase().includes(key)).length);
+    });
+    byAnswer.forEach((label,key)=>{
+      if((counts.get(key)||0)>=2){
+        groups.push({
+          type:category+":"+key,category,text:title+": "+label,
+          test:q=>normalize(cleanNote(q)).toLocaleLowerCase().includes(key)
+        });
+      }
+    });
+    matching.forEach(p=>{
+      const label=missionLabel(p,category);
+      if(!label)return;
+      const normalized=normalize(label).toLocaleLowerCase();
+      const hasShared=[...byAnswer.keys()].some(key=>(counts.get(key)||0)>=2&&normalized.includes(key));
+      if(!hasShared){
+        groups.push({type:category+":"+p.id,category,text:title+": "+label,test:q=>q.id===p.id});
+      }
+    });
+    return groups;
+  }
+
   matching.forEach(p=>{
     const label=missionLabel(p,category); if(!label)return;
     const id=category+":"+p.id;
