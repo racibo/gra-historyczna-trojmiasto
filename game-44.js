@@ -1,4 +1,4 @@
-const SHEET_ID="1TmRHJDv6IMlGwg761JV50M8vS4zXTdWBtjDziAleSQI",DATA_URL=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;let map,points=[],current=null,gameStart=null,target=null,visited=new Set(),moves=0,choiceLocked=false,premiumShown=false,candidateMarkers=[],currentMarker,startMarker,targetMarker,routeLine=null,routePoints=[],routePointMarkers=[],visitedHistory=[],visitedMarkers=[],summaryMarkers=[],summaryRouteLines=[],solutionMarkers=[],customStartMarker=null,customStartSelected=null,customStartPickHandler=null;const missionEl=document.getElementById("mission"),tasksEl=document.getElementById("tasks"),progressEl=document.getElementById("progress"),movesEl=document.getElementById("moves"),choiceEl=document.getElementById("choice"),revealEl=document.getElementById("reveal"),statusEl=document.getElementById("status");let activeTasks=[],completed=new Set(),missionHits=new Map(),gameDistance=0,searchZone=null,instructionTimer=null,settings={count:2,countRandom:false,randomCategories:true,age:true,periods:true,architects:true,people:true,functions:true,names:true,history:true,institutions:true,creators:true,hints:true,distanceRange:"0-3",startCity:"random",defaultsVersion:55},pathGraph=null;
+const SHEET_ID="1TmRHJDv6IMlGwg761JV50M8vS4zXTdWBtjDziAleSQI",DATA_URL=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;let map,points=[],current=null,gameStart=null,target=null,visited=new Set(),moves=0,choiceLocked=false,premiumShown=false,candidateMarkers=[],currentMarker,startMarker,targetMarker,routeLine=null,routePoints=[],routePointMarkers=[],visitedHistory=[],visitedMarkers=[],summaryMarkers=[],summaryRouteLines=[],solutionMarkers=[],customStartMarker=null,customStartSelected=null,customStartPickHandler=null;const missionEl=document.getElementById("mission"),tasksEl=document.getElementById("tasks"),progressEl=document.getElementById("progress"),movesEl=document.getElementById("moves"),choiceEl=document.getElementById("choice"),revealEl=document.getElementById("reveal"),statusEl=document.getElementById("status");let activeTasks=[],completed=new Set(),missionHits=new Map(),gameDistance=0,searchZone=null,instructionTimer=null,missionSearchRadius=3000,missionSearchFallback=false,settings={count:2,countRandom:false,randomCategories:true,age:true,periods:true,architects:true,people:true,functions:true,names:true,history:true,institutions:true,creators:true,hints:true,distanceRange:"0-3",startCity:"random",defaultsVersion:55},pathGraph=null;
 function getSheetVal(obj,searchStrings){const keys=Object.keys(obj||{});for(const search of searchStrings){const clean=search.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"");const exact=keys.find(k=>k.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"")===clean);if(exact&&String(obj[exact]??"").trim()!=="")return String(obj[exact]).trim()}for(const search of searchStrings){const clean=search.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"");const partial=keys.find(k=>k.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"").includes(clean));if(partial&&String(obj[partial]??"").trim()!=="")return String(obj[partial]).trim()}return""}
 function parseSheetRows(data){return data.map((item,i)=>{const name=getSheetVal(item,["adres","nazwa","obiekt","name"])||"Nieznany",date=getSheetVal(item,["datawybudowania","rokbudowy","data","rok","czas","wiek"])||"",notes=getSheetVal(item,["uwagi","opis","informacje","info","inne"]),architect=getSheetVal(item,["architekt","arch.","arch","projektant","proj.","proj","autor"])||String(Object.values(item)[3]??"").trim(),gps=getSheetVal(item,["pozycjagps","gps","wspolrzedne","współrzędne","lokalizacja"]);let lat,lng;if(gps){const matches=String(gps).replace(/;/g,",").match(/-?\d+[\.,]\d+/g)||[];if(matches.length>=2){lat=parseFloat(matches[0].replace(",","."));lng=parseFloat(matches[1].replace(",","."))}}if(!Number.isFinite(lat)||!Number.isFinite(lng))return null;return{id:i,name,lat,lon:lng,raw:notes,date,architect,notes}}).filter(Boolean).filter(p=>p.lat>53.9&&p.lat<54.7&&p.lon>18.2&&p.lon<19.1)}
 function year(p){const m=p.date.match(/(1[0-9]{3}|20[0-9]{2})/);return m?+m[1]:null}function distance(a,b){const R=6371000,dLat=(b.lat-a.lat)*Math.PI/180,dLon=(b.lon-a.lon)*Math.PI/180,x=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(x))}function bearing(a,b){const y=Math.sin((b.lon-a.lon)*Math.PI/180)*Math.cos(b.lat*Math.PI/180),x=Math.cos(a.lat*Math.PI/180)*Math.sin(b.lat*Math.PI/180)-Math.sin(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.cos((b.lon-a.lon)*Math.PI/180);return(Math.atan2(y,x)*180/Math.PI+360)%360}function dirAngle(d){return{up:0,right:90,down:180,left:270}[d]}function angleDiff(a,b){const d=Math.abs(a-b)%360;return d>180?360-d:d}function icon(cls){return L.divIcon({className:cls,iconSize:[28,28],iconAnchor:[14,14]})}
@@ -95,9 +95,10 @@ async function auditPath(start,maxDepth=10,onProgress=null){
 function missionCoverageLimits(start,target){
   const d=distance(start,target);
   if((settings.distanceRange||"random")==="0-3"){
-    // Dla zakresu 0–3 km wszystkie rozwiązania misji muszą
-    // znajdować się w promieniu 3 km od punktu startowego.
-    return {startMax:3000,targetMax:Infinity};
+    // Standardowo wszystkie rozwiązania misji są w promieniu 3 km od startu.
+    // Gdy w tym obszarze nie da się ułożyć pełnego zestawu misji,
+    // startowo zwiększamy promień o 1 km i próbujemy ponownie.
+    return {startMax:missionSearchRadius,targetMax:Infinity};
   }
   return {startMax:d,targetMax:Math.max(d,1500)};
 }
@@ -155,20 +156,36 @@ async function chooseTargetForStart(start,candidateTasks,onProgress=null){
   const required=Math.min(settings.count||0,candidateTasks.length);
   if(!required)return null;
 
-  // Sprawdzamy wszystkie możliwe cele. Dla własnego startu zapamiętujemy
-  // najlepszą znalezioną kombinację, aby pojedynczy brak pełnego zestawu
-  // misji nie wyrzucał gracza z powrotem do ekranu powitalnego.
+  // Dla zakresu 0–3 km najpierw szukamy kompletnego zestawu w promieniu 3 km.
+  // Jeśli go nie ma, zwiększamy promień kolejno o 1 km. Grę uruchamiamy
+  // dopiero wtedy, gdy rzeczywiście znaleźliśmy pełny zestaw wymaganych misji.
+  const baseRadius=(settings.distanceRange||"random")==="0-3"?3000:null;
+  const maxRadius=baseRadius?10000:null;
   let best=null;
-  for(let i=0;i<targetPool.length;i++){
-    const target=targetPool[i];
-    const usable=missionCandidateTasks(candidateTasks,start,target);
-    if(onProgress)onProgress(i+1,targetPool.length,target,usable.length);
-    const result={start,target,path:[start],auditMoves:0,auditedStates:0,score:missionCoverageScore(usable,start,target),usableTasks:usable};
-    if(!best||usable.length>best.usableTasks.length)best=result;
-    if(usable.length>=required)return result;
-    if(i%8===7)await new Promise(r=>setTimeout(r,0));
+  let radius=baseRadius||missionSearchRadius||3000;
+  let lastTargetCount=targetPool.length;
+
+  while(true){
+    missionSearchRadius=radius;
+    for(let i=0;i<targetPool.length;i++){
+      const target=targetPool[i];
+      const usable=missionCandidateTasks(candidateTasks,start,target);
+      if(onProgress)onProgress(i+1,targetPool.length,target,usable.length,radius);
+      const result={start,target,path:[start],auditMoves:0,auditedStates:0,score:missionCoverageScore(usable,start,target),usableTasks:usable,missionRadius:radius};
+      if(!best||usable.length>best.usableTasks.length)best=result;
+      if(usable.length>=required){
+        missionSearchFallback=!!baseRadius&&radius>baseRadius;
+        return result;
+      }
+      if(i%8===7)await new Promise(r=>setTimeout(r,0));
+    }
+    lastTargetCount=targetPool.length;
+    if(!baseRadius||radius>=maxRadius)break;
+    radius+=1000;
   }
-  return best;
+  missionSearchRadius=baseRadius||radius;
+  missionSearchFallback=false;
+  return null;
 }
 function missionCandidateTasks(tasks,start,target){
   const candidates=missionCandidatePoints(start,target);
@@ -177,7 +194,7 @@ function missionCandidateTasks(tasks,start,target){
 async function chooseStartAndTarget(candidateTasks,onProgress=null){
   const pool=shuffleArray(points.filter(p=>cityMatch(p,settings.startCity||"random")));
   if(!pool.length)return null;
-  const maxStarts=Math.min(12,pool.length);
+  const maxStarts=Math.min(24,pool.length);
   for(let attempt=0;attempt<maxStarts;attempt++){
     const start=pool[attempt];
     if(onProgress)onProgress(attempt+1,maxStarts,start,0,0);
@@ -985,11 +1002,12 @@ async function start(){
         startBtn.textContent="ROZPOCZNIJ GRĘ";
         return;
       }
-      const progress=(attempt,max,start,checked,total,target,usable)=>{
+      const progress=(attempt,max,start,checked,total,target,usable,radius)=>{
         const sec=Math.floor((Date.now()-loadingStarted)/1000);
         const detail=target?(" • meta "+Math.round(distance(start,target))+" m"): "";
         const count=typeof usable==="number"?(" • misje "+usable):"";
-        missionEl.innerHTML="<div class='mission-loading'>Ładowanie gry… <b>"+sec+" s</b><br><small>Start "+attempt+"/"+max+" • sprawdzono "+(checked||0)+"/"+(total||0)+" celów"+detail+count+"</small></div>";
+        const radiusInfo=radius?(" • promień "+(radius/1000)+" km"):"";
+        missionEl.innerHTML="<div class='mission-loading'>Ładowanie gry… <b>"+sec+" s</b><br><small>Start "+attempt+"/"+max+" • sprawdzono "+(checked||0)+"/"+(total||0)+" celów"+radiusInfo+detail+count+"</small></div>";
       };
       if(settings.startCity==="custom"){
         audited=await chooseTargetForStart(customStartSelected,candidateTasks,progress);
@@ -1015,7 +1033,9 @@ async function start(){
   if(!audited){
     choiceLocked=false;
     missionEl.innerHTML="";
-    statusEl.textContent="Nie udało się znaleźć gry dla wybranych ustawień. Wybierz inny zakres odległości lub miejsce startu.";
+    const radiusText=(settings.distanceRange||"random")==="0-3"?"3–10 km od wybranego startu":"dla wybranych ustawień";
+    statusEl.textContent="Nie udało się znaleźć pełnego zestawu misji "+radiusText+". Spróbuj innego miejsca startu, zakresu odległości lub ustawień misji.";
+    movesEl.textContent="Gra nie została uruchomiona — nie znaleziono wymaganej liczby odpowiednich punktów.";
     document.getElementById("start").classList.remove("hidden");
     startBtn.disabled=false;startBtn.textContent="ROZPOCZNIJ GRĘ";
     return;
@@ -1023,6 +1043,11 @@ async function start(){
   current=audited.start;gameStart=audited.start;target=audited.target;gameDistance=distance(current,target);
   if(customStartMarker){try{map.removeLayer(customStartMarker)}catch(e){}customStartMarker=null}
   routePoints=[current];updateRoute();missionEl.innerHTML="";updateProgress();
+  if(missionSearchFallback){
+    statusEl.textContent="⚠️ W rejonie wybranego startu nie udało się znaleźć wszystkich misji w promieniu 3 km. Rozszerzyłem promień wyszukiwania do "+(audited.missionRadius/1000)+" km, dlatego część punktów może być dalej od startu.";
+  }else{
+    statusEl.textContent="Wybierz kierunek strzałką.";
+  }
   startMarker=L.marker([current.lat,current.lon],{icon:icon("start-marker"),zIndexOffset:1100}).addTo(map);
   setCurrent(current,true);targetMarker=null;
   if(activeTasks.length===0){
@@ -1030,7 +1055,7 @@ async function start(){
     statusEl.textContent="Nie udało się przygotować żadnej misji. Włącz co najmniej jedną kategorię misji w ustawieniach i rozpocznij nową grę.";
     document.getElementById("settings").classList.remove("hidden");
   }else{
-    statusEl.textContent="Wybierz kierunek strzałką.";
+    if(!missionSearchFallback)statusEl.textContent="Wybierz kierunek strzałką.";
     document.querySelector(".choice-title").textContent="Wybierz kierunek wycieczki";
     choiceEl.classList.add("direction-choice-empty");
     document.querySelector(".choice-buttons").style.display="none";
