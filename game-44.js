@@ -282,7 +282,7 @@ function updatePremiumHint(){
   const d=distance(current,target);
   if(d<=500&&!targetMarker)revealTarget();
   const suffix=d<=500?"<span class='premium-hot'>META JEST JUŻ W POBLIŻU</span>":"";
-  missionEl.innerHTML="<div class='premium-title'>CZĘŚĆ PREMIUM</div><div class='premium-target'><b>Cel:</b> "+esc(target.name)+"</div><div class='premium-distance'><span class='premium-heat'>"+info.icon+"</span><span>"+info.label+"</span></div>"+suffix;
+  missionEl.innerHTML="<div class='premium-title'>META</div><div class='premium-target'><b>"+esc(target.name)+"</b></div><div class='premium-distance'><span class='premium-heat'>"+info.icon+"</span><span>"+info.label+"</span></div>"+suffix;
 }
 function revealTarget(){
   if(!target||targetMarker)return;
@@ -979,27 +979,10 @@ function reveal(p){
     if(completed.size===activeTasks.length&&!premiumShown){
       premiumShown=true;
       updatePremiumHint();
-      const premiumText="<b>Teraz część premium.</b><br>Możesz swobodnie eksplorować mapę. Znasz już adres celu, ale jego punkt pojawi się na mapie dopiero, gdy znajdziesz się w odległości 500 m.<br><b>Twój nowy cel: "+esc(target.name)+"</b>";
-      missionEl.innerHTML=premiumText;
+      updatePremiumHint();
       if(visited.has(target.id)){
         finish();
         return;
-      }
-      if(current.id!==target.id){
-        revealEl.innerHTML="<div class='premium-message'>"+premiumText+"</div>";
-        revealEl.className="reveal premium-reveal";
-        revealEl.style.zIndex="1400";
-        revealEl.style.bottom="auto";
-        revealEl.style.top="50%";
-        window.setTimeout(()=>{
-          if(revealEl.classList.contains("premium-reveal")){
-            revealEl.classList.add("hidden");
-            revealEl.classList.remove("premium-reveal");
-            revealEl.style.zIndex="";
-            revealEl.style.top="";
-            revealEl.style.bottom="";
-          }
-        },3500);
       }
     }
     if(current.id===target.id){if(completed.size===activeTasks.length)finish();else{statusEl.textContent="Jeszcze za szybko na metę, zalicz wszystkie misje";}}
