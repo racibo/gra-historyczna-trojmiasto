@@ -346,6 +346,34 @@ function showCandidates(dir){
   document.getElementById("choiceA").onclick=()=>choose(chosen[0]);
   document.getElementById("choiceB").onclick=()=>choose(chosen[1]);
 }
+function updateCategoryCounts(){
+  const counts={
+    age:points.filter(p=>{const y=year(p);return y>=1800&&y<=2099}).length,
+    periods:points.filter(p=>{const y=year(p);return (y>=1900&&y<=1914)||(y>=1918&&y<=1939)||(y>=1945&&y<=1989)||(y>=1990&&y<=1999)||(y>=2001&&y<=2099)}).length,
+    architects:points.filter(p=>missionData(p).architects.length).length,
+    people:points.filter(p=>missionData(p).people).length,
+    functions:points.filter(p=>missionData(p).functions.length).length,
+    names:points.filter(p=>missionData(p).names).length,
+    history:points.filter(p=>missionData(p).history.length).length,
+    institutions:points.filter(p=>missionData(p).institutions.length).length,
+    creators:points.filter(p=>missionData(p).creators.length).length
+  };
+  Object.entries(counts).forEach(([key,count])=>{const el=document.getElementById("count-"+key);if(el)el.textContent=count+" "+(count===1?"obiekt":"obiektów")});
+}
+function loadSettings(){
+  try{
+    const x=JSON.parse(localStorage.getItem("trojmiastoGameSettings")||"null");
+    if(x)settings={...settings,...x};
+    if(x&&!Object.prototype.hasOwnProperty.call(x,"countRandom"))settings.countRandom=false;
+    if(!Object.prototype.hasOwnProperty.call(x||{},"distanceRange"))settings.distanceRange="0-3";
+    if(!["random","0-3","3-5","5-10","10-20","20+"].includes(settings.distanceRange))settings.distanceRange="0-3";
+    if(!["random","gdansk","sopot","gdynia","custom","gps"].includes(settings.startCity))settings.startCity="random";
+    if(settings.defaultsVersion!==55){
+      settings.count=2;settings.countRandom=false;settings.distanceRange="0-3";settings.startCity="random";settings.defaultsVersion=55;
+      localStorage.setItem("trojmiastoGameSettings",JSON.stringify(settings));
+    }
+  }catch(e){console.warn("Nie udało się wczytać ustawień:",e)}
+}
 function saveSettings(){const oldRange=settings.distanceRange,oldCity=settings.startCity;settings.countRandom=document.getElementById("missionCount").value==="random";settings.count=settings.countRandom?(settings.count||4):+document.getElementById("missionCount").value;settings.age=document.getElementById("catAge").checked;settings.periods=document.getElementById("catPeriods").checked;settings.architects=document.getElementById("catArchitects").checked;settings.people=document.getElementById("catPeople").checked;settings.functions=document.getElementById("catFunctions").checked;settings.names=document.getElementById("catNames").checked;settings.history=document.getElementById("catHistory").checked;settings.institutions=document.getElementById("catInstitutions").checked;settings.creators=document.getElementById("catCreators").checked;settings.hints=document.getElementById("allowHints").checked;settings.randomCategories=document.getElementById("randomCategories").checked;if(settings.randomCategories){settings.age=settings.periods=settings.architects=settings.people=settings.functions=settings.names=settings.history=settings.institutions=settings.creators=false}else{if(![settings.age,settings.periods,settings.architects,settings.people,settings.functions,settings.names,settings.history,settings.institutions,settings.creators].some(Boolean))settings.age=true}settings.distanceRange=document.getElementById("distanceRange").value;settings.startCity=document.getElementById("startCity").value;settings.defaultsVersion=54;localStorage.setItem("trojmiastoGameSettings",JSON.stringify(settings));return oldRange!==settings.distanceRange||oldCity!==settings.startCity}
 function syncCategoryMode(){
   const random=document.getElementById("randomCategories").checked;
