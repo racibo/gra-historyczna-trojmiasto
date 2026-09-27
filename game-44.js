@@ -78,18 +78,31 @@ function auditPath(start,maxDepth=10){
   }
   return {paths,examined};
 }
+function missionPathDistance(p,path){
+  if(!p||!path?.length)return Infinity;
+  return Math.min(...path.map(x=>distance(p,x)));
+}
+function missionCoverageLimits(start,target){
+  const d=distance(start,target);
+  if((settings.distanceRange||"random")==="0-3"||d<=3000){
+    return {startMax:1500,targetMax:1500,routeMax:1200};
+  }
+  return {startMax:d,targetMax:Math.max(d,1500),routeMax:Math.max(1200,d)};
+}
+function missionFitsGame(t,start,target,path){
+  const limits=missionCoverageLimits(start,target);
+  return points.some(p=>{
+    if(p.id===start.id||p.id===target.id||visited.has(p.id)||!t.test(p))return false;
+    const ds=distance(start,p),dt=distance(p,target),dr=missionPathDistance(p,path);
+    return ds<=limits.startMax&&dt<=limits.targetMax&&dr<=limits.routeMax;
+  });
+}
 function missionCoverageScore(start,target,path){
   if(!activeTasks.length)return 0;
-  const gameKm=distance(start,target)/1000;
-  const baseRadius=gameKm<=3?gameKm*1000:gameKm*1000;
-  const corridorRadius=Math.max(1200,baseRadius);
   let covered=0;
-  activeTasks.forEach(t=>{
-    const ok=points.some(p=>p.id!==start.id&&!visited.has(p.id)&&t.test(p)&&distance(start,p)<=corridorRadius&&distance(p,target)<=Math.max(corridorRadius,1500));
-    if(ok)covered++;
-  });
-  const pathInside=path.filter(p=>distance(start,p)<=baseRadius+300).length/Math.max(path.length,1);
-  return covered*3+pathInside*2;
+  activeTasks.forEach(t=>{if(missionFitsGame(t,start,target,path))covered++});
+  const pathInside=path.filter(p=>distance(start,p)<=distance(start,target)+300).length/Math.max(path.length,1);
+  return covered*10+pathInside*2;
 }
 
 function cityMatch(p,city){
@@ -108,20 +121,16 @@ function chooseTargetForStart(start){
   for(const path of audit.paths.filter(path=>path.length>=4&&path.length<=10)){
     const target=path[path.length-1];
     if(target.id!==start.id&&distanceRangeMatch({start,target})){
-      matching.push({start,target,auditMoves:path.length-1,auditedStates:audit.examined,score:missionCoverageScore(start,target,path)});
+      const covered=activeTasks.filter(t=>missionFitsGame(t,start,target,path));
+      if(covered.length===activeTasks.length){
+        matching.push({start,target,path,auditMoves:path.length-1,auditedStates:audit.examined,score:missionCoverageScore(start,target,path)});
+      }
     }
   }
   if(matching.length){
     matching.sort((a,b)=>b.score-a.score);
     const top=matching.slice(0,Math.min(12,matching.length));
     return top[Math.floor(Math.random()*top.length)];
-  }
-  const candidates=points.filter(p=>p.id!==start.id&&distanceRangeMatch({start,target}));
-  if(candidates.length){
-    candidates.sort((a,b)=>missionCoverageScore(start,b, [start,b])-missionCoverageScore(start,a,[start,a]));
-    const top=candidates.slice(0,Math.min(20,candidates.length));
-    const target=top[Math.floor(Math.random()*top.length)];
-    return {start,target,auditMoves:0,auditedStates:audit.examined};
   }
   return null;
 }
@@ -444,14 +453,24 @@ function taskForGame(){
   return shuffleArray(selected).slice(0,limit);
 }
 function taskSolutionDistance(t,p){
-  const targets=points.filter(x=>x.id!==p.id&&!visited.has(x.id)&&t.test(x));
+  const limits=target?missionCoverageLimits(gameStart||p,target):null;
+  const targets=points.filter(x=>{
+    if(x.id===p.id||visited.has(x.id)||!t.test(x))return false;
+    if(!limits||!routePoints.length)return true;
+    return distance(gameStart||p,x)<=limits.startMax&&distance(x,target)<=limits.targetMax&&missionPathDistance(x,routePoints)<=limits.routeMax;
+  });
   if(!targets.length)return null;
   return Math.min(...targets.map(x=>distance(p,x)));
 }
 function taskSolutionDistanceAt(t,index){
   const seen=new Set(visitedHistory.slice(0,index+1).map(p=>p.id));
   const p=visitedHistory[index];
-  const targets=points.filter(x=>x.id!==p.id&&!seen.has(x.id)&&t.test(x));
+  const limits=target?missionCoverageLimits(gameStart||p,target):null;
+  const targets=points.filter(x=>{
+    if(x.id===p.id||seen.has(x.id)||!t.test(x))return false;
+    if(!limits||!routePoints.length)return true;
+    return distance(gameStart||p,x)<=limits.startMax&&distance(x,target)<=limits.targetMax&&missionPathDistance(x,routePoints)<=limits.routeMax;
+  });
   if(!targets.length)return null;
   return Math.min(...targets.map(x=>distance(p,x)));
 }
@@ -467,14 +486,24 @@ function taskAwayStreak(t){
   return streak;
 }
 function taskHintHtml(t){
-  const targets=points.filter(p=>p.id!==current.id&&!visited.has(p.id)&&t.test(p));
+  const limits=target?missionCoverageLimits(gameStart||current,target):null;
+  const targets=points.filter(p=>{
+    if(p.id===current.id||visited.has(p.id)||!t.test(p))return false;
+    if(!limits||!routePoints.length)return true;
+    return distance(gameStart||current,p)<=limits.startMax&&distance(p,target)<=limits.targetMax&&missionPathDistance(p,routePoints)<=limits.routeMax;
+  });
   if(!targets.length)return "";
   const d=Math.min(...targets.map(p=>distance(current,p)));
   const text=d<1000?Math.round(d)+" m":(d/1000).toFixed(2)+" km";
   return ' <span class="automatic-hint">PODPOWIEDŹ: '+text+'</span>';
 }
 function taskHint(t){
-  const targets=points.filter(p=>p.id!==current.id&&!visited.has(p.id)&&t.test(p));
+  const limits=target?missionCoverageLimits(gameStart||current,target):null;
+  const targets=points.filter(p=>{
+    if(p.id===current.id||visited.has(p.id)||!t.test(p))return false;
+    if(!limits||!routePoints.length)return true;
+    return distance(gameStart||current,p)<=limits.startMax&&distance(p,target)<=limits.targetMax&&missionPathDistance(p,routePoints)<=limits.routeMax;
+  });
   if(!targets.length)return "Brak jeszcze dostępnego punktu spełniającego tę misję.";
   const p=targets.reduce((a,b)=>distance(current,a)<distance(current,b)?a:b),d=distance(current,p);
   return "Najbliższy punkt rozwiązania jest dokładnie "+(d<1000?Math.round(d)+" m":(d/1000).toFixed(2)+" km")+" stąd.";
@@ -496,7 +525,12 @@ function showSolution(){
   activeTasks.forEach((t,i)=>{
     let p=visitedHistory.find(x=>(missionHits.get(x.id)||[]).includes(t.type));
     if(!p){
-      const targets=points.filter(x=>x.id!==current.id&&!visited.has(x.id)&&t.test(x));
+      const limits=target?missionCoverageLimits(gameStart||current,target):null;
+      const targets=points.filter(x=>{
+        if(x.id===current.id||visited.has(x.id)||!t.test(x))return false;
+        if(!limits||!routePoints.length)return true;
+        return distance(gameStart||current,x)<=limits.startMax&&distance(x,target)<=limits.targetMax&&missionPathDistance(x,routePoints)<=limits.routeMax;
+      });
       if(targets.length)p=targets.reduce((a,b)=>distance(current,a)<distance(current,b)?a:b);
     }
     if(p){
@@ -810,7 +844,12 @@ function showYearObject(y){
 }
 function missionHeat(t){
   if(!current||completed.has(t.type))return "";
-  const targets=points.filter(p=>p.id!==current.id&&!visited.has(p.id)&&t.test(p));
+  const limits=target?missionCoverageLimits(gameStart||current,target):null;
+  const targets=points.filter(p=>{
+    if(p.id===current.id||visited.has(p.id)||!t.test(p))return false;
+    if(!limits||!routePoints.length)return true;
+    return distance(gameStart||current,p)<=limits.startMax&&distance(p,target)<=limits.targetMax&&missionPathDistance(p,routePoints)<=limits.routeMax;
+  });
   if(!targets.length)return ' <span class="heat heat-snow heat-small" title="Brak dostępnego punktu">❄️</span><small class="heat-range">brak dostępnego</small>';
   const nearest=Math.min(...targets.map(p=>distance(current,p)));
   if(nearest<=200)return ' <span class="heat heat-fire heat-large">🔥</span><small class="heat-range">do 200 m</small>';
@@ -871,17 +910,22 @@ async function start(){
   if(customStartPickHandler){map.off("click",customStartPickHandler);customStartPickHandler=null}
   map.getContainer().classList.remove("custom-start-pick");
   applyRandomGameSettings();
-  activeTasks=taskForGame();
   missionEl.innerHTML="<div class='mission-loading'>Ładowanie misji do zaliczenia…</div>";
   await new Promise(r=>setTimeout(r,40));
-  let audited;
-  if(settings.startCity==="custom"){
-    if(!customStartSelected){beginCustomStartPick();startBtn.disabled=false;startBtn.textContent="ROZPOCZNIJ GRĘ";return}
-    audited=chooseTargetForStart(customStartSelected);
-    customStartSelected=null;
-  }else{
-    audited=chooseStartAndTarget();
+  let audited=null;
+  // Misje i meta są dobierane wspólnie. Przy „do 3 km” każda misja
+  // musi mieć rozwiązanie blisko startu, mety i faktycznej trasy.
+  for(let taskAttempt=0;taskAttempt<30&&!audited;taskAttempt++){
+    activeTasks=taskForGame();
+    if(!activeTasks.length)break;
+    if(settings.startCity==="custom"){
+      if(!customStartSelected){beginCustomStartPick();startBtn.disabled=false;startBtn.textContent="ROZPOCZNIJ GRĘ";return}
+      audited=chooseTargetForStart(customStartSelected);
+    }else{
+      audited=chooseStartAndTarget();
+    }
   }
+  if(settings.startCity==="custom")customStartSelected=null;
   if(!audited){
     choiceLocked=false;
     missionEl.innerHTML="";
