@@ -1,9 +1,18 @@
-const SHEET_ID="1TmRHJDv6IMlGwg761JV50M8vS4zXTdWBtjDziAleSQI",DATA_URL=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;let map,points=[],current=null,gameStart=null,target=null,visited=new Set(),moves=0,choiceLocked=false,premiumShown=false,candidateMarkers=[],currentMarker,startMarker,targetMarker,routeLine=null,routePoints=[],visitedHistory=[],visitedMarkers=[],summaryMarkers=[],summaryRouteLines=[],solutionMarkers=[],customStartMarker=null,customStartSelected=null,customStartPickHandler=null;const missionEl=document.getElementById("mission"),tasksEl=document.getElementById("tasks"),progressEl=document.getElementById("progress"),movesEl=document.getElementById("moves"),choiceEl=document.getElementById("choice"),revealEl=document.getElementById("reveal"),statusEl=document.getElementById("status");let activeTasks=[],completed=new Set(),missionHits=new Map(),gameDistance=0,searchZone=null,instructionTimer=null,settings={count:2,countRandom:false,randomCategories:true,age:true,periods:true,architects:true,people:true,functions:true,names:true,history:true,institutions:true,creators:true,hints:true,distanceRange:"0-3",startCity:"random",defaultsVersion:55},pathGraph=null;
+const SHEET_ID="1TmRHJDv6IMlGwg761JV50M8vS4zXTdWBtjDziAleSQI",DATA_URL=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;let map,points=[],current=null,gameStart=null,target=null,visited=new Set(),moves=0,choiceLocked=false,premiumShown=false,candidateMarkers=[],currentMarker,startMarker,targetMarker,routeLine=null,routePoints=[],routePointMarkers=[],visitedHistory=[],visitedMarkers=[],summaryMarkers=[],summaryRouteLines=[],solutionMarkers=[],customStartMarker=null,customStartSelected=null,customStartPickHandler=null;const missionEl=document.getElementById("mission"),tasksEl=document.getElementById("tasks"),progressEl=document.getElementById("progress"),movesEl=document.getElementById("moves"),choiceEl=document.getElementById("choice"),revealEl=document.getElementById("reveal"),statusEl=document.getElementById("status");let activeTasks=[],completed=new Set(),missionHits=new Map(),gameDistance=0,searchZone=null,instructionTimer=null,settings={count:2,countRandom:false,randomCategories:true,age:true,periods:true,architects:true,people:true,functions:true,names:true,history:true,institutions:true,creators:true,hints:true,distanceRange:"0-3",startCity:"random",defaultsVersion:55},pathGraph=null;
 function getSheetVal(obj,searchStrings){const keys=Object.keys(obj||{});for(const search of searchStrings){const clean=search.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"");const exact=keys.find(k=>k.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"")===clean);if(exact&&String(obj[exact]??"").trim()!=="")return String(obj[exact]).trim()}for(const search of searchStrings){const clean=search.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"");const partial=keys.find(k=>k.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"").includes(clean));if(partial&&String(obj[partial]??"").trim()!=="")return String(obj[partial]).trim()}return""}
 function parseSheetRows(data){return data.map((item,i)=>{const name=getSheetVal(item,["adres","nazwa","obiekt","name"])||"Nieznany",date=getSheetVal(item,["datawybudowania","rokbudowy","data","rok","czas","wiek"])||"",notes=getSheetVal(item,["uwagi","opis","informacje","info","inne"]),architect=getSheetVal(item,["architekt","arch.","arch","projektant","proj.","proj","autor"])||String(Object.values(item)[3]??"").trim(),gps=getSheetVal(item,["pozycjagps","gps","wspolrzedne","współrzędne","lokalizacja"]);let lat,lng;if(gps){const matches=String(gps).replace(/;/g,",").match(/-?\d+[\.,]\d+/g)||[];if(matches.length>=2){lat=parseFloat(matches[0].replace(",","."));lng=parseFloat(matches[1].replace(",","."))}}if(!Number.isFinite(lat)||!Number.isFinite(lng))return null;return{id:i,name,lat,lon:lng,raw:notes,date,architect,notes}}).filter(Boolean).filter(p=>p.lat>53.9&&p.lat<54.7&&p.lon>18.2&&p.lon<19.1)}
 function year(p){const m=p.date.match(/(1[0-9]{3}|20[0-9]{2})/);return m?+m[1]:null}function distance(a,b){const R=6371000,dLat=(b.lat-a.lat)*Math.PI/180,dLon=(b.lon-a.lon)*Math.PI/180,x=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(x))}function bearing(a,b){const y=Math.sin((b.lon-a.lon)*Math.PI/180)*Math.cos(b.lat*Math.PI/180),x=Math.cos(a.lat*Math.PI/180)*Math.sin(b.lat*Math.PI/180)-Math.sin(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.cos((b.lon-a.lon)*Math.PI/180);return(Math.atan2(y,x)*180/Math.PI+360)%360}function dirAngle(d){return{up:0,right:90,down:180,left:270}[d]}function angleDiff(a,b){const d=Math.abs(a-b)%360;return d>180?360-d:d}function icon(cls){return L.divIcon({className:cls,iconSize:[28,28],iconAnchor:[14,14]})}
 function setCurrent(p,showHere=true){if(currentMarker)map.removeLayer(currentMarker);currentMarker=L.marker([p.lat,p.lon],{icon:icon("current-marker"),zIndexOffset:1000}).addTo(map);currentMarker.bindPopup(visitedLabelHtml(p),{closeButton:true,autoClose:true,maxWidth:340});if(showHere)currentMarker.bindTooltip("TU JESTEŚ",{permanent:true,direction:"top",className:"current-label"});map.panTo([p.lat,p.lon],{animate:true,duration:.5})}
-function updateRoute(){if(routeLine)map.removeLayer(routeLine);routeLine=L.polyline(routePoints.map(p=>[p.lat,p.lon]),{color:"#2e7d32",weight:4,opacity:.9,dashArray:"2 8",lineCap:"round"}).addTo(map)}
+function updateRoute(){
+  if(routeLine)map.removeLayer(routeLine);
+  routePointMarkers.forEach(m=>{try{map.removeLayer(m)}catch(e){}});
+  routePointMarkers=[];
+  routeLine=L.polyline(routePoints.map(p=>[p.lat,p.lon]),{color:"#2e7d32",weight:4,opacity:.9,dashArray:"2 8",lineCap:"round"}).addTo(map);
+  routePoints.forEach((p,i)=>{
+    const marker=L.circleMarker([p.lat,p.lon],{radius:3.5,color:"#fff",weight:1.5,fillColor:"#263238",fillOpacity:.95,interactive:false,zIndexOffset:300+i}).addTo(map);
+    routePointMarkers.push(marker);
+  });
+}
 function visitedLabelHtml(p,index){
   let html="<div class='visited-full'><h3>"+esc(p.name)+"</h3>";
   if(p.date)html+="<p><b>Data budowy:</b> "+esc(p.date)+"</p>";
@@ -143,15 +152,22 @@ function distanceRangeMatch(m){
 async function chooseTargetForStart(start,candidateTasks,onProgress=null){
   if(!start||!candidateTasks?.length)return null;
   const targetPool=shuffleArray(points.filter(p=>p.id!==start.id&&distanceRangeMatch({start,target:p})));
-  const maxTargets=Math.min(40,targetPool.length);
-  for(let i=0;i<maxTargets;i++){
+  const required=Math.min(settings.count||0,candidateTasks.length);
+  if(!required)return null;
+
+  // Najpierw próbujemy losowych celów, ale nie kończymy na 40 próbach.
+  // Wcześniej losowy limit powodował sporadyczny powrót do ekranu startowego,
+  // mimo że dla wybranego startu istniała poprawna meta i komplet misji.
+  const firstPass=Math.min(40,targetPool.length);
+  for(let i=0;i<targetPool.length;i++){
     const target=targetPool[i];
     const usable=missionCandidateTasks(candidateTasks,start,target);
-    if(onProgress)onProgress(i+1,maxTargets,target,usable.length);
-    if(usable.length>=Math.min(settings.count||0,candidateTasks.length)){
+    if(onProgress)onProgress(i+1,targetPool.length,target,usable.length);
+    if(usable.length>=required){
       return {start,target,path:[start],auditMoves:0,auditedStates:0,score:missionCoverageScore(usable,start,target),usableTasks:usable};
     }
     if(i%8===7)await new Promise(r=>setTimeout(r,0));
+    if(i===firstPass-1 && targetPool.length>firstPass)await new Promise(r=>setTimeout(r,0));
   }
   return null;
 }
@@ -687,6 +703,11 @@ function renderSummaryMap(){
     marker.bindPopup(summaryPointPopup(p),{maxWidth:360});
     summaryMarkers.push(marker);
   });
+  // Małe punkty na trasie pozostają widoczne niezależnie od koloru segmentu.
+  routePoints.forEach((p,i)=>{
+    const marker=L.circleMarker([p.lat,p.lon],{radius:3.5,color:"#fff",weight:1.5,fillColor:"#263238",fillOpacity:.95,interactive:false}).addTo(map);
+    summaryMarkers.push(marker);
+  });
   if(target&&(!visitedHistory.some(p=>p.id===target.id))){
     const marker=L.marker([target.lat,target.lon],{icon:icon("summary-meta"),zIndexOffset:1200}).addTo(map);
     summaryMarkers.push(marker);
@@ -935,7 +956,10 @@ async function start(){
   if(targetMarker){map.removeLayer(targetMarker);targetMarker=null}
   if(startMarker){map.removeLayer(startMarker);startMarker=null}
   if(currentMarker){map.removeLayer(currentMarker);currentMarker=null}
-  routePoints=[];moves=0;visited=new Set();visitedHistory=[];completed=new Set();missionHits=new Map();activeTasks=[];
+  routePoints=[];
+  routePointMarkers.forEach(m=>{try{map.removeLayer(m)}catch(e){}});
+  routePointMarkers=[];
+  moves=0;visited=new Set();visitedHistory=[];completed=new Set();missionHits=new Map();activeTasks=[];
   if(customStartPickHandler){map.off("click",customStartPickHandler);customStartPickHandler=null}
   map.getContainer().classList.remove("custom-start-pick");
   applyRandomGameSettings();
