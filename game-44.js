@@ -1024,38 +1024,60 @@ function summaryProgress(){
 function reveal(p){
   const hits=activeTasks.filter(t=>!completed.has(t.type)&&t.test(p)&&p.id!==target?.id);
   const reachedFinish=!!(target&&p.id===target.id);
+  const completesPremium=hits.length>0&&activeTasks.every(t=>completed.has(t.type)||hits.some(h=>h.type===t.type));
   visitedHistory.push(p);
+
   let html="<h2>"+esc(p.name)+"</h2>";
   if(p.date)html+="<p><b>Data:</b> "+esc(p.date)+"</p>";
   if(p.architect)html+="<p><b>Architekt:</b> "+esc(p.architect)+"</p>";
+
   if(hits.length){
     hits.forEach(h=>{html+="<div class='match'>✓ "+esc(h.text)+"</div>"});
     missionHits.set(p.id,[...(missionHits.get(p.id)||[]),...hits.map(h=>h.type)]);
-  }
-  if(hits.length){
-    html="<div class='success-message'><div class='success-kicker'>BRAWO!</div><h2>Misja zaliczona</h2><p>Dotarłeś do <b>"+esc(p.name)+"</b>, który spełnia misję:</p>"+hits.map(h=>"<div class='success-mission'>"+esc(h.text)+"</div>").join("")+"</div>";
+    html="<div class='success-message'>"+
+      "<div class='success-kicker'>BRAWO!</div>"+
+      "<h2>Misja zaliczona</h2>"+
+      "<p>Dotarłeś do <b>"+esc(p.name)+"</b>, który spełnia misję:</p>"+
+      hits.map(h=>"<div class='success-mission'>"+esc(h.text)+"</div>").join("")+
+      (completesPremium?
+        "<div class='premium-start-message'>"+
+          "<div class='premium-start-kicker'>✨ TERAZ COŚ SPECJALNEGO!</div>"+
+          "<p>Wszystkie misje zostały ukończone.</p>"+
+          "<p>Wycieczka w stronę wskazanego adresu:</p>"+
+          "<div class='premium-start-target'><b>"+esc(target?.name||"celu")+"</b></div>"+
+          "<p>Eksploruj i finiszuj owocnie.</p>"+
+        "</div>":"")+
+      "</div>";
   }else if(reachedFinish&&completed.size===activeTasks.length){
     html="<div class='success-message'><div class='success-kicker'>BRAWO!</div><h2>Meta osiągnięta</h2><p>Dotarłeś do <b>"+esc(p.name)+"</b>, który jest metą.</p></div>";
   }
+
   revealEl.innerHTML=html+"<div class='reveal-auto'>Okno zamknie się automatycznie…</div>";
   revealEl.classList.remove("hidden");
   choiceLocked=true;
-  const revealDuration=(hits.length||reachedFinish)?3000:1500;
+
+  const revealDuration=(hits.length||reachedFinish)?(completesPremium?5000:3000):1500;
+
   window.setTimeout(()=>{
     if(!revealEl.classList.contains("hidden"))revealEl.classList.add("hidden");
     choiceLocked=false;
     updateProgress();
+
     if(completed.size===activeTasks.length&&!premiumShown){
       premiumShown=true;
-      updatePremiumHint();
       updatePremiumHint();
       if(visited.has(target.id)){
         finish();
         return;
       }
     }
-    if(current.id===target.id){if(completed.size===activeTasks.length)finish();else{statusEl.textContent="Jeszcze za szybko na metę, zalicz wszystkie misje";}}
+
+    if(current.id===target.id){
+      if(completed.size===activeTasks.length)finish();
+      else statusEl.textContent="Jeszcze za szybko na metę, zalicz wszystkie misje";
+    }
   },revealDuration);
+
   hits.forEach(h=>completed.add(h.type));
   updateTagCloud();
 }
