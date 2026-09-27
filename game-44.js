@@ -563,6 +563,72 @@ function categoryTasks(all,category,title,matcher){
   // Historia może dotyczyć kilku obiektów jednocześnie. Jeżeli kilka wpisów
   // opisuje ten sam konkretny epizod (np. „Kombinat Budowy Domów nr 3 w Leningradzie”),
   // wszystkie te obiekty są prawidłowymi rozwiązaniami jednej misji.
+  if(category==="institutions"){
+    const byAnswer=new Map();
+    const normalize=s=>String(s||"")
+      .replace(/[„”«»"]/g,"")
+      .replace(/\\s+/g," ")
+      .trim();
+    const addAnswer=(label)=>{
+      const clean=normalize(label);
+      if(!clean||clean.length<8)return;
+      const key=clean.toLocaleLowerCase();
+      if(!byAnswer.has(key))byAnswer.set(key,clean);
+    };
+
+    // Instytucja/grupa jest wspólną odpowiedzią wtedy, gdy ta sama nazwa
+    // występuje w uwagach przy co najmniej dwóch różnych obiektach.
+    // Szczególnie ważne są nazwy typu „Kombinat Budowy Domów nr 3
+    // w Leningradzie”, które nie mogą być związane z jednym losowym id.
+    const institutionRe=/\\b(?:Kombinat(?:\\s+[^.;!?\\n]{3,100})?|Towarzystwo(?:\\s+[^.;!?\\n]{3,100})?|Spółdzielnia(?:\\s+[^.;!?\\n]{3,100})?|Przedsiębiorstwo(?:\\s+[^.;!?\\n]{3,100})?|Zjednoczenie(?:\\s+[^.;!?\\n]{3,100})?|Stocznia(?:\\s+[^.;!?\\n]{3,100})?|Fabryka(?:\\s+[^.;!?\\n]{3,100})?|Instytut(?:\\s+[^.;!?\\n]{3,100})?|Uniwersytet(?:\\s+[^.;!?\\n]{3,100})?|Politechnika(?:\\s+[^.;!?\\n]{3,100})?|Ministerstwo(?:\\s+[^.;!?\\n]{3,100})?|Komitet(?:\\s+[^.;!?\\n]{3,100})?|Związek(?:\\s+[^.;!?\\n]{3,100})?|Organizacja(?:\\s+[^.;!?\\n]{3,100})?|Liga(?:\\s+[^.;!?\\n]{3,100})?|Klub(?:\\s+[^.;!?\\n]{3,100})?|Bractwo(?:\\s+[^.;!?\\n]{3,100})?|Cech(?:\\s+[^.;!?\\n]{3,100})?|Parafia(?:\\s+[^.;!?\\n]{3,100})?|Drużyna(?:\\s+[^.;!?\\n]{3,100})?|Jednostka(?:\\s+[^.;!?\\n]{3,100})?)\\b/g;
+
+    matching.forEach(p=>{
+      const n=cleanNote(p);
+      const quoted=n.match(/[„«"][^„”»"]{8,120}[”»"]/g)||[];
+      quoted.forEach(addAnswer);
+      (n.match(institutionRe)||[]).forEach(addAnswer);
+    });
+
+    const counts=new Map();
+    byAnswer.forEach((label,key)=>{
+      counts.set(key,matching.filter(p=>
+        normalize(cleanNote(p)).toLocaleLowerCase().includes(key)
+      ).length);
+    });
+
+    // Tylko wspólne nazwy stają się misjami grupowymi.
+    // Jeżeli nazwa występuje tylko raz, zachowujemy dotychczasową misję
+    // przypisaną do konkretnego obiektu.
+    byAnswer.forEach((label,key)=>{
+      if((counts.get(key)||0)>=2){
+        groups.push({
+          type:category+":"+key,
+          category,
+          text:title+": "+label,
+          test:q=>normalize(cleanNote(q)).toLocaleLowerCase().includes(key)
+        });
+      }
+    });
+
+    matching.forEach(p=>{
+      const label=missionLabel(p,category);
+      if(!label)return;
+      const normalized=normalize(label).toLocaleLowerCase();
+      const hasShared=[...byAnswer.keys()].some(key=>
+        (counts.get(key)||0)>=2&&normalized.includes(key)
+      );
+      if(!hasShared){
+        groups.push({
+          type:category+":"+p.id,
+          category,
+          text:title+": "+label,
+          test:q=>q.id===p.id
+        });
+      }
+    });
+    return groups;
+  }
+
   if(category==="history"){
     const byAnswer=new Map();
     const normalize=s=>String(s||"").replace(/[„”«»"]/g,"").replace(/\\s+/g," ").trim();
