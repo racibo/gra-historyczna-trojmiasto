@@ -107,7 +107,7 @@ function chooseTargetForStart(start){
   const audit=auditPath(start,10);
   for(const path of audit.paths.filter(path=>path.length>=4&&path.length<=10)){
     const target=path[path.length-1];
-    if(target.id!==start.id&&distanceRangeMatch({start,target:p=>p})){
+    if(target.id!==start.id&&distanceRangeMatch({start,target})){
       matching.push({start,target,auditMoves:path.length-1,auditedStates:audit.examined,score:missionCoverageScore(start,target,path)});
     }
   }
