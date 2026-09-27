@@ -83,10 +83,6 @@ async function auditPath(start,maxDepth=10,onProgress=null){
   if(onProgress)onProgress(examined,queue.length);
   return {paths,examined};
 }
-function missionPathDistance(p,path){
-  if(!p||!path?.length)return Infinity;
-  return Math.min(...path.map(x=>distance(p,x)));
-}
 function missionCoverageLimits(start,target){
   const d=distance(start,target);
   if((settings.distanceRange||"random")==="0-3"){
@@ -545,8 +541,8 @@ function taskHintHtml(t){
   const limits=target?missionCoverageLimits(gameStart||current,target):null;
   const targets=points.filter(p=>{
     if(p.id===current.id||visited.has(p.id)||!t.test(p))return false;
-    if(!limits||!routePoints.length)return true;
-    return distance(gameStart||current,p)<=limits.startMax&&distance(p,target)<=limits.targetMax&&missionPathDistance(p,routePoints)<=limits.routeMax;
+    if(!limits)return true;
+    return distance(gameStart||current,p)<=limits.startMax&&distance(p,target)<=limits.targetMax;
   });
   if(!targets.length)return "";
   const d=Math.min(...targets.map(p=>distance(current,p)));
@@ -557,8 +553,8 @@ function taskHint(t){
   const limits=target?missionCoverageLimits(gameStart||current,target):null;
   const targets=points.filter(p=>{
     if(p.id===current.id||visited.has(p.id)||!t.test(p))return false;
-    if(!limits||!routePoints.length)return true;
-    return distance(gameStart||current,p)<=limits.startMax&&distance(p,target)<=limits.targetMax&&missionPathDistance(p,routePoints)<=limits.routeMax;
+    if(!limits)return true;
+    return distance(gameStart||current,p)<=limits.startMax&&distance(p,target)<=limits.targetMax;
   });
   if(!targets.length)return "Brak jeszcze dostępnego punktu spełniającego tę misję.";
   const p=targets.reduce((a,b)=>distance(current,a)<distance(current,b)?a:b),d=distance(current,p);
@@ -584,8 +580,8 @@ function showSolution(){
       const limits=target?missionCoverageLimits(gameStart||current,target):null;
       const targets=points.filter(x=>{
         if(x.id===current.id||visited.has(x.id)||!t.test(x))return false;
-        if(!limits||!routePoints.length)return true;
-        return distance(gameStart||current,x)<=limits.startMax&&distance(x,target)<=limits.targetMax&&missionPathDistance(x,routePoints)<=limits.routeMax;
+        if(!limits)return true;
+        return distance(gameStart||current,x)<=limits.startMax&&distance(x,target)<=limits.targetMax;
       });
       if(targets.length)p=targets.reduce((a,b)=>distance(current,a)<distance(current,b)?a:b);
     }
@@ -903,8 +899,8 @@ function missionHeat(t){
   const limits=target?missionCoverageLimits(gameStart||current,target):null;
   const targets=points.filter(p=>{
     if(p.id===current.id||visited.has(p.id)||!t.test(p))return false;
-    if(!limits||!routePoints.length)return true;
-    return distance(gameStart||current,p)<=limits.startMax&&distance(p,target)<=limits.targetMax&&missionPathDistance(p,routePoints)<=limits.routeMax;
+    if(!limits)return true;
+    return distance(gameStart||current,p)<=limits.startMax&&distance(p,target)<=limits.targetMax;
   });
   if(!targets.length)return ' <span class="heat heat-snow heat-small" title="Brak dostępnego punktu">❄️</span><small class="heat-range">brak dostępnego</small>';
   const nearest=Math.min(...targets.map(p=>distance(current,p)));
