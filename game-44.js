@@ -89,29 +89,75 @@ function missionPathDistance(p,path){
 }
 function missionCoverageLimits(start,target){
   const d=distance(start,target);
-  if((settings.distanceRange||"random")==="0-3"||d<=3000){
+  if((settings.distanceRange||"random")==="0-3"){
     return {startMax:1500,targetMax:1500,routeMax:1200};
   }
   return {startMax:d,targetMax:Math.max(d,1500),routeMax:Math.max(1200,d)};
 }
-function missionCandidatesForGame(t,start,target){
+function missionCandidatesForGame(t,start,target,path){
   const limits=missionCoverageLimits(start,target);
   return points.filter(p=>{
     if(p.id===start.id||p.id===target.id||visited.has(p.id)||!t.test(p))return false;
-    const ds=distance(start,p),dt=distance(p,target);
-    return ds<=limits.startMax&&dt<=limits.targetMax;
+    const ds=distance(start,p),dt=distance(p,target),dr=missionPathDistance(p,path);
+    return ds<=limits.startMax&&dt<=limits.targetMax&&dr<=limits.routeMax;
   });
 }
 function missionFitsGame(t,start,target,path){
-  const limits=missionCoverageLimits(start,target);
-  return missionCandidatesForGame(t,start,target).some(p=>missionPathDistance(p,path)<=limits.routeMax);
+  return missionCandidatesForGame(t,start,target,path).length>0;
 }
-function missionCoverageScore(start,target,path){
-  if(!activeTasks.length)return 0;
+function missionCoverageScore(tasks,start,target,path){
+  if(!tasks?.length)return 0;
   let covered=0;
-  activeTasks.forEach(t=>{if(missionFitsGame(t,start,target,path))covered++});
+  tasks.forEach(t=>{if(missionFitsGame(t,start,target,path))covered++});
   const pathInside=path.filter(p=>distance(start,p)<=distance(start,target)+300).length/Math.max(path.length,1);
   return covered*10+pathInside*2;
+}
+function missionsForRoute(tasks,start,target,path){
+  const usable=tasks.filter(t=>missionFitsGame(t,start,target,path));
+  const limit=Math.min(settings.count||usable.length,usable.length);
+  if(!settings.randomCategories)return shuffleArray(usable).slice(0,limit);
+  const byCategory={};
+  usable.forEach(t=>(byCategory[t.category]??=[]).push(t));
+  let selectedCategories=shuffleArray(Object.keys(byCategory));
+  if(selectedCategories.length>limit)selectedCategories=selectedCategories.slice(0,limit);
+  const quotas=Object.fromEntries(selectedCategories.map(c=>[c,1]));
+  let remaining=limit-selectedCategories.length;
+  while(remaining>0){
+    const candidates=selectedCategories.filter(c=>(quotas[c]||0)<byCategory[c].length);
+    if(!candidates.length)break;
+    const cat=candidates[Math.floor(Math.random()*candidates.length)];
+    quotas[cat]++;remaining--;
+  }
+  const selected=[];
+  selectedCategories.forEach(c=>selected.push(...shuffleArray(byCategory[c]).slice(0,quotas[c])));
+  return shuffleArray(selected).slice(0,limit);
+}
+function missionSetForRoute(start,target,path){
+function auditMissionTasks(tasks,start,target,path){
+  return tasks.filter(t=>missionFitsGame(t,start,target,path));
+}
+  const candidates=missionPoints();
+  const allTasks=taskPoolForGame();
+  const usable=allTasks.filter(t=>missionFitsGame(t,start,target,path));
+  const required=Math.min(settings.count||0,usable.length);
+  if(required<=0)return [];
+  if(!settings.randomCategories)return shuffleArray(usable).slice(0,required);
+  const byCategory={};
+  usable.forEach(t=>(byCategory[t.category]??=[]).push(t));
+  let cats=shuffleArray(Object.keys(byCategory));
+  if(cats.length>required)cats=cats.slice(0,required);
+  const quotas=Object.fromEntries(cats.map(cat=>[cat,1]));
+  let remaining=required-cats.length;
+  while(remaining>0){
+    const choices=cats.filter(cat=>(quotas[cat]||0)<byCategory[cat].length);
+    if(!choices.length)break;
+    const cat=choices[Math.floor(Math.random()*choices.length)];
+    quotas[cat]++;
+    remaining--;
+  }
+  const selected=[];
+  cats.forEach(cat=>selected.push(...shuffleArray(byCategory[cat]).slice(0,quotas[cat])));
+  return shuffleArray(selected).slice(0,required);
 }
 
 function cityMatch(p,city){
@@ -130,9 +176,9 @@ async function chooseTargetForStart(start,onProgress=null){
   for(const path of audit.paths.filter(path=>path.length>=4&&path.length<=10)){
     const target=path[path.length-1];
     if(target.id!==start.id&&distanceRangeMatch({start,target})){
-      const covered=activeTasks.filter(t=>missionFitsGame(t,start,target,path));
-      if(covered.length===activeTasks.length){
-        matching.push({start,target,path,auditMoves:path.length-1,auditedStates:audit.examined,score:missionCoverageScore(start,target,path)});
+      const usable=activeTasks.filter(t=>missionFitsGame(t,start,target,path));
+      if(usable.length>=Math.min(settings.count||0,activeTasks.length)){
+        matching.push({start,target,path,auditMoves:path.length-1,auditedStates:audit.examined,score:missionCoverageScore(usable,start,target,path),usableTasks:usable});
       }
     }
   }
@@ -422,7 +468,7 @@ function shuffleArray(arr){
   for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
   return a;
 }
-function taskForGame(){
+function taskPoolForGame(){
   const all=missionPoints(),dated=all.filter(p=>p.date),pool=[];
   if(settings.age)dated.length&&pool.push(
     {type:"19",category:"age",text:"Odwiedź obiekt z XIX wieku",test:p=>{const y=year(p);return y>=1800&&y<=1899}},
@@ -928,26 +974,37 @@ async function start(){
   const loadingStarted=Date.now();
   const loadingTimer=setInterval(()=>{
     const sec=Math.floor((Date.now()-loadingStarted)/1000);
-    const msg="Ładowanie misji i trasy… <b>"+sec+" s</b>";
-    missionEl.innerHTML="<div class='mission-loading'>"+msg+"</div>";
-    movesEl.textContent="Układanie trasy i sprawdzanie zagadek… "+sec+" s";
+    missionEl.innerHTML="<div class='mission-loading'>Ładowanie misji i trasy… <b>"+sec+" s</b></div>";
+    movesEl.textContent="Układanie trasy i dobieranie zagadek… "+sec+" s";
   },250);
   try{
-    for(let taskAttempt=0;taskAttempt<6&&!audited;taskAttempt++){
-      activeTasks=taskForGame();
-      if(!activeTasks.length)break;
-      missionEl.innerHTML="<div class='mission-loading'>Ładowanie misji i trasy… <b>"+Math.floor((Date.now()-loadingStarted)/1000)+" s</b><br><small>Próba "+(taskAttempt+1)+"/6</small></div>";
-      if(settings.startCity==="custom"){
-        if(!customStartSelected){beginCustomStartPick();startBtn.disabled=false;startBtn.textContent="ROZPOCZNIJ GRĘ";return}
-        audited=await chooseTargetForStart(customStartSelected,(examined,queued)=>{
-          const sec=Math.floor((Date.now()-loadingStarted)/1000);
-          missionEl.innerHTML="<div class='mission-loading'>Ładowanie misji i trasy… <b>"+sec+" s</b><br><small>Sprawdzono "+examined+" wariantów trasy…</small></div>";
-        });
-      }else{
-        audited=await chooseStartAndTarget((attempt,max,start,examined,queued)=>{
-          const sec=Math.floor((Date.now()-loadingStarted)/1000);
-          missionEl.innerHTML="<div class='mission-loading'>Ładowanie misji i trasy… <b>"+sec+" s</b><br><small>Sprawdzono "+(examined||0)+" wariantów • próba "+attempt+"/12</small></div>";
-        });
+    const candidateTasks=taskPoolForGame();
+    if(!candidateTasks.length){
+      activeTasks=[];
+    }else{
+      for(let routeAttempt=0;routeAttempt<12&&!audited;routeAttempt++){
+        missionEl.innerHTML="<div class='mission-loading'>Ładowanie trasy… <b>"+Math.floor((Date.now()-loadingStarted)/1000)+" s</b><br><small>Próba trasy "+(routeAttempt+1)+"/12</small></div>";
+        if(settings.startCity==="custom"){
+          if(!customStartSelected){beginCustomStartPick();startBtn.disabled=false;startBtn.textContent="ROZPOCZNIJ GRĘ";return}
+          audited=await chooseTargetForStart(customStartSelected,(examined)=>{
+            const sec=Math.floor((Date.now()-loadingStarted)/1000);
+            missionEl.innerHTML="<div class='mission-loading'>Ładowanie trasy… <b>"+sec+" s</b><br><small>Sprawdzono "+examined+" wariantów</small></div>";
+          });
+        }else{
+          audited=await chooseStartAndTarget((attempt,max,start,examined)=>{
+            const sec=Math.floor((Date.now()-loadingStarted)/1000);
+            missionEl.innerHTML="<div class='mission-loading'>Ładowanie trasy… <b>"+sec+" s</b><br><small>Sprawdzono "+(examined||0)+" wariantów • start "+attempt+"/12</small></div>";
+          });
+        }
+        if(audited){
+          const usable=auditMissionTasks(candidateTasks,audited.start,audited.target,audited.path);
+          if(usable.length>=Math.min(settings.count||0,candidateTasks.length)){
+            audited.usableTasks=usable;
+            activeTasks=missionsForRoute(usable,audited.start,audited.target,audited.path);
+          }else{
+            audited=null;
+          }
+        }
       }
     }
   }finally{
