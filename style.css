@@ -853,3 +853,10 @@ routeLine{}\n/* V44.5 — automatyczne kadrowanie uwzględnia panel wyboru na do
 .exact-date-hint-title{margin-bottom:8px;font-size:18px;font-weight:900;letter-spacing:.5px}
 .exact-date-hint-close{margin-top:12px;color:#aaa;font-size:9px}
 @media(max-width:600px){.exact-date-hint-popup{width:calc(100vw - 36px);padding:18px 16px 14px;font-size:13px}.exact-date-hint-title{font-size:16px}}
+
+/* V60 — komunikaty zaliczenia misji i mety */
+.success-message{text-align:center}
+.success-kicker{font-size:19px;font-weight:900;letter-spacing:.6px;margin-bottom:4px;color:#2e7d32}
+.success-message h2{font-size:21px;margin:0 0 10px;color:#111}
+.success-message p{font-size:14px;line-height:1.5;margin:7px 0}
+.success-mission{margin-top:9px;padding:9px 10px;border-radius:9px;background:#e8f5e9;color:#245b2a;font-size:13px;font-weight:700;line-height:1.4}
