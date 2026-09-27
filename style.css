@@ -737,3 +737,84 @@ routeLine{}\n/* V44.5 — automatyczne kadrowanie uwzględnia panel wyboru na do
   .start-card .secondary-start-btn,.start-card #startBtn{padding:10px}
   .start-card .start-wait-note{font-size:10px;margin:5px 0}
 }
+
+
+/* V57.2 — premium: odległość i komunikaty nie zasłaniają sterowania */
+.premium-distance{
+  display:flex!important;
+  align-items:center!important;
+  gap:3px!important;
+  margin-top:4px!important;
+  min-height:20px;
+  line-height:1!important;
+}
+.premium-distance .premium-heat{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center;
+  width:22px;
+  height:20px;
+  margin:0!important;
+  font-size:18px!important;
+  line-height:1!important;
+}
+.premium-distance>span:last-child{
+  display:inline-block;
+  line-height:1.05!important;
+  transform:translateY(-1px);
+}
+@media(max-width:600px){
+  .premium-distance{gap:2px!important;margin-top:2px!important;min-height:20px}
+  .premium-distance .premium-heat{width:21px;height:20px;font-size:18px!important}
+  .premium-distance>span:last-child{font-size:11px!important}
+}
+
+/* Wynik wyboru w części premium pojawia się wyłącznie w centralnym popupie. */
+.premium-choice-reveal{
+  background:transparent!important;
+  padding:0!important;
+  box-shadow:none!important;
+  width:auto!important;
+  color:inherit!important;
+}
+.premium-choice-feedback{
+  width:min(86vw,420px);
+  box-sizing:border-box;
+  background:rgba(18,18,18,.96);
+  color:#fff;
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:16px;
+  padding:20px 22px 16px;
+  text-align:center;
+  box-shadow:0 12px 42px rgba(0,0,0,.65);
+  font-size:14px;
+  line-height:1.45;
+  cursor:pointer;
+}
+.premium-choice-headline{
+  font-size:18px;
+  font-weight:900;
+  margin-bottom:8px;
+}
+.premium-choice-close{
+  margin-top:12px;
+  font-size:9px;
+  color:#999;
+}
+@media(max-width:600px){
+  .premium-choice-feedback{
+    width:calc(100vw - 40px);
+    padding:17px 16px 14px;
+    font-size:12px;
+  }
+  .premium-choice-headline{font-size:16px}
+}
+
+/* Podsumowanie: tekst musi być czytelny na ciemnym panelu. */
+.summary-mode .summary-progress-compact{
+  color:#fff!important;
+  font-weight:800!important;
+}
+.summary-mode .summary-progress-compact b{
+  color:#8bc34a!important;
+}
