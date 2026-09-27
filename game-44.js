@@ -1,7 +1,11 @@
 const SHEET_ID="1TmRHJDv6IMlGwg761JV50M8vS4zXTdWBtjDziAleSQI",DATA_URL=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;let map,points=[],current=null,gameStart=null,target=null,visited=new Set(),moves=0,choiceLocked=false,premiumShown=false,candidateMarkers=[],currentMarker,startMarker,targetMarker,routeLine=null,routePoints=[],routePointMarkers=[],visitedHistory=[],visitedMarkers=[],summaryMarkers=[],summaryRouteLines=[],solutionMarkers=[],customStartMarker=null,customStartSelected=null,customStartPickHandler=null,gpsStartSelected=null,premiumStats={directions:0,goodDirections:0,choices:0,goodChoices:0,lastDirectionGood:false};const missionEl=document.getElementById("mission"),tasksEl=document.getElementById("tasks"),progressEl=document.getElementById("progress"),movesEl=document.getElementById("moves"),choiceEl=document.getElementById("choice"),revealEl=document.getElementById("reveal"),statusEl=document.getElementById("status");let activeTasks=[],completed=new Set(),missionHits=new Map(),gameDistance=0,searchZone=null,instructionTimer=null,missionSearchRadius=3000,missionSearchFallback=false,settings={count:2,countRandom:false,randomCategories:true,age:true,periods:true,architects:true,people:true,functions:true,names:true,history:true,institutions:true,creators:true,hints:true,distanceRange:"0-3",startCity:"gps",defaultsVersion:57},pathGraph=null;
 function getSheetVal(obj,searchStrings){const keys=Object.keys(obj||{});for(const search of searchStrings){const clean=search.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"");const exact=keys.find(k=>k.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"")===clean);if(exact&&String(obj[exact]??"").trim()!=="")return String(obj[exact]).trim()}for(const search of searchStrings){const clean=search.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"");const partial=keys.find(k=>k.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]/g,"").includes(clean));if(partial&&String(obj[partial]??"").trim()!=="")return String(obj[partial]).trim()}return""}
 function parseSheetRows(data){return data.map((item,i)=>{const name=getSheetVal(item,["adres","nazwa","obiekt","name"])||"Nieznany",date=getSheetVal(item,["datawybudowania","rokbudowy","data","rok","czas","wiek"])||"",notes=getSheetVal(item,["uwagi","opis","informacje","info","inne"]),architect=getSheetVal(item,["architekt","arch.","arch","projektant","proj.","proj","autor"])||String(Object.values(item)[3]??"").trim(),gps=getSheetVal(item,["pozycjagps","gps","wspolrzedne","współrzędne","lokalizacja"]);let lat,lng;if(gps){const matches=String(gps).replace(/;/g,",").match(/-?\d+[\.,]\d+/g)||[];if(matches.length>=2){lat=parseFloat(matches[0].replace(",","."));lng=parseFloat(matches[1].replace(",","."))}}if(!Number.isFinite(lat)||!Number.isFinite(lng))return null;return{id:i,name,lat,lon:lng,raw:notes,date,architect,notes}}).filter(Boolean).filter(p=>p.lat>53.9&&p.lat<54.7&&p.lon>18.2&&p.lon<19.1)}
-function year(p){const m=p.date.match(/(1[0-9]{3}|20[0-9]{2})/);return m?+m[1]:null}function distance(a,b){const R=6371000,dLat=(b.lat-a.lat)*Math.PI/180,dLon=(b.lon-a.lon)*Math.PI/180,x=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(x))}function bearing(a,b){const y=Math.sin((b.lon-a.lon)*Math.PI/180)*Math.cos(b.lat*Math.PI/180),x=Math.cos(a.lat*Math.PI/180)*Math.sin(b.lat*Math.PI/180)-Math.sin(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.cos((b.lon-a.lon)*Math.PI/180);return(Math.atan2(y,x)*180/Math.PI+360)%360}function dirAngle(d){return{up:0,right:90,down:180,left:270}[d]}function angleDiff(a,b){const d=Math.abs(a-b)%360;return d>180?360-d:d}function icon(cls){return L.divIcon({className:cls,iconSize:[28,28],iconAnchor:[14,14]})}
+function year(p){const m=String(p.date||"").match(/(1[0-9]{3}|20[0-9]{2})/);return m?+m[1]:null}
+function exactBuildDate(p){
+  return String(p?.date||"").replace(/\\s*r\\.?\\s*$/i,"").replace(/\\s+/g," ").trim();
+}
+function exactBuildDateKey(p){return exactBuildDate(p).toLocaleLowerCase()}function distance(a,b){const R=6371000,dLat=(b.lat-a.lat)*Math.PI/180,dLon=(b.lon-a.lon)*Math.PI/180,x=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(x))}function bearing(a,b){const y=Math.sin((b.lon-a.lon)*Math.PI/180)*Math.cos(b.lat*Math.PI/180),x=Math.cos(a.lat*Math.PI/180)*Math.sin(b.lat*Math.PI/180)-Math.sin(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.cos((b.lon-a.lon)*Math.PI/180);return(Math.atan2(y,x)*180/Math.PI+360)%360}function dirAngle(d){return{up:0,right:90,down:180,left:270}[d]}function angleDiff(a,b){const d=Math.abs(a-b)%360;return d>180?360-d:d}function icon(cls){return L.divIcon({className:cls,iconSize:[28,28],iconAnchor:[14,14]})}
 function setCurrent(p,showHere=true){if(currentMarker)map.removeLayer(currentMarker);currentMarker=L.marker([p.lat,p.lon],{icon:icon("current-marker"),zIndexOffset:1000}).addTo(map);currentMarker.bindPopup(visitedLabelHtml(p),{closeButton:true,autoClose:true,maxWidth:340});if(showHere)currentMarker.bindTooltip("TU JESTEŚ",{permanent:true,direction:"top",className:"current-label"});map.panTo([p.lat,p.lon],{animate:true,duration:.5})}
 function updateRoute(){
   if(routeLine)map.removeLayer(routeLine);
@@ -284,6 +288,30 @@ function revealTarget(){
   targetMarker=L.marker([target.lat,target.lon],{icon:icon("target-marker")}).addTo(map).bindTooltip("META: "+esc(target.name),{permanent:true,direction:"top",className:"target-label"});
   statusEl.textContent="Jesteś nie dalej niż 500 m od mety — punkt mety został zaznaczony.";
 }
+function zoomToChoicePoints(chosen){
+  if(!map||!current||!chosen?.length)return;
+  const relevant=[current,...chosen].filter(Boolean);
+  if(relevant.length<2)return;
+  requestAnimationFrame(()=>{
+    map.invalidateSize({pan:false});
+    const mapEl=map.getContainer();
+    const mapRect=mapEl.getBoundingClientRect();
+    const missionPanel=document.querySelector(".mission");
+    const choicePanel=document.getElementById("choice");
+    const missionRect=missionPanel?.getBoundingClientRect();
+    const choiceRect=choicePanel?.getBoundingClientRect();
+    const topPad=Math.max(35,missionRect?Math.round(missionRect.bottom-mapRect.top+18):35);
+    const bottomPad=Math.max(35,choiceRect?Math.round(mapRect.bottom-choiceRect.top+18):35);
+    const bounds=L.latLngBounds(relevant.map(p=>[p.lat,p.lon]));
+    map.fitBounds(bounds,{
+      paddingTopLeft:[24,topPad],
+      paddingBottomRight:[24,bottomPad],
+      maxZoom:16,
+      animate:true,
+      duration:.45
+    });
+  });
+}
 function showCandidates(dir){
   if(choiceLocked)return;
   statusEl.textContent="";
@@ -373,6 +401,7 @@ function showCandidates(dir){
   choiceEl.classList.remove("hidden");
   document.getElementById("choiceA").onclick=()=>choose(chosen[0]);
   document.getElementById("choiceB").onclick=()=>choose(chosen[1]);
+  zoomToChoicePoints(chosen);
 }
 function updateCategoryCounts(){
   const counts={
@@ -610,13 +639,21 @@ function taskPoolForGame(){
     {type:"20",category:"age",text:"Odwiedź obiekt z XX wieku",test:p=>{const y=year(p);return y>=1900&&y<=1999}},
     {type:"21",category:"age",text:"Odwiedź obiekt z XXI wieku",test:p=>{const y=year(p);return y>=2000&&y<=2099}}
   );
-  if(settings.periods)dated.length&&pool.push(
-    {type:"1900-14",category:"periods",text:"Odwiedź obiekt z lat 1900–1914",test:p=>{const y=year(p);return y>=1900&&y<=1914}},
-    {type:"1918-39",category:"periods",text:"Odwiedź obiekt z lat 1918–1939",test:p=>{const y=year(p);return y>=1918&&y<=1939}},
-    {type:"1945-89",category:"periods",text:"Odwiedź obiekt z lat 1945–1989",test:p=>{const y=year(p);return y>=1945&&y<=1989}},
-    {type:"1990-99",category:"periods",text:"Odwiedź obiekt z lat 1990–1999",test:p=>{const y=year(p);return y>=1990&&y<=1999}},
-    {type:"2000+",category:"periods",text:"Odwiedź obiekt wybudowany po 2000 roku",test:p=>{const y=year(p);return y>=2001&&y<=2099}}
-  );
+  if(settings.periods){
+    const byDate=new Map();
+    dated.forEach(p=>{
+      const label=exactBuildDate(p),key=exactBuildDateKey(p);
+      if(!label||!key)return;
+      if(!byDate.has(key))byDate.set(key,label);
+    });
+    byDate.forEach((label,key)=>pool.push({
+      type:"date:"+key,
+      category:"periods",
+      exactDate:true,
+      text:"Znajdź budynek z dokładną datą budowy: "+label,
+      test:p=>exactBuildDateKey(p)===key
+    }));
+  }
   if(settings.architects)pool.push(...categoryTasks(all,"architects","Znajdź obiekt zaprojektowany przez",p=>missionData(p).architects.length));
   if(settings.people)pool.push(...categoryTasks(all,"people","Znajdź obiekt związany z osobą lub rodziną",p=>missionData(p).people));
   if(settings.functions)pool.push(...categoryTasks(all,"functions","Znajdź obiekt o dawnej funkcji",p=>missionData(p).functions));
@@ -672,6 +709,23 @@ function taskHintHtml(t){
   if(!targets.length)return "";
   const d=Math.min(...targets.map(p=>distance(current,p)));
   const text=d<1000?Math.round(d)+" m":(d/1000).toFixed(2)+" km";
+
+  // Dla misji „dokładna data budowy” pomagamy, gdy gracz trafi na
+  // budynek z podobnego okresu, ale nie na właściwy rok/datę.
+  if(t.exactDate&&current&&!t.test(current)){
+    const currentYear=year(current);
+    const nearbyTargets=targets
+      .map(p=>({p,y:year(p)}))
+      .filter(x=>currentYear!==null&&x.y!==null&&Math.abs(x.y-currentYear)<=10)
+      .sort((a,b)=>distance(current,a.p)-distance(current,b.p));
+    if(nearbyTargets.length){
+      const targetPoint=nearbyTargets[0].p;
+      const targetDate=exactBuildDate(targetPoint);
+      const targetDistance=distance(current,targetPoint);
+      const targetText=targetDistance<1000?Math.round(targetDistance)+" m":(targetDistance/1000).toFixed(2)+" km";
+      return ' <span class="automatic-hint">PODPOWIEDŹ: To budynek z podobnego okresu. Szukaj daty <b>'+esc(targetDate)+'</b> — cel jest '+targetText+' stąd.</span>';
+    }
+  }
   return ' <span class="automatic-hint">PODPOWIEDŹ: '+text+'</span>';
 }
 function taskHint(t){
