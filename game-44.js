@@ -339,7 +339,7 @@ function showCandidates(dir){
     candidateMarkers.push(m);m.on("click",()=>choose(p));
     const btn=document.getElementById(i?"choiceB":"choiceA");
     btn.className=i?"choice-b":"choice-a";
-    const suffix=p.premiumBest&&premiumActive?" ★ NAJKRÓTSZA DROGA":"";
+    const suffix="";
     btn.innerHTML='<span class="letter">'+(i?"B":"A")+'</span> '+(p.isTarget?"META":"okolice "+esc(placeLabel(p)))+suffix;
   });
   choiceEl.classList.remove("hidden");
@@ -852,7 +852,44 @@ function choose(p){
   document.querySelector(".choice-title").textContent="Wybierz kierunek wycieczki";choiceEl.classList.add("direction-choice-empty");
   document.querySelector(".choice-buttons").style.display="none";document.getElementById("choiceA").textContent="";document.getElementById("choiceB").textContent="";
   choiceEl.classList.remove("hidden");reveal(p);updatePremiumHint();
-  if(premiumActive)statusEl.innerHTML=premiumLiveMessage();
+  if(premiumActive)showPremiumChoiceFeedback(p);
+}
+function showPremiumChoiceFeedback(p){
+  if(!target||!current)return;
+  const directionGood=premiumStats.lastDirectionGood;
+  const pointGood=!!(p.premiumBest||p.isTarget);
+  const directionPct=premiumStats.directions?Math.round(premiumStats.goodDirections/premiumStats.directions*100):0;
+  const choicePct=premiumStats.choices?Math.round(premiumStats.goodChoices/premiumStats.choices*100):0;
+  let headline="",detail="";
+  if(directionGood&&pointGood){
+    headline="👍 Dobry kierunek!";
+    detail="Zgodność kierunków <b>"+directionPct+"%</b><br>Wybrałeś punkt, który prowadzi najkrótszą drogą do mety.";
+  }else if(directionGood){
+    headline="👍 Dobry kierunek";
+    detail="Zgodność kierunków <b>"+directionPct+"%</b><br>Można było wybrać punkt jeszcze lepiej prowadzący do mety.";
+  }else if(pointGood){
+    headline="↗ Dobry wybór punktu";
+    detail="Ten punkt prowadzi najkrótszą drogą do mety, choć kierunek mógł być lepszy.";
+  }else{
+    headline="↪ Kierunek oddala od mety";
+    detail="Zgodność kierunków <b>"+directionPct+"%</b> · dobre wybory punktów <b>"+choicePct+"%</b>.";
+  }
+  revealEl.innerHTML="<div class='premium-choice-feedback'><div class='premium-choice-headline'>"+headline+"</div><div>"+detail+"</div><div class='premium-choice-close'>Dotknij, aby zamknąć</div></div>";
+  revealEl.className="reveal premium-choice-reveal";
+  revealEl.style.zIndex="1600";
+  revealEl.style.bottom="auto";
+  revealEl.style.top="50%";
+  const close=()=>{
+    if(!revealEl.classList.contains("premium-choice-reveal"))return;
+    revealEl.classList.add("hidden");
+    revealEl.classList.remove("premium-choice-reveal");
+    revealEl.style.zIndex="";
+    revealEl.style.top="";
+    revealEl.style.bottom="";
+    revealEl.onclick=null;
+  };
+  revealEl.onclick=close;
+  window.setTimeout(close,3000);
 }
 function summaryTripDistance(){return routePoints.reduce((sum,p,i)=>i?sum+distance(routePoints[i-1],p):0,0)/1000}
 function openTripInfo(){
@@ -950,7 +987,7 @@ function updateProgress(){
 }
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
 async function getGpsStartPoint(){
-  if(!navigator.geolocation)throw new Error("Ta przeglądarka nie udostępnia lokalizacji GPS.");
+  if(!window.isSecureContext&&location.hostname!=="localhost"&&location.hostname!=="127.0.0.1")throw new Error("Lokalizacja działa tylko na stronie HTTPS. Otwórz grę przez bezpieczny adres https://.");if(!navigator.geolocation)throw new Error("Ta przeglądarka nie udostępnia lokalizacji GPS.");
   statusEl.textContent="Pobieram lokalizację tylko na potrzeby wyboru startu…";
   movesEl.textContent="Lokalizacja jest używana jednorazowo do znalezienia najbliższego punktu.";
   const position=await new Promise((resolve,reject)=>{
@@ -1014,7 +1051,7 @@ async function start(){
   routePoints=[];
   routePointMarkers.forEach(m=>{try{map.removeLayer(m)}catch(e){}});
   routePointMarkers=[];
-  moves=0;visited=new Set();visitedHistory=[];completed=new Set();missionHits=new Map();activeTasks=[];resetPremiumStats();
+  moves=0;visited=new Set();visitedHistory=[];completed=new Set();missionHits=new Map();activeTasks=[];premiumShown=false;resetPremiumStats();
   if(customStartPickHandler){map.off("click",customStartPickHandler);customStartPickHandler=null}
   map.getContainer().classList.remove("custom-start-pick");
   applyRandomGameSettings();
