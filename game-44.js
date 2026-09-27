@@ -343,7 +343,7 @@ function showCandidates(dir){
   }
 
   // Po zaliczeniu misji analogiczna zasada obowiązuje dla mety.
-  if(!forcedGoal&&target){
+  if(!forcedGoal&&completed.size===activeTasks.length&&target){
     const goalDistance=distance(current,target);
     const goalBearing=bearing(current,target);
     const goalDiff=angleDiff(goalBearing,dirAngle(dir));
