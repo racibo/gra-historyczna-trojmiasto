@@ -468,27 +468,37 @@ function categoryTasks(all,category,title,matcher){
   const groups=[];
   const matching=all.filter(matcher);
 
-  // Misja architektoniczna dotyczy ARCHITEKTA, a nie jednego konkretnego budynku.
-  // Jeśli np. Kurt Arnheim zaprojektował 15 obiektów, wszystkie 15 jest
-  // poprawnym rozwiązaniem tej samej misji.
+  // Odpowiedź na misję może występować przy wielu obiektach.
+  // Misja nie może być związana z jednym wylosowanym punktem.
   if(category==="architects"){
-    const byArchitect=new Map();
+    const byAnswer=new Map();
+    matching.forEach(p=>missionData(p).architects.forEach(name=>{
+      const label=String(name||"").replace(/\s+/g," ").trim();
+      if(!label)return;
+      const key=label.toLocaleLowerCase();
+      if(!byAnswer.has(key))byAnswer.set(key,label);
+    }));
+    byAnswer.forEach((label,key)=>groups.push({
+      type:category+":"+key,category,text:title+": "+label,
+      test:q=>missionData(q).architects.some(name=>String(name||"").replace(/\s+/g," ").trim().toLocaleLowerCase()===key)
+    }));
+    return groups;
+  }
+
+  if(category==="functions"){
+    const terms=["zajezdnia","łaźnia","szpital","hotel","kotłownia","gazownia","biurowiec","hala","ujeżdżalnia","więzienie","komisariat","posterunek","straż pożarna","biblioteka","dworzec","instytut","dom handlowy","dom technika","internat","schronisko","hangar","kino","pensjonat","dom wczasowy","szkoła","klasztor","kościół","magazyn","fabryka","warsztat","ratusz","poczta"];
+    const byAnswer=new Map();
     matching.forEach(p=>{
-      missionData(p).architects.forEach(name=>{
-        const label=String(name||"").trim();
-        if(!label)return;
+      const n=cleanNote(p).toLocaleLowerCase();
+      terms.filter(term=>n.includes(term)).forEach(label=>{
         const key=label.toLocaleLowerCase();
-        if(!byArchitect.has(key))byArchitect.set(key,label);
+        if(!byAnswer.has(key))byAnswer.set(key,label);
       });
     });
-    byArchitect.forEach((label,key)=>{
-      groups.push({
-        type:category+":"+key,
-        category,
-        text:title+": "+label,
-        test:q=>missionData(q).architects.some(name=>String(name||"").trim().toLocaleLowerCase()===key)
-      });
-    });
+    byAnswer.forEach((label,key)=>groups.push({
+      type:category+":"+key,category,text:title+": "+label,
+      test:q=>cleanNote(q).toLocaleLowerCase().includes(key)
+    }));
     return groups;
   }
 
