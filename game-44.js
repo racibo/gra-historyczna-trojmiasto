@@ -567,7 +567,7 @@ function categoryTasks(all,category,title,matcher){
     const byAnswer=new Map();
     const normalize=s=>String(s||"")
       .replace(/[„”«»"]/g,"")
-      .replace(/\\s+/g," ")
+      .replace(/\s+/g," ")
       .trim();
     const addAnswer=(label)=>{
       const clean=normalize(label);
@@ -580,7 +580,7 @@ function categoryTasks(all,category,title,matcher){
     // występuje w uwagach przy co najmniej dwóch różnych obiektach.
     // Szczególnie ważne są nazwy typu „Kombinat Budowy Domów nr 3
     // w Leningradzie”, które nie mogą być związane z jednym losowym id.
-    const institutionRe=/\\b(?:Kombinat(?:\\s+[^.;!?\\n]{3,100})?|Towarzystwo(?:\\s+[^.;!?\\n]{3,100})?|Spółdzielnia(?:\\s+[^.;!?\\n]{3,100})?|Przedsiębiorstwo(?:\\s+[^.;!?\\n]{3,100})?|Zjednoczenie(?:\\s+[^.;!?\\n]{3,100})?|Stocznia(?:\\s+[^.;!?\\n]{3,100})?|Fabryka(?:\\s+[^.;!?\\n]{3,100})?|Instytut(?:\\s+[^.;!?\\n]{3,100})?|Uniwersytet(?:\\s+[^.;!?\\n]{3,100})?|Politechnika(?:\\s+[^.;!?\\n]{3,100})?|Ministerstwo(?:\\s+[^.;!?\\n]{3,100})?|Komitet(?:\\s+[^.;!?\\n]{3,100})?|Związek(?:\\s+[^.;!?\\n]{3,100})?|Organizacja(?:\\s+[^.;!?\\n]{3,100})?|Liga(?:\\s+[^.;!?\\n]{3,100})?|Klub(?:\\s+[^.;!?\\n]{3,100})?|Bractwo(?:\\s+[^.;!?\\n]{3,100})?|Cech(?:\\s+[^.;!?\\n]{3,100})?|Parafia(?:\\s+[^.;!?\\n]{3,100})?|Drużyna(?:\\s+[^.;!?\\n]{3,100})?|Jednostka(?:\\s+[^.;!?\\n]{3,100})?)\\b/g;
+    const institutionRe=/\b(?:Kombinat(?:\s+[^.;!?\\n]{3,100})?|Towarzystwo(?:\s+[^.;!?\\n]{3,100})?|Spółdzielnia(?:\s+[^.;!?\\n]{3,100})?|Przedsiębiorstwo(?:\s+[^.;!?\\n]{3,100})?|Zjednoczenie(?:\s+[^.;!?\\n]{3,100})?|Stocznia(?:\s+[^.;!?\\n]{3,100})?|Fabryka(?:\s+[^.;!?\\n]{3,100})?|Instytut(?:\s+[^.;!?\\n]{3,100})?|Uniwersytet(?:\s+[^.;!?\\n]{3,100})?|Politechnika(?:\s+[^.;!?\\n]{3,100})?|Ministerstwo(?:\s+[^.;!?\\n]{3,100})?|Komitet(?:\s+[^.;!?\\n]{3,100})?|Związek(?:\s+[^.;!?\\n]{3,100})?|Organizacja(?:\s+[^.;!?\\n]{3,100})?|Liga(?:\s+[^.;!?\\n]{3,100})?|Klub(?:\s+[^.;!?\\n]{3,100})?|Bractwo(?:\s+[^.;!?\\n]{3,100})?|Cech(?:\s+[^.;!?\\n]{3,100})?|Parafia(?:\s+[^.;!?\\n]{3,100})?|Drużyna(?:\s+[^.;!?\\n]{3,100})?|Jednostka(?:\s+[^.;!?\\n]{3,100})?)\b/g;
 
     matching.forEach(p=>{
       const n=cleanNote(p);
