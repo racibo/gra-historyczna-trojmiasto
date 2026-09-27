@@ -493,24 +493,10 @@ function taskPoolForGame(){
   if(settings.history)pool.push(...categoryTasks(all,"history","Znajdź obiekt z ciekawym epizodem historycznym",p=>missionData(p).history));
   if(settings.institutions)pool.push(...categoryTasks(all,"institutions","Znajdź obiekt związany z instytucją lub grupą",p=>missionData(p).institutions));
   if(settings.creators)pool.push(...categoryTasks(all,"creators","Znajdź dzieło, którego twórca jest opisany w danych",p=>missionData(p).creators));
-  const usable=pool.filter(t=>all.some(t.test));
-  const limit=Math.min(settings.count,usable.length);
-  if(!settings.randomCategories)return shuffleArray(usable).slice(0,limit);
-  const byCategory={};
-  usable.forEach(t=>(byCategory[t.category]??=[]).push(t));
-  let selectedCategories=shuffleArray(Object.keys(byCategory));
-  if(selectedCategories.length>limit)selectedCategories=selectedCategories.slice(0,limit);
-  const quotas=Object.fromEntries(selectedCategories.map(c=>[c,1]));
-  let remaining=limit-selectedCategories.length;
-  while(remaining>0){
-    const candidates=selectedCategories.filter(c=>(quotas[c]||0)<byCategory[c].length);
-    if(!candidates.length)break;
-    const c=candidates[Math.floor(Math.random()*candidates.length)];
-    quotas[c]++;remaining--;
-  }
-  const selected=[];
-  selectedCategories.forEach(c=>selected.push(...shuffleArray(byCategory[c]).slice(0,quotas[c])));
-  return shuffleArray(selected).slice(0,limit);
+  // Nie losujemy jeszcze konkretnych misji.
+  // Najpierw wybieramy start/metę i filtrujemy zadania według odległości.
+  // Dopiero z misji możliwych w danym obszarze wybieramy finalny zestaw.
+  return pool.filter(t=>all.some(t.test));
 }
 function taskSolutionDistance(t,p){
   const limits=target?missionCoverageLimits(gameStart||p,target):null;
