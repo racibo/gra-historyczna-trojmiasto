@@ -1413,7 +1413,7 @@ document.getElementById("startSettingsBtn").onclick=openSettings;
 document.getElementById("randomCategories").addEventListener("change",syncCategoryMode);
 document.getElementById("surrenderSettings").onclick=showSolution;movesEl.addEventListener("click",()=>{if(instructionTimer){clearTimeout(instructionTimer);instructionTimer=null}movesEl.classList.remove("instruction-visible");movesEl.classList.add("instruction-hidden")});const tagToggle=document.getElementById("tagToggle"),tagCloud=document.getElementById("tagCloud");if(tagToggle&&tagCloud)tagToggle.onclick=()=>tagCloud.classList.toggle("closed");updateTagCloud();statusEl.addEventListener("click",()=>{if(!searchZone)return;searchZone.setStyle({fillOpacity:searchZone.options.fillOpacity>0?0:.14,opacity:searchZone.options.opacity>0?0:.9})});document.getElementById("saveSettings").onclick=async()=>{const btn=document.getElementById("saveSettings");btn.disabled=true;btn.textContent="ZAPISYWANIE…";statusEl.textContent="Trwa zapisywanie ustawień…";await new Promise(r=>setTimeout(r,350));saveSettings();document.getElementById("settings").classList.add("hidden");btn.disabled=false;btn.textContent="ZAPISZ";if(document.getElementById("start").classList.contains("hidden")){await start()}else statusEl.textContent="Ustawienia zapisane. Kliknij „ROZPOCZNIJ GRĘ”.";};document.querySelectorAll("[data-dir]").forEach(b=>b.onclick=()=>showCandidates(b.dataset.dir));document.addEventListener("keydown",e=>{const d={ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right"}[e.key];if(d){e.preventDefault();showCandidates(d)}});try{if(typeof Papa==="undefined")throw Error("Nie załadowano parsera CSV");const r=await fetch(DATA_URL,{cache:"no-store"});if(!r.ok)throw Error("Arkusz Google zwrócił HTTP "+r.status);const csv=await r.text();const parsed=Papa.parse(csv,{header:true,skipEmptyLines:true});if(parsed.errors?.length)console.warn("Ostrzeżenia CSV:",parsed.errors);points=parseSheetRows(parsed.data);updateCategoryCounts();if(points.length<20)throw Error("Za mało poprawnych punktów GPS w arkuszu");statusEl.textContent="Załadowano "+points.length+" punktów z Google Sheets (wierszy CSV: "+parsed.data.length+")."}catch(e){console.error("Błąd ładowania Google Sheets:",e);statusEl.textContent="Błąd danych: "+e.message}try{if(L.control&&L.control.scale) L.control.scale({imperial:false,metric:true,position:"bottomleft"}).addTo(map)}catch(e){console.warn("Kontrolka skali pominięta:",e)} }catch(e){console.error("Błąd inicjalizacji gry:",e);statusEl.textContent="BŁĄD MAPY: "+e.message;statusEl.title=e.stack||"";document.getElementById("start").classList.remove("hidden")}}
 /* V65 — TRYB 2 GRACZY: wspólna misja, osobne trasy, naprzemienne tury */
-let duel=null, duelNamesPending=false;
+let duel=null, duelNamesPending=false, duelPrepared=false;
 const singleStartOriginal=start, singleShowCandidatesOriginal=showCandidates, singleChooseOriginal=choose;
 const singleLoadSettingsOriginal=loadSettings, singleSaveSettingsOriginal=saveSettings, singleOpenSettingsOriginal=openSettings;
 
@@ -1553,11 +1553,12 @@ function duelConfirmSetup(){
   const n1=(document.getElementById("duelName1").value||"Gracz 1").trim().slice(0,24)||"Gracz 1";
   const n2=(document.getElementById("duelName2").value||"Gracz 2").trim().slice(0,24)||"Gracz 2";
   settings.player1Name=n1;settings.player2Name=n2;
-  duelNamesPending=false;
+  duelNamesPending=false;duelPrepared=true;
   document.getElementById("duelSetup").classList.add("hidden");
   settings.count=Number(settings.duelRounds)||5;settings.countRandom=false;
   singleStartOriginal().then(()=>{
-    if(!duelNamesPending)duelStartFromSingle();
+    duelPrepared=false;
+    if(gameStart&&activeTasks.length)duelStartFromSingle();
   }).catch(e=>{
     console.error(e);choiceLocked=false;duelSetStatus("Błąd przygotowania pojedynku: "+esc(e.message||e));
   });
@@ -1565,6 +1566,7 @@ function duelConfirmSetup(){
 function start(){
   if(settings.gameMode!=="duel")return singleStartOriginal();
   if(duelIsActive())return;
+  if(duelPrepared)return singleStartOriginal();
   duelShowSetup();
 }
 function loadSettings(){
