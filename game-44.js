@@ -1564,6 +1564,8 @@ function duelConfirmSetup(){
   });
 }
 function start(){
+  const modeEl=document.getElementById("gameMode");
+  if(modeEl)settings.gameMode=modeEl.value==="duel"?"duel":"single";
   if(settings.gameMode!=="duel")return singleStartOriginal();
   if(duelIsActive())return;
   if(duelPrepared)return singleStartOriginal();
