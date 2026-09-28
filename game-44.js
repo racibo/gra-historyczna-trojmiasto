@@ -312,7 +312,7 @@ function zoomToChoicePoints(chosen){
     });
   });
 }
-function showCandidates(dir){
+function singleShowCandidatesBase(dir){
   if(choiceLocked)return;
   statusEl.textContent="";
   candidateMarkers.forEach(m=>map.removeLayer(m));candidateMarkers=[];
@@ -417,7 +417,7 @@ function updateCategoryCounts(){
   };
   Object.entries(counts).forEach(([key,count])=>{const el=document.getElementById("count-"+key);if(el)el.textContent=count+" "+(count===1?"obiekt":"obiektów")});
 }
-function loadSettings(){
+function singleLoadSettingsBase(){
   try{
     const x=JSON.parse(localStorage.getItem("trojmiastoGameSettings")||"null");
     if(x)settings={...settings,...x};
@@ -431,7 +431,7 @@ function loadSettings(){
     }
   }catch(e){console.warn("Nie udało się wczytać ustawień:",e)}
 }
-function saveSettings(){const oldRange=settings.distanceRange,oldCity=settings.startCity;settings.countRandom=document.getElementById("missionCount").value==="random";settings.count=settings.countRandom?(settings.count||4):+document.getElementById("missionCount").value;settings.age=document.getElementById("catAge").checked;settings.periods=document.getElementById("catPeriods").checked;settings.architects=document.getElementById("catArchitects").checked;settings.people=document.getElementById("catPeople").checked;settings.functions=document.getElementById("catFunctions").checked;settings.names=document.getElementById("catNames").checked;settings.history=document.getElementById("catHistory").checked;settings.institutions=document.getElementById("catInstitutions").checked;settings.creators=document.getElementById("catCreators").checked;settings.hints=document.getElementById("allowHints").checked;settings.randomCategories=document.getElementById("randomCategories").checked;if(settings.randomCategories){settings.age=settings.periods=settings.architects=settings.people=settings.functions=settings.names=settings.history=settings.institutions=settings.creators=false}else{if(![settings.age,settings.periods,settings.architects,settings.people,settings.functions,settings.names,settings.history,settings.institutions,settings.creators].some(Boolean))settings.age=true}settings.distanceRange=document.getElementById("distanceRange").value;settings.startCity=document.getElementById("startCity").value;settings.defaultsVersion=54;localStorage.setItem("trojmiastoGameSettings",JSON.stringify(settings));return oldRange!==settings.distanceRange||oldCity!==settings.startCity}
+function singleSaveSettingsBase(){const oldRange=settings.distanceRange,oldCity=settings.startCity;settings.countRandom=document.getElementById("missionCount").value==="random";settings.count=settings.countRandom?(settings.count||4):+document.getElementById("missionCount").value;settings.age=document.getElementById("catAge").checked;settings.periods=document.getElementById("catPeriods").checked;settings.architects=document.getElementById("catArchitects").checked;settings.people=document.getElementById("catPeople").checked;settings.functions=document.getElementById("catFunctions").checked;settings.names=document.getElementById("catNames").checked;settings.history=document.getElementById("catHistory").checked;settings.institutions=document.getElementById("catInstitutions").checked;settings.creators=document.getElementById("catCreators").checked;settings.hints=document.getElementById("allowHints").checked;settings.randomCategories=document.getElementById("randomCategories").checked;if(settings.randomCategories){settings.age=settings.periods=settings.architects=settings.people=settings.functions=settings.names=settings.history=settings.institutions=settings.creators=false}else{if(![settings.age,settings.periods,settings.architects,settings.people,settings.functions,settings.names,settings.history,settings.institutions,settings.creators].some(Boolean))settings.age=true}settings.distanceRange=document.getElementById("distanceRange").value;settings.startCity=document.getElementById("startCity").value;settings.defaultsVersion=54;localStorage.setItem("trojmiastoGameSettings",JSON.stringify(settings));return oldRange!==settings.distanceRange||oldCity!==settings.startCity}
 function syncCategoryMode(){
   const random=document.getElementById("randomCategories").checked;
   const ids=["catAge","catPeriods","catArchitects","catPeople","catFunctions","catNames","catHistory","catInstitutions","catCreators"];
@@ -442,7 +442,7 @@ function syncCategoryMode(){
     if(random)el.checked=false;
   });
 }
-function openSettings(){
+function singleOpenSettingsBase(){
   document.getElementById("missionCount").value=settings.countRandom?"random":String(settings.count);
   document.getElementById("catAge").checked=settings.age;
   document.getElementById("catPeriods").checked=settings.periods;
@@ -1109,7 +1109,7 @@ function reveal(p){
   hits.forEach(h=>completed.add(h.type));
   updateTagCloud();
 }
-function choose(p){
+function singleChooseBase(p){
   const premiumActive=completed.size===activeTasks.length&&!!target;
   if(premiumActive&&target){premiumStats.choices++;if(p.premiumBest||isTargetPoint(p))premiumStats.goodChoices++}
   choiceEl.classList.add("hidden");candidateMarkers.forEach(m=>map.removeLayer(m));candidateMarkers=[];clearSearchZone();
@@ -1279,7 +1279,7 @@ function premiumLiveMessage(){
   if(premiumStats.directions)return "↪ Ten kierunek oddala od najlepszego kursu. Zgodność kierunków: <b>"+directionPct+"%</b> · dobry wybór punktu: <b>"+choicePct+"%</b>.";
   return "🎯 Część premium: wybierz kierunek możliwie zgodny z kierunkiem do mety.";
 }
-async function start(){
+async function singleStartBase(){
   if(choiceLocked)return;
   choiceLocked=true;
   const startBtn=document.getElementById("startBtn");
@@ -1408,7 +1408,304 @@ async function start(){
   }
   startBtn.disabled=false;startBtn.textContent="ROZPOCZNIJ GRĘ";
 }function startFooterCycle(){const footer=document.getElementById("map-footer");if(!footer)return;setTimeout(()=>footer.classList.add("footer-hidden"),5000);setInterval(()=>{footer.classList.remove("footer-hidden");setTimeout(()=>footer.classList.add("footer-hidden"),5000)},180000)}
-async function init(){try{startFooterCycle();if(typeof L==="undefined")throw new Error("Leaflet nie został załadowany");const mapEl=document.getElementById("map");if(!mapEl)throw new Error("Brak elementu mapy");map=L.map(mapEl,{zoomControl:false}).setView([54.38,18.62],12);if(!map||typeof map.addLayer!=="function")throw new Error("Nie udało się utworzyć mapy Leaflet");L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap"}).addTo(map);loadSettings();updateMoveInfo(0);document.getElementById("startBtn").onclick=start;document.getElementById("settingsBtn").onclick=openSettings;
+async function init(){try{startFooterCycle();if(typeof L==="undefined")throw new Error("Leaflet nie został załadowany");const mapEl=document.getElementById("map");if(!mapEl)throw new Error("Brak elementu mapy");map=L.map(mapEl,{zoomControl:false}).setView([54.38,18.62],12);if(!map||typeof map.addLayer!=="function")throw new Error("Nie udało się utworzyć mapy Leaflet");L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap"}).addTo(map);loadSettings();updateMoveInfo(0);document.getElementById("startBtn").onclick=start;document.getElementById("settingsBtn").onclick=openSettings;document.getElementById("duelStartBtn").onclick=duelConfirmSetup;
 document.getElementById("startSettingsBtn").onclick=openSettings;
 document.getElementById("randomCategories").addEventListener("change",syncCategoryMode);
-document.getElementById("surrenderSettings").onclick=showSolution;movesEl.addEventListener("click",()=>{if(instructionTimer){clearTimeout(instructionTimer);instructionTimer=null}movesEl.classList.remove("instruction-visible");movesEl.classList.add("instruction-hidden")});const tagToggle=document.getElementById("tagToggle"),tagCloud=document.getElementById("tagCloud");if(tagToggle&&tagCloud)tagToggle.onclick=()=>tagCloud.classList.toggle("closed");updateTagCloud();statusEl.addEventListener("click",()=>{if(!searchZone)return;searchZone.setStyle({fillOpacity:searchZone.options.fillOpacity>0?0:.14,opacity:searchZone.options.opacity>0?0:.9})});document.getElementById("saveSettings").onclick=async()=>{const btn=document.getElementById("saveSettings");btn.disabled=true;btn.textContent="ZAPISYWANIE…";statusEl.textContent="Trwa zapisywanie ustawień…";await new Promise(r=>setTimeout(r,350));saveSettings();document.getElementById("settings").classList.add("hidden");btn.disabled=false;btn.textContent="ZAPISZ";if(document.getElementById("start").classList.contains("hidden")){await start()}else statusEl.textContent="Ustawienia zapisane. Kliknij „ROZPOCZNIJ GRĘ”.";};document.querySelectorAll("[data-dir]").forEach(b=>b.onclick=()=>showCandidates(b.dataset.dir));document.addEventListener("keydown",e=>{const d={ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right"}[e.key];if(d){e.preventDefault();showCandidates(d)}});try{if(typeof Papa==="undefined")throw Error("Nie załadowano parsera CSV");const r=await fetch(DATA_URL,{cache:"no-store"});if(!r.ok)throw Error("Arkusz Google zwrócił HTTP "+r.status);const csv=await r.text();const parsed=Papa.parse(csv,{header:true,skipEmptyLines:true});if(parsed.errors?.length)console.warn("Ostrzeżenia CSV:",parsed.errors);points=parseSheetRows(parsed.data);updateCategoryCounts();if(points.length<20)throw Error("Za mało poprawnych punktów GPS w arkuszu");statusEl.textContent="Załadowano "+points.length+" punktów z Google Sheets (wierszy CSV: "+parsed.data.length+")."}catch(e){console.error("Błąd ładowania Google Sheets:",e);statusEl.textContent="Błąd danych: "+e.message}try{if(L.control&&L.control.scale) L.control.scale({imperial:false,metric:true,position:"bottomleft"}).addTo(map)}catch(e){console.warn("Kontrolka skali pominięta:",e)} }catch(e){console.error("Błąd inicjalizacji gry:",e);statusEl.textContent="BŁĄD MAPY: "+e.message;statusEl.title=e.stack||"";document.getElementById("start").classList.remove("hidden")}}init();
+document.getElementById("surrenderSettings").onclick=showSolution;movesEl.addEventListener("click",()=>{if(instructionTimer){clearTimeout(instructionTimer);instructionTimer=null}movesEl.classList.remove("instruction-visible");movesEl.classList.add("instruction-hidden")});const tagToggle=document.getElementById("tagToggle"),tagCloud=document.getElementById("tagCloud");if(tagToggle&&tagCloud)tagToggle.onclick=()=>tagCloud.classList.toggle("closed");updateTagCloud();statusEl.addEventListener("click",()=>{if(!searchZone)return;searchZone.setStyle({fillOpacity:searchZone.options.fillOpacity>0?0:.14,opacity:searchZone.options.opacity>0?0:.9})});document.getElementById("saveSettings").onclick=async()=>{const btn=document.getElementById("saveSettings");btn.disabled=true;btn.textContent="ZAPISYWANIE…";statusEl.textContent="Trwa zapisywanie ustawień…";await new Promise(r=>setTimeout(r,350));saveSettings();document.getElementById("settings").classList.add("hidden");btn.disabled=false;btn.textContent="ZAPISZ";if(document.getElementById("start").classList.contains("hidden")){await start()}else statusEl.textContent="Ustawienia zapisane. Kliknij „ROZPOCZNIJ GRĘ”.";};document.querySelectorAll("[data-dir]").forEach(b=>b.onclick=()=>showCandidates(b.dataset.dir));document.addEventListener("keydown",e=>{const d={ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right"}[e.key];if(d){e.preventDefault();showCandidates(d)}});try{if(typeof Papa==="undefined")throw Error("Nie załadowano parsera CSV");const r=await fetch(DATA_URL,{cache:"no-store"});if(!r.ok)throw Error("Arkusz Google zwrócił HTTP "+r.status);const csv=await r.text();const parsed=Papa.parse(csv,{header:true,skipEmptyLines:true});if(parsed.errors?.length)console.warn("Ostrzeżenia CSV:",parsed.errors);points=parseSheetRows(parsed.data);updateCategoryCounts();if(points.length<20)throw Error("Za mało poprawnych punktów GPS w arkuszu");statusEl.textContent="Załadowano "+points.length+" punktów z Google Sheets (wierszy CSV: "+parsed.data.length+")."}catch(e){console.error("Błąd ładowania Google Sheets:",e);statusEl.textContent="Błąd danych: "+e.message}try{if(L.control&&L.control.scale) L.control.scale({imperial:false,metric:true,position:"bottomleft"}).addTo(map)}catch(e){console.warn("Kontrolka skali pominięta:",e)} }catch(e){console.error("Błąd inicjalizacji gry:",e);statusEl.textContent="BŁĄD MAPY: "+e.message;statusEl.title=e.stack||"";document.getElementById("start").classList.remove("hidden")}}
+/* V65 — TRYB 2 GRACZY: wspólna misja, osobne trasy, naprzemienne tury */
+let duel=null, duelNamesPending=false, duelPrepared=false, duelConfig=null;
+const singleStartOriginal=singleStartBase, singleShowCandidatesOriginal=singleShowCandidatesBase, singleChooseOriginal=singleChooseBase;
+const singleLoadSettingsOriginal=singleLoadSettingsBase, singleSaveSettingsOriginal=singleSaveSettingsBase, singleOpenSettingsOriginal=singleOpenSettingsBase;
+
+function duelIsActive(){return !!duel?.active}
+function duelPlayer(){return duel?.players?.[duel.activePlayer]||null}
+function duelSetStatus(html){statusEl.innerHTML=html||""}
+function duelRouteStyle(p){return {color:p.color,weight:5,opacity:.95,dashArray:"8 8",lineCap:"round",lineJoin:"round"}}
+function duelMarkerIcon(p,type){
+  if(type==="start")return L.divIcon({className:"duel-start-marker",html:"<div style='color:"+p.color+"'>⚑</div>",iconSize:[30,30],iconAnchor:[15,15]});
+  return L.divIcon({className:"duel-current-marker",html:"<div style='background:"+p.color+"'></div>",iconSize:[22,22],iconAnchor:[11,11]});
+}
+function duelRemoveLayer(layer){if(layer){try{map.removeLayer(layer)}catch(e){}}}
+function duelRenderPlayer(p){
+  duelRemoveLayer(p.routeLine);
+  p.routeLine=L.polyline(p.routePoints.map(x=>[x.lat,x.lon]),duelRouteStyle(p)).addTo(map);
+  (p.routePointMarkers||[]).forEach(duelRemoveLayer);p.routePointMarkers=[];
+  p.routePoints.forEach((x,i)=>{
+    const m=L.circleMarker([x.lat,x.lon],{radius:3.5,color:"#fff",weight:1.5,fillColor:p.color,fillOpacity:.95,interactive:false,zIndexOffset:300+i}).addTo(map);
+    p.routePointMarkers.push(m);
+  });
+  duelRemoveLayer(p.currentMarker);
+  p.currentMarker=L.marker([p.current.lat,p.current.lon],{icon:duelMarkerIcon(p,"current"),zIndexOffset:1200}).addTo(map);
+  const samePlace=duel.players.some(other=>other!==p&&other.current&&distance(other.current,p.current)<2);
+  const labelDirection=samePlace?(p===duel.players[0]?"top":"bottom"):"top";
+  p.currentMarker.bindTooltip(p.name+" • "+(p===duelPlayer()?"TU JESTEŚ":"pozycja"),{permanent:true,direction:labelDirection,offset:labelDirection==="bottom"?[0,8]:[0,-8],className:"duel-current-label"});
+}
+function duelRenderMap(){
+  if(!duel)return;
+  duel.players.forEach(duelRenderPlayer);
+  const all=duel.players.flatMap(p=>[...p.routePoints,p.current]).filter(Boolean);
+  if(all.length>1)requestAnimationFrame(()=>{
+    map.invalidateSize({pan:false});
+    const mr=map.getContainer().getBoundingClientRect();
+    const missionPanel=document.querySelector(".mission"),choicePanel=document.getElementById("choice");
+    const top=Math.max(35,missionPanel?Math.round(missionPanel.getBoundingClientRect().bottom-mr.top+18):35);
+    const bottom=Math.max(35,choicePanel?Math.round(mr.bottom-choicePanel.getBoundingClientRect().top+18):35);
+    map.fitBounds(L.latLngBounds(all.map(x=>[x.lat,x.lon])),{paddingTopLeft:[24,top],paddingBottomRight:[24,bottom],maxZoom:16,animate:true,duration:.35});
+  });
+}
+function duelRemoveSingleLayers(){
+  [routeLine,currentMarker,startMarker,targetMarker].forEach(duelRemoveLayer);
+  routeLine=null;currentMarker=null;startMarker=null;targetMarker=null;
+  candidateMarkers.forEach(duelRemoveLayer);candidateMarkers=[];
+  clearSearchZone();visitedMarkers.forEach(duelRemoveLayer);visitedMarkers=[];
+}
+function duelMissionDistanceInfo(){
+  const p=duelPlayer(),m=duel?.mission;
+  if(!p||!m)return "";
+  const targets=points.filter(x=>x.id!==p.current.id&&!p.visited.has(x.id)&&m.test(x));
+  if(!targets.length)return '<span class="duel-mission-distance"><span class="duel-mission-distance-icon">❄️</span><span>brak dostępnego punktu</span></span>';
+  const nearest=Math.min(...targets.map(x=>distance(p.current,x)));
+  let icon="❄️",label="ponad 3 km";
+  if(nearest<=200){icon="🔥";label="do 200 m";}
+  else if(nearest<=700){icon="🔥";label="200–700 m";}
+  else if(nearest<=1000){icon="🔥";label="700 m–1 km";}
+  else if(nearest<=2000){label="1–2 km";}
+  else if(nearest<=3000){icon="❄️";label="2–3 km";}
+  return '<span class="duel-mission-distance"><span class="duel-mission-distance-icon">'+icon+'</span><span>najbliższy pasujący punkt: '+label+'</span></span>';
+}
+function duelMissionHtml(){
+  const m=duel?.mission;if(!m)return "";
+  const p=duelPlayer(),a=duel.players[0],b=duel.players[1];
+  return "<div class='duel-round'>RUNDA "+duel.round+" / "+duel.totalRounds+"</div>"+
+    "<div class='duel-score'><span style='color:#2e7d32'>"+esc(a.name)+" "+a.score+"</span><b> : </b><span style='color:#c62828'>"+esc(b.name)+" "+b.score+"</span></div>"+
+    "<div class='duel-turn' style='color:"+p.color+"'>TERAZ GRA: "+esc(p.name)+"</div>"+
+    "<div class='duel-mission-text'>"+esc(m.text)+"</div>"+
+    duelMissionDistanceInfo();
+}
+function duelUpdatePanel(){
+  if(!duel)return;
+  missionEl.innerHTML=duelMissionHtml();
+  tasksEl.innerHTML="<div class='duel-help'>Ta runda ma jedną wspólną misję. Znajdź dowolny obiekt spełniający zadanie.</div>";
+  progressEl.textContent="Punkty: "+duel.players[0].score+" : "+duel.players[1].score;
+  movesEl.textContent="Tura: "+duelPlayer().name+" • ruchy: "+duelPlayer().moves;
+}
+function duelZoom(){
+  if(!duel)return;
+  const all=duel.players.flatMap(p=>p.routePoints).filter(Boolean);
+  if(all.length<2)return;
+  requestAnimationFrame(()=>map.fitBounds(L.latLngBounds(all.map(x=>[x.lat,x.lon])),{padding:[90,90],maxZoom:16,animate:true,duration:.35}));
+}
+function duelPassScreen(){
+  const p=duelPlayer();
+  revealEl.innerHTML="<div class='duel-pass'><div class='duel-pass-kicker'>PRZEKAŻ TELEFON</div><h2 style='color:"+p.color+"'>"+esc(p.name)+"</h2><p>Teraz gra <b>"+esc(p.name)+"</b>. Wykonaj ruch dla tego gracza.</p><button id='duelContinue'>MOJA TURA</button></div>";
+  revealEl.className="reveal duel-reveal";revealEl.classList.remove("hidden");
+  document.getElementById("duelContinue").onclick=()=>{
+    revealEl.classList.add("hidden");revealEl.className="reveal hidden";
+    choiceLocked=false;duelUpdatePanel();
+  };
+}
+function duelBeginRound(index,startPlayer){
+  duel.round=index+1;
+  duel.mission=duel.missions[index];
+  duel.roundStarter=Number.isInteger(startPlayer)?startPlayer:(index%2);
+  duel.activePlayer=duel.roundStarter;
+  duel.players.forEach(p=>{p.roundMoves=0});
+  duelUpdatePanel();duelRenderMap();
+  choiceEl.classList.add("hidden");
+  document.querySelector(".controls").classList.remove("direction-hidden");
+  document.querySelector(".choice-buttons").style.display="none";
+  document.querySelector(".choice-title").textContent="Wybierz kierunek wycieczki";
+  choiceLocked=false;duelPassScreen();
+}
+function duelFindExtraMission(){
+  const used=new Set(duel.missions.map(m=>m.type));
+  const pool=shuffleArray(taskPoolForGame().filter(t=>!used.has(t.type)));
+  for(const t of pool){
+    const has=duel.players.some(p=>points.some(x=>x.id!==p.current.id&&!p.visited.has(x.id)&&t.test(x)));
+    if(has)return t;
+  }
+  return null;
+}
+function duelStartFromSingle(){
+  const base=gameStart;
+  const cfg=duelConfig;
+  const total=Number(cfg?.totalRounds)||5;
+  const missions=activeTasks.slice(0,total);
+  if(!base||missions.length<total){
+    settings.count=total;settings.countRandom=false;
+    duelSetStatus("Nie udało się przygotować "+total+" misji. Spróbuj ponownie.");
+    document.getElementById("start").classList.remove("hidden");
+    choiceLocked=false;duelConfig=null;return;
+  }
+  duelRemoveSingleLayers();
+  duel={
+    active:true,totalRounds:total,round:1,mission:missions[0],missions,
+    activePlayer:0,roundStarter:0,
+    players:[
+      {name:cfg.names[0],color:"#2e7d32",start:base,current:base,routePoints:[base],visited:new Set([base.id]),visitedHistory:[base],moves:0,roundMoves:0,score:0,routeLine:null,currentMarker:null,routePointMarkers:[]},
+      {name:cfg.names[1],color:"#c62828",start:base,current:base,routePoints:[base],visited:new Set([base.id]),visitedHistory:[base],moves:0,roundMoves:0,score:0,routeLine:null,currentMarker:null,routePointMarkers:[]}
+    ],
+    names:cfg.names,tieBreak:false
+  };
+  duelConfig=null;
+  gameStart=base;current=base;visited=new Set([base.id]);visitedHistory=[base];moves=0;
+  activeTasks=missions;
+  duelUpdatePanel();duelRenderMap();duelPassScreen();
+  statusEl.textContent="Pojedynek gotowy.";
+}
+function duelShowSetup(){
+  const box=document.getElementById("duelSetup");
+  if(!box)return;
+  duelNamesPending=true;
+  document.getElementById("duelName1").value=settings.player1Name||"Gracz 1";
+  document.getElementById("duelName2").value=settings.player2Name||"Gracz 2";
+  box.classList.remove("hidden");
+  setTimeout(()=>document.getElementById("duelName1")?.focus(),50);
+}
+function duelConfirmSetup(){
+  const n1=(document.getElementById("duelName1").value||"Gracz 1").trim().slice(0,24)||"Gracz 1";
+  const n2=(document.getElementById("duelName2").value||"Gracz 2").trim().slice(0,24)||"Gracz 2";
+  const rounds=[3,5,7,10].includes(Number(settings.duelRounds))?Number(settings.duelRounds):5;
+  settings.player1Name=n1;settings.player2Name=n2;
+  duelNamesPending=false;duelPrepared=true;
+  duelConfig={totalRounds:rounds,names:[n1,n2]};
+  document.getElementById("duelSetup").classList.add("hidden");
+  settings.count=rounds;settings.countRandom=false;
+  singleStartOriginal().then(()=>{
+    duelPrepared=false;
+    if(gameStart&&activeTasks.length)duelStartFromSingle();
+  }).catch(e=>{
+    console.error(e);duelPrepared=false;duelConfig=null;choiceLocked=false;
+    duelSetStatus("Błąd przygotowania pojedynku: "+esc(e.message||e));
+  });
+}
+function start(){
+  const modeEl=document.getElementById("gameMode");
+  if(modeEl)settings.gameMode=modeEl.value==="duel"?"duel":"single";
+  if(settings.gameMode!=="duel")return singleStartOriginal();
+  if(duelIsActive())return;
+  if(duelPrepared)return singleStartOriginal();
+  duelShowSetup();
+}
+function loadSettings(){
+  singleLoadSettingsOriginal();
+  settings.gameMode=settings.gameMode==="duel"?"duel":"single";
+  settings.duelRounds=[3,5,7,10].includes(Number(settings.duelRounds))?Number(settings.duelRounds):5;
+  settings.player1Name=settings.player1Name||"Gracz 1";
+  settings.player2Name=settings.player2Name||"Gracz 2";
+}
+function saveSettings(){
+  const restart=singleSaveSettingsOriginal();
+  const mode=document.getElementById("gameMode"),rounds=document.getElementById("duelRounds");
+  if(mode)settings.gameMode=mode.value==="duel"?"duel":"single";
+  if(rounds)settings.duelRounds=[3,5,7,10].includes(Number(rounds.value))?Number(rounds.value):5;
+  localStorage.setItem("trojmiastoGameSettings",JSON.stringify(settings));
+  return restart;
+}
+function openSettings(){
+  singleOpenSettingsOriginal();
+  const mode=document.getElementById("gameMode"),rounds=document.getElementById("duelRounds");
+  if(mode)mode.value=settings.gameMode||"single";
+  if(rounds)rounds.value=String(settings.duelRounds||5);
+}
+function duelDirectionCandidates(from,seen,dir){
+  return directionCandidates(from,seen,dir);
+}
+function showCandidates(dir){
+  if(!duelIsActive())return singleShowCandidatesOriginal(dir);
+  if(choiceLocked)return;
+  const p=duelPlayer();
+  candidateMarkers.forEach(duelRemoveLayer);candidateMarkers=[];clearSearchZone();
+  const a=dirAngle(dir);
+  const c=duelDirectionCandidates(p.current,p.visited,dir);
+  const solutions=points.filter(x=>x.id!==p.current.id&&!p.visited.has(x.id)&&duel.mission.test(x))
+    .map(x=>({...x,d:distance(p.current,x),bd:bearing(p.current,x),ad:angleDiff(bearing(p.current,x),a)}))
+    .filter(x=>x.d<=500&&x.ad<=45).sort((x,y)=>x.d-y.d);
+  let chosen;
+  if(solutions.length){
+    const alternatives=c.filter(x=>x.id!==solutions[0].id).sort((x,y)=>x.d-y.d);
+    chosen=[solutions[0],alternatives[0]].filter(Boolean);
+  }else chosen=chooseBestPair(c);
+  if(chosen.length<2){duelSetStatus("W tym kierunku nie ma dwóch dostępnych punktów — wybierz inną strzałkę.");return;}
+  choiceLocked=true;
+  document.querySelector(".controls").classList.add("direction-hidden");
+  choiceEl.classList.remove("direction-choice-empty");
+  document.querySelector(".choice-buttons").style.display="flex";
+  document.querySelector(".choice-title").textContent="TURA: "+p.name+" — wybierz punkt";
+  chosen.forEach((x,i)=>{
+    const m=L.marker([x.lat,x.lon],{icon:icon(i?"candidate-b":"candidate-a")}).addTo(map);
+    candidateMarkers.push(m);m.on("click",()=>choose(x));
+    const btn=document.getElementById(i?"choiceB":"choiceA");
+    btn.className=i?"choice-b":"choice-a";
+    btn.innerHTML='<span class="letter">'+(i?"B":"A")+'</span> okolice '+esc(placeLabel(x));
+    btn.onclick=()=>choose(x);
+  });
+  choiceEl.classList.remove("hidden");duelZoom();
+}
+
+function choose(p){
+  if(!duelIsActive())return singleChooseOriginal(p);
+  if(!choiceLocked)return;
+  const pl=duelPlayer();
+  choiceEl.classList.add("hidden");candidateMarkers.forEach(duelRemoveLayer);candidateMarkers=[];
+  document.querySelector(".controls").classList.remove("direction-hidden");
+  pl.current=p;pl.visited.add(p.id);pl.visitedHistory.push(p);pl.routePoints.push(p);pl.moves++;pl.roundMoves++;
+  duelRenderMap();current=p;visited=pl.visited;visitedHistory=pl.visitedHistory;moves=pl.moves;
+  if(duel.mission.test(p)){duelRoundWin(pl,p);return;}
+  // W tej samej rundzie drugi gracz dostaje następną turę.
+  duel.activePlayer=duel.activePlayer===0?1:0;
+  choiceLocked=false;duelUpdatePanel();duelPassScreen();
+}
+
+function duelRoundWin(pl,p){
+  pl.score++;
+  duelRenderPlayer(pl);
+  missionEl.innerHTML="<div class='duel-win' style='border-color:"+pl.color+"'><div class='duel-win-kicker'>PUNKT DLA</div><h2 style='color:"+pl.color+"'>"+esc(pl.name)+"</h2><p>"+esc(p.name)+" spełnia misję:</p><b>"+esc(duel.mission.text)+"</b><div class='duel-score-big'>"+duel.players[0].score+" : "+duel.players[1].score+"</div></div>";
+  tasksEl.innerHTML="<div class='duel-help'>Runda zakończona. Następna runda otrzyma nową, pojedynczą misję.</div>";
+  progressEl.textContent="Runda "+duel.round+" zakończona";
+  choiceLocked=true;
+  setTimeout(()=>{
+    if(duel.round>=duel.totalRounds){duelEnd();return;}
+    duelBeginRound(duel.round,1-duel.roundStarter);
+  },2200);
+}
+
+function duelEnd(){
+  choiceLocked=true;
+  const a=duel.players[0],b=duel.players[1],tied=a.score===b.score;
+  if(tied&&!duel.tieBreak){
+    const extra=duelFindExtraMission();
+    if(extra){
+      duel.tieBreak=true;duel.totalRounds++;duel.missions.push(extra);
+      duelBeginRound(duel.round,1-duel.roundStarter);
+      missionEl.innerHTML="<div class='duel-round'>RUNDA ROZSTRZYGAJĄCA</div>"+
+        "<div class='duel-score'>"+esc(a.name)+" "+a.score+" : "+esc(b.name)+" "+b.score+"</div>"+
+        "<div class='duel-turn' style='color:"+duelPlayer().color+"'>TERAZ GRA: "+esc(duelPlayer().name)+"</div>"+
+        "<div class='duel-mission-text'>"+esc(extra.text)+"</div>";
+      return;
+    }
+  }
+  duelShowFinal(tied);
+}
+
+function duelShowFinal(tied){
+  const a=duel.players[0],b=duel.players[1];
+  duel.players.forEach(duelRenderPlayer);
+  const all=duel.players.flatMap(p=>p.routePoints);
+  if(all.length>1)map.fitBounds(L.latLngBounds(all.map(p=>[p.lat,p.lon])),{padding:[100,100],maxZoom:15});
+  const headline=tied?"REMIS":"WYGRYWA";
+  const winner=tied?"":(a.score>b.score?a.name:b.name);
+  missionEl.innerHTML="<div class='duel-final'><div class='duel-final-kicker'>POJEDYNEK ZAKOŃCZONY</div><h2>"+headline+(winner?"<br><span style='color:"+(a.score>b.score?a.color:b.color)+"'>"+esc(winner)+"</span>":"")+"</h2><div class='duel-score-big'>"+a.score+" : "+b.score+"</div><p>"+esc(a.name)+" — "+a.moves+" ruchów<br>"+esc(b.name)+" — "+b.moves+" ruchów</p><button id='duelRestart' class='summary-restart-panel'>NOWA GRA</button></div>";
+  tasksEl.innerHTML="<div class='duel-final-note'>Zielona i czerwona linia pokazują osobne trasy obu graczy. Przebieg całej gry pozostaje na mapie.</div>";
+  progressEl.textContent="Koniec gry";
+  choiceEl.classList.add("hidden");
+  const c=document.querySelector(".controls");if(c)c.classList.add("direction-hidden");
+  document.getElementById("duelRestart").onclick=()=>location.reload();
+  duel.active=false;
+  duelZoom();
+}
+function duelUpdateMapOnResize(){if(duelIsActive())duelRenderMap()}
+window.addEventListener("resize",duelUpdateMapOnResize);
+
+window.start=start;window.duelConfirmSetup=duelConfirmSetup;window.openSettings=openSettings;
+init();

@@ -1,0 +1,36 @@
+name: Preview feature branch
+
+on:
+  push:
+    branches:
+      - feature/tryb-2-osobowy
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create HTML preview
+        id: preview
+        uses: pavi2410/html-preview-action@v5
+        with:
+          html_file: index.html
+          site_root: .
+          upload: archive
+          archive_name: gra-historyczna-tryb-2-osobowy
+          retention_days: 7
+          job_summary: true
+
+      - name: Show preview URL
+        run: |
+          echo "Preview: ${{ steps.preview.outputs.url }}"
