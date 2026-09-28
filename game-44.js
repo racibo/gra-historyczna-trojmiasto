@@ -1507,7 +1507,8 @@ function duelPassScreen(){
 function duelBeginRound(index,startPlayer){
   duel.round=index+1;
   duel.mission=duel.missions[index];
-  duel.activePlayer=Number.isInteger(startPlayer)?startPlayer:(index%2);
+  duel.roundStarter=Number.isInteger(startPlayer)?startPlayer:(index%2);
+  duel.activePlayer=duel.roundStarter;
   duel.players.forEach(p=>{p.roundMoves=0});
   duelUpdatePanel();duelRenderMap();
   choiceEl.classList.add("hidden");
@@ -1539,7 +1540,7 @@ function duelStartFromSingle(){
   duelRemoveSingleLayers();
   duel={
     active:true,totalRounds:total,round:1,mission:missions[0],missions,
-    activePlayer:0,
+    activePlayer:0,roundStarter:0,
     players:[
       {name:cfg.names[0],color:"#2e7d32",start:base,current:base,routePoints:[base],visited:new Set([base.id]),visitedHistory:[base],moves:0,roundMoves:0,score:0,routeLine:null,currentMarker:null,routePointMarkers:[]},
       {name:cfg.names[1],color:"#c62828",start:base,current:base,routePoints:[base],visited:new Set([base.id]),visitedHistory:[base],moves:0,roundMoves:0,score:0,routeLine:null,currentMarker:null,routePointMarkers:[]}
@@ -1665,7 +1666,7 @@ function duelRoundWin(pl,p){
   choiceLocked=true;
   setTimeout(()=>{
     if(duel.round>=duel.totalRounds){duelEnd();return;}
-    duelBeginRound(duel.round,duel.round%2);
+    duelBeginRound(duel.round,1-duel.roundStarter);
   },2200);
 }
 
@@ -1676,7 +1677,7 @@ function duelEnd(){
     const extra=duelFindExtraMission();
     if(extra){
       duel.tieBreak=true;duel.totalRounds++;duel.missions.push(extra);
-      duelBeginRound(duel.round,duel.round%2);
+      duelBeginRound(duel.round,1-duel.roundStarter);
       missionEl.innerHTML="<div class='duel-round'>RUNDA ROZSTRZYGAJĄCA</div>"+
         "<div class='duel-score'>"+esc(a.name)+" "+a.score+" : "+esc(b.name)+" "+b.score+"</div>"+
         "<div class='duel-turn' style='color:"+duelPlayer().color+"'>TERAZ GRA: "+esc(duelPlayer().name)+"</div>"+
