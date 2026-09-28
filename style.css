@@ -870,3 +870,10 @@ routeLine{}\n/* V44.5 — automatyczne kadrowanie uwzględnia panel wyboru na do
 
 /* Duel setup must sit above the start overlay when both are visible. */
 #duelSetup{z-index:2200}
+
+
+/* Duel: czytelne etykiety graczy w tym samym miejscu + odległość do misji. */
+.duel-current-label{font-size:10px;line-height:1.15;white-space:nowrap;z-index:3000!important;}
+.duel-mission-distance{display:flex;align-items:center;gap:5px;margin-top:6px;font-size:10px;font-weight:600;color:#cfcfcf;line-height:1.15;}
+.duel-mission-distance-icon{font-size:17px;line-height:1;}
+@media(max-width:600px){.duel-mission-distance{font-size:9px;margin-top:5px}.duel-mission-distance-icon{font-size:16px;}}
