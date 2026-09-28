@@ -312,7 +312,7 @@ function zoomToChoicePoints(chosen){
     });
   });
 }
-function showCandidates(dir){
+function singleShowCandidatesBase(dir){
   if(choiceLocked)return;
   statusEl.textContent="";
   candidateMarkers.forEach(m=>map.removeLayer(m));candidateMarkers=[];
@@ -417,7 +417,7 @@ function updateCategoryCounts(){
   };
   Object.entries(counts).forEach(([key,count])=>{const el=document.getElementById("count-"+key);if(el)el.textContent=count+" "+(count===1?"obiekt":"obiektów")});
 }
-function loadSettings(){
+function singleLoadSettingsBase(){
   try{
     const x=JSON.parse(localStorage.getItem("trojmiastoGameSettings")||"null");
     if(x)settings={...settings,...x};
@@ -431,7 +431,7 @@ function loadSettings(){
     }
   }catch(e){console.warn("Nie udało się wczytać ustawień:",e)}
 }
-function saveSettings(){const oldRange=settings.distanceRange,oldCity=settings.startCity;settings.countRandom=document.getElementById("missionCount").value==="random";settings.count=settings.countRandom?(settings.count||4):+document.getElementById("missionCount").value;settings.age=document.getElementById("catAge").checked;settings.periods=document.getElementById("catPeriods").checked;settings.architects=document.getElementById("catArchitects").checked;settings.people=document.getElementById("catPeople").checked;settings.functions=document.getElementById("catFunctions").checked;settings.names=document.getElementById("catNames").checked;settings.history=document.getElementById("catHistory").checked;settings.institutions=document.getElementById("catInstitutions").checked;settings.creators=document.getElementById("catCreators").checked;settings.hints=document.getElementById("allowHints").checked;settings.randomCategories=document.getElementById("randomCategories").checked;if(settings.randomCategories){settings.age=settings.periods=settings.architects=settings.people=settings.functions=settings.names=settings.history=settings.institutions=settings.creators=false}else{if(![settings.age,settings.periods,settings.architects,settings.people,settings.functions,settings.names,settings.history,settings.institutions,settings.creators].some(Boolean))settings.age=true}settings.distanceRange=document.getElementById("distanceRange").value;settings.startCity=document.getElementById("startCity").value;settings.defaultsVersion=54;localStorage.setItem("trojmiastoGameSettings",JSON.stringify(settings));return oldRange!==settings.distanceRange||oldCity!==settings.startCity}
+function singleSaveSettingsBase(){const oldRange=settings.distanceRange,oldCity=settings.startCity;settings.countRandom=document.getElementById("missionCount").value==="random";settings.count=settings.countRandom?(settings.count||4):+document.getElementById("missionCount").value;settings.age=document.getElementById("catAge").checked;settings.periods=document.getElementById("catPeriods").checked;settings.architects=document.getElementById("catArchitects").checked;settings.people=document.getElementById("catPeople").checked;settings.functions=document.getElementById("catFunctions").checked;settings.names=document.getElementById("catNames").checked;settings.history=document.getElementById("catHistory").checked;settings.institutions=document.getElementById("catInstitutions").checked;settings.creators=document.getElementById("catCreators").checked;settings.hints=document.getElementById("allowHints").checked;settings.randomCategories=document.getElementById("randomCategories").checked;if(settings.randomCategories){settings.age=settings.periods=settings.architects=settings.people=settings.functions=settings.names=settings.history=settings.institutions=settings.creators=false}else{if(![settings.age,settings.periods,settings.architects,settings.people,settings.functions,settings.names,settings.history,settings.institutions,settings.creators].some(Boolean))settings.age=true}settings.distanceRange=document.getElementById("distanceRange").value;settings.startCity=document.getElementById("startCity").value;settings.defaultsVersion=54;localStorage.setItem("trojmiastoGameSettings",JSON.stringify(settings));return oldRange!==settings.distanceRange||oldCity!==settings.startCity}
 function syncCategoryMode(){
   const random=document.getElementById("randomCategories").checked;
   const ids=["catAge","catPeriods","catArchitects","catPeople","catFunctions","catNames","catHistory","catInstitutions","catCreators"];
@@ -442,7 +442,7 @@ function syncCategoryMode(){
     if(random)el.checked=false;
   });
 }
-function openSettings(){
+function singleOpenSettingsBase(){
   document.getElementById("missionCount").value=settings.countRandom?"random":String(settings.count);
   document.getElementById("catAge").checked=settings.age;
   document.getElementById("catPeriods").checked=settings.periods;
@@ -1109,7 +1109,7 @@ function reveal(p){
   hits.forEach(h=>completed.add(h.type));
   updateTagCloud();
 }
-function choose(p){
+function singleChooseBase(p){
   const premiumActive=completed.size===activeTasks.length&&!!target;
   if(premiumActive&&target){premiumStats.choices++;if(p.premiumBest||isTargetPoint(p))premiumStats.goodChoices++}
   choiceEl.classList.add("hidden");candidateMarkers.forEach(m=>map.removeLayer(m));candidateMarkers=[];clearSearchZone();
@@ -1279,7 +1279,7 @@ function premiumLiveMessage(){
   if(premiumStats.directions)return "↪ Ten kierunek oddala od najlepszego kursu. Zgodność kierunków: <b>"+directionPct+"%</b> · dobry wybór punktu: <b>"+choicePct+"%</b>.";
   return "🎯 Część premium: wybierz kierunek możliwie zgodny z kierunkiem do mety.";
 }
-async function start(){
+async function singleStartBase(){
   if(choiceLocked)return;
   choiceLocked=true;
   const startBtn=document.getElementById("startBtn");
@@ -1414,8 +1414,8 @@ document.getElementById("randomCategories").addEventListener("change",syncCatego
 document.getElementById("surrenderSettings").onclick=showSolution;movesEl.addEventListener("click",()=>{if(instructionTimer){clearTimeout(instructionTimer);instructionTimer=null}movesEl.classList.remove("instruction-visible");movesEl.classList.add("instruction-hidden")});const tagToggle=document.getElementById("tagToggle"),tagCloud=document.getElementById("tagCloud");if(tagToggle&&tagCloud)tagToggle.onclick=()=>tagCloud.classList.toggle("closed");updateTagCloud();statusEl.addEventListener("click",()=>{if(!searchZone)return;searchZone.setStyle({fillOpacity:searchZone.options.fillOpacity>0?0:.14,opacity:searchZone.options.opacity>0?0:.9})});document.getElementById("saveSettings").onclick=async()=>{const btn=document.getElementById("saveSettings");btn.disabled=true;btn.textContent="ZAPISYWANIE…";statusEl.textContent="Trwa zapisywanie ustawień…";await new Promise(r=>setTimeout(r,350));saveSettings();document.getElementById("settings").classList.add("hidden");btn.disabled=false;btn.textContent="ZAPISZ";if(document.getElementById("start").classList.contains("hidden")){await start()}else statusEl.textContent="Ustawienia zapisane. Kliknij „ROZPOCZNIJ GRĘ”.";};document.querySelectorAll("[data-dir]").forEach(b=>b.onclick=()=>showCandidates(b.dataset.dir));document.addEventListener("keydown",e=>{const d={ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right"}[e.key];if(d){e.preventDefault();showCandidates(d)}});try{if(typeof Papa==="undefined")throw Error("Nie załadowano parsera CSV");const r=await fetch(DATA_URL,{cache:"no-store"});if(!r.ok)throw Error("Arkusz Google zwrócił HTTP "+r.status);const csv=await r.text();const parsed=Papa.parse(csv,{header:true,skipEmptyLines:true});if(parsed.errors?.length)console.warn("Ostrzeżenia CSV:",parsed.errors);points=parseSheetRows(parsed.data);updateCategoryCounts();if(points.length<20)throw Error("Za mało poprawnych punktów GPS w arkuszu");statusEl.textContent="Załadowano "+points.length+" punktów z Google Sheets (wierszy CSV: "+parsed.data.length+")."}catch(e){console.error("Błąd ładowania Google Sheets:",e);statusEl.textContent="Błąd danych: "+e.message}try{if(L.control&&L.control.scale) L.control.scale({imperial:false,metric:true,position:"bottomleft"}).addTo(map)}catch(e){console.warn("Kontrolka skali pominięta:",e)} }catch(e){console.error("Błąd inicjalizacji gry:",e);statusEl.textContent="BŁĄD MAPY: "+e.message;statusEl.title=e.stack||"";document.getElementById("start").classList.remove("hidden")}}
 /* V65 — TRYB 2 GRACZY: wspólna misja, osobne trasy, naprzemienne tury */
 let duel=null, duelNamesPending=false, duelPrepared=false;
-const singleStartOriginal=start, singleShowCandidatesOriginal=showCandidates, singleChooseOriginal=choose;
-const singleLoadSettingsOriginal=loadSettings, singleSaveSettingsOriginal=saveSettings, singleOpenSettingsOriginal=openSettings;
+const singleStartOriginal=singleStartBase, singleShowCandidatesOriginal=singleShowCandidatesBase, singleChooseOriginal=singleChooseBase;
+const singleLoadSettingsOriginal=singleLoadSettingsBase, singleSaveSettingsOriginal=singleSaveSettingsBase, singleOpenSettingsOriginal=singleOpenSettingsBase;
 
 function duelIsActive(){return !!duel?.active}
 function duelPlayer(){return duel?.players?.[duel.activePlayer]||null}
