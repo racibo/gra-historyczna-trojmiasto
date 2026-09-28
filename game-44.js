@@ -1695,4 +1695,5 @@ function duelShowFinal(tied){
 function duelUpdateMapOnResize(){if(duelIsActive())duelRenderMap()}
 window.addEventListener("resize",duelUpdateMapOnResize);
 
+window.start=start;window.duelConfirmSetup=duelConfirmSetup;window.openSettings=openSettings;
 init();
