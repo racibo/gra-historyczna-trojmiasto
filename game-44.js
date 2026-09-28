@@ -1611,6 +1611,7 @@ function showCandidates(dir){
   if(chosen.length<2){duelSetStatus("W tym kierunku nie ma dwóch dostępnych punktów — wybierz inną strzałkę.");return;}
   choiceLocked=true;
   document.querySelector(".controls").classList.add("direction-hidden");
+  choiceEl.classList.remove("direction-choice-empty");
   document.querySelector(".choice-buttons").style.display="flex";
   document.querySelector(".choice-title").textContent="TURA: "+p.name+" — wybierz punkt";
   chosen.forEach((x,i)=>{
