@@ -1411,4 +1411,286 @@ async function start(){
 async function init(){try{startFooterCycle();if(typeof L==="undefined")throw new Error("Leaflet nie został załadowany");const mapEl=document.getElementById("map");if(!mapEl)throw new Error("Brak elementu mapy");map=L.map(mapEl,{zoomControl:false}).setView([54.38,18.62],12);if(!map||typeof map.addLayer!=="function")throw new Error("Nie udało się utworzyć mapy Leaflet");L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap"}).addTo(map);loadSettings();updateMoveInfo(0);document.getElementById("startBtn").onclick=start;document.getElementById("settingsBtn").onclick=openSettings;
 document.getElementById("startSettingsBtn").onclick=openSettings;
 document.getElementById("randomCategories").addEventListener("change",syncCategoryMode);
-document.getElementById("surrenderSettings").onclick=showSolution;movesEl.addEventListener("click",()=>{if(instructionTimer){clearTimeout(instructionTimer);instructionTimer=null}movesEl.classList.remove("instruction-visible");movesEl.classList.add("instruction-hidden")});const tagToggle=document.getElementById("tagToggle"),tagCloud=document.getElementById("tagCloud");if(tagToggle&&tagCloud)tagToggle.onclick=()=>tagCloud.classList.toggle("closed");updateTagCloud();statusEl.addEventListener("click",()=>{if(!searchZone)return;searchZone.setStyle({fillOpacity:searchZone.options.fillOpacity>0?0:.14,opacity:searchZone.options.opacity>0?0:.9})});document.getElementById("saveSettings").onclick=async()=>{const btn=document.getElementById("saveSettings");btn.disabled=true;btn.textContent="ZAPISYWANIE…";statusEl.textContent="Trwa zapisywanie ustawień…";await new Promise(r=>setTimeout(r,350));saveSettings();document.getElementById("settings").classList.add("hidden");btn.disabled=false;btn.textContent="ZAPISZ";if(document.getElementById("start").classList.contains("hidden")){await start()}else statusEl.textContent="Ustawienia zapisane. Kliknij „ROZPOCZNIJ GRĘ”.";};document.querySelectorAll("[data-dir]").forEach(b=>b.onclick=()=>showCandidates(b.dataset.dir));document.addEventListener("keydown",e=>{const d={ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right"}[e.key];if(d){e.preventDefault();showCandidates(d)}});try{if(typeof Papa==="undefined")throw Error("Nie załadowano parsera CSV");const r=await fetch(DATA_URL,{cache:"no-store"});if(!r.ok)throw Error("Arkusz Google zwrócił HTTP "+r.status);const csv=await r.text();const parsed=Papa.parse(csv,{header:true,skipEmptyLines:true});if(parsed.errors?.length)console.warn("Ostrzeżenia CSV:",parsed.errors);points=parseSheetRows(parsed.data);updateCategoryCounts();if(points.length<20)throw Error("Za mało poprawnych punktów GPS w arkuszu");statusEl.textContent="Załadowano "+points.length+" punktów z Google Sheets (wierszy CSV: "+parsed.data.length+")."}catch(e){console.error("Błąd ładowania Google Sheets:",e);statusEl.textContent="Błąd danych: "+e.message}try{if(L.control&&L.control.scale) L.control.scale({imperial:false,metric:true,position:"bottomleft"}).addTo(map)}catch(e){console.warn("Kontrolka skali pominięta:",e)} }catch(e){console.error("Błąd inicjalizacji gry:",e);statusEl.textContent="BŁĄD MAPY: "+e.message;statusEl.title=e.stack||"";document.getElementById("start").classList.remove("hidden")}}init();
+document.getElementById("surrenderSettings").onclick=showSolution;movesEl.addEventListener("click",()=>{if(instructionTimer){clearTimeout(instructionTimer);instructionTimer=null}movesEl.classList.remove("instruction-visible");movesEl.classList.add("instruction-hidden")});const tagToggle=document.getElementById("tagToggle"),tagCloud=document.getElementById("tagCloud");if(tagToggle&&tagCloud)tagToggle.onclick=()=>tagCloud.classList.toggle("closed");updateTagCloud();statusEl.addEventListener("click",()=>{if(!searchZone)return;searchZone.setStyle({fillOpacity:searchZone.options.fillOpacity>0?0:.14,opacity:searchZone.options.opacity>0?0:.9})});document.getElementById("saveSettings").onclick=async()=>{const btn=document.getElementById("saveSettings");btn.disabled=true;btn.textContent="ZAPISYWANIE…";statusEl.textContent="Trwa zapisywanie ustawień…";await new Promise(r=>setTimeout(r,350));saveSettings();document.getElementById("settings").classList.add("hidden");btn.disabled=false;btn.textContent="ZAPISZ";if(document.getElementById("start").classList.contains("hidden")){await start()}else statusEl.textContent="Ustawienia zapisane. Kliknij „ROZPOCZNIJ GRĘ”.";};document.querySelectorAll("[data-dir]").forEach(b=>b.onclick=()=>showCandidates(b.dataset.dir));document.addEventListener("keydown",e=>{const d={ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right"}[e.key];if(d){e.preventDefault();showCandidates(d)}});try{if(typeof Papa==="undefined")throw Error("Nie załadowano parsera CSV");const r=await fetch(DATA_URL,{cache:"no-store"});if(!r.ok)throw Error("Arkusz Google zwrócił HTTP "+r.status);const csv=await r.text();const parsed=Papa.parse(csv,{header:true,skipEmptyLines:true});if(parsed.errors?.length)console.warn("Ostrzeżenia CSV:",parsed.errors);points=parseSheetRows(parsed.data);updateCategoryCounts();if(points.length<20)throw Error("Za mało poprawnych punktów GPS w arkuszu");statusEl.textContent="Załadowano "+points.length+" punktów z Google Sheets (wierszy CSV: "+parsed.data.length+")."}catch(e){console.error("Błąd ładowania Google Sheets:",e);statusEl.textContent="Błąd danych: "+e.message}try{if(L.control&&L.control.scale) L.control.scale({imperial:false,metric:true,position:"bottomleft"}).addTo(map)}catch(e){console.warn("Kontrolka skali pominięta:",e)} }catch(e){console.error("Błąd inicjalizacji gry:",e);statusEl.textContent="BŁĄD MAPY: "+e.message;statusEl.title=e.stack||"";document.getElementById("start").classList.remove("hidden")}}
+/* V65 — TRYB 2 GRACZY: wspólna misja, osobne trasy, naprzemienne tury */
+let duel=null, duelNamesPending=false;
+const singleStartOriginal=start, singleShowCandidatesOriginal=showCandidates, singleChooseOriginal=choose;
+const singleLoadSettingsOriginal=loadSettings, singleSaveSettingsOriginal=saveSettings, singleOpenSettingsOriginal=openSettings;
+
+function duelIsActive(){return !!duel?.active}
+function duelPlayer(){return duel?.players?.[duel.activePlayer]||null}
+function duelSetStatus(html){statusEl.innerHTML=html||""}
+function duelRouteStyle(p){
+  return {color:p.color,weight:5,opacity:.95,dashArray:"8 8",lineCap:"round",lineJoin:"round"};
+}
+function duelMarkerIcon(p,type){
+  if(type==="start")return L.divIcon({className:"duel-start-marker",html:"<div style='color:"+p.color+"'>⚑</div>",iconSize:[30,30],iconAnchor:[15,15]});
+  return L.divIcon({className:"duel-current-marker",html:"<div style='background:"+p.color+"'></div>",iconSize:[22,22],iconAnchor:[11,11]});
+}
+function duelRemoveLayer(layer){if(layer){try{map.removeLayer(layer)}catch(e){}}}
+function duelClearPlayerMapObjects(p){
+  duelRemoveLayer(p.routeLine);p.routeLine=null;
+  duelRemoveLayer(p.currentMarker);p.currentMarker=null;
+  duelRemoveLayer(p.startMarker);p.startMarker=null;
+  (p.routePointMarkers||[]).forEach(duelRemoveLayer);p.routePointMarkers=[];
+}
+function duelRenderPlayer(p){
+  duelRemoveLayer(p.routeLine);
+  p.routeLine=L.polyline(p.routePoints.map(x=>[x.lat,x.lon]),duelRouteStyle(p)).addTo(map);
+  (p.routePointMarkers||[]).forEach(duelRemoveLayer);p.routePointMarkers=[];
+  p.routePoints.forEach((x,i)=>{
+    const m=L.circleMarker([x.lat,x.lon],{radius:3.5,color:"#fff",weight:1.5,fillColor:p.color,fillOpacity:.95,interactive:false,zIndexOffset:300+i}).addTo(map);
+    p.routePointMarkers.push(m);
+  });
+  duelRemoveLayer(p.currentMarker);
+  p.currentMarker=L.marker([p.current.lat,p.current.lon],{icon:duelMarkerIcon(p,"current"),zIndexOffset:1200}).addTo(map);
+  p.currentMarker.bindTooltip(p.name+" • "+(p===duelPlayer()?"TU JESTEŚ":"pozycja"),{permanent:true,direction:"top",className:"duel-current-label"});
+}
+function duelRenderMap(){
+  if(!duel)return;
+  duel.players.forEach(duelRenderPlayer);
+  const all=duel.players.flatMap(p=>[...p.routePoints,p.current]).filter(Boolean);
+  if(all.length>1)requestAnimationFrame(()=>{
+    map.invalidateSize({pan:false});
+    const mr=map.getContainer().getBoundingClientRect();
+    const missionPanel=document.querySelector(".mission"),choicePanel=document.getElementById("choice");
+    const top=Math.max(35,missionPanel?Math.round(missionPanel.getBoundingClientRect().bottom-mr.top+18):35);
+    const bottom=Math.max(35,choicePanel?Math.round(mr.bottom-choicePanel.getBoundingClientRect().top+18):35);
+    map.fitBounds(L.latLngBounds(all.map(x=>[x.lat,x.lon])),{paddingTopLeft:[24,top],paddingBottomRight:[24,bottom],maxZoom:16,animate:true,duration:.35});
+  });
+}
+function duelRemoveSingleLayers(){
+  [routeLine,currentMarker,startMarker,targetMarker].forEach(duelRemoveLayer);
+  routeLine=null;currentMarker=null;startMarker=null;targetMarker=null;
+  candidateMarkers.forEach(duelRemoveLayer);candidateMarkers=[];
+  clearSearchZone();visitedMarkers.forEach(duelRemoveLayer);visitedMarkers=[];
+}
+function duelMissionHtml(){
+  const m=duel?.mission;
+  if(!m)return "";
+  const p=duelPlayer();
+  const score=duel.players.map(x=>x.score);
+  return "<div class='duel-round'>RUNDA "+duel.round+" / "+duel.totalRounds+"</div>"+
+    "<div class='duel-score'><span style='color:#2e7d32'>"+esc(duel.players[0].name)+" "+score[0]+"</span><b> : </b><span style='color:#c62828'>"+esc(duel.players[1].name)+" "+score[1]+"</span></div>"+
+    "<div class='duel-turn' style='color:"+p.color+"'>TURA: "+esc(p.name)+"</div>"+
+    "<div class='duel-mission-text'>"+esc(m.text)+"</div>";
+}
+function duelUpdatePanel(){
+  if(!duel)return;
+  missionEl.innerHTML=duelMissionHtml();
+  tasksEl.innerHTML="<div class='duel-help'>Znajdź dowolny obiekt spełniający tę misję. Nie musi to być jeden konkretny punkt.</div>";
+  progressEl.textContent="Punkty: "+duel.players[0].score+" : "+duel.players[1].score;
+  movesEl.textContent="Ruchy: "+duelPlayer().moves+" • wybierz kierunek";
+}
+function duelZoom(){
+  if(!duel)return;
+  const all=duel.players.flatMap(p=>p.routePoints).filter(Boolean);
+  if(all.length<2)return;
+  requestAnimationFrame(()=>map.fitBounds(L.latLngBounds(all.map(x=>[x.lat,x.lon])),{padding:[90,90],maxZoom:16,animate:true,duration:.35}));
+}
+function duelPassScreen(){
+  const p=duelPlayer();
+  revealEl.innerHTML="<div class='duel-pass'><div class='duel-pass-kicker'>PRZEKAŻ TELEFON</div><h2 style='color:"+p.color+"'>"+esc(p.name)+"</h2><p>Twoja tura. Pozostali gracze nie wykonują ruchu.</p><button id='duelContinue'>MOJA TURA</button></div>";
+  revealEl.className="reveal duel-reveal";revealEl.classList.remove("hidden");
+  document.getElementById("duelContinue").onclick=()=>{
+    revealEl.classList.add("hidden");revealEl.className="reveal hidden";
+    choiceLocked=false;duelUpdatePanel();
+  };
+}
+function duelBeginRound(index){
+  duel.round=index+1;
+  duel.mission=duel.missions[index];
+  duel.activePlayer=index%2;
+  duel.players.forEach(p=>{p.roundMoves=0});
+  duelUpdatePanel();
+  duelRenderMap();
+  choiceEl.classList.add("hidden");
+  document.querySelector(".controls").classList.remove("direction-hidden");
+  document.querySelector(".choice-buttons").style.display="none";
+  document.querySelector(".choice-title").textContent="Wybierz kierunek wycieczki";
+  choiceLocked=false;
+  duelPassScreen();
+}
+function duelStartFromSingle(){
+  const base=gameStart;
+  const missions=activeTasks.slice(0,duel.totalRounds);
+  if(!base||missions.length<duel.totalRounds){
+    settings.count=duel.totalRounds;settings.countRandom=false;
+    duelSetStatus("Nie udało się przygotować "+duel.totalRounds+" różnych misji. Spróbuj ponownie.");
+    document.getElementById("start").classList.remove("hidden");
+    choiceLocked=false;return;
+  }
+  duelRemoveSingleLayers();
+  duel={
+    active:true,
+    totalRounds:duel.totalRounds,
+    round:1,
+    mission:missions[0],
+    missions,
+    activePlayer:0,
+    players:[
+      {name:duel.names[0],color:"#2e7d32",start:base,current:base,routePoints:[base],visited:new Set([base.id]),visitedHistory:[base],moves:0,roundMoves:0,score:0,routeLine:null,currentMarker:null,startMarker:null,routePointMarkers:[]},
+      {name:duel.names[1],color:"#c62828",start:base,current:base,routePoints:[base],visited:new Set([base.id]),visitedHistory:[base],moves:0,roundMoves:0,score:0,routeLine:null,currentMarker:null,startMarker:null,routePointMarkers:[]}
+    ],
+    names:duel.names,
+    tieBreak:false
+  };
+  gameStart=base;current=base;visited=new Set([base.id]);visitedHistory=[base];moves=0;
+  activeTasks=missions;
+  duelUpdatePanel();duelRenderMap();duelPassScreen();
+  statusEl.textContent="Pojedynek gotowy.";
+}
+function duelShowSetup(){
+  const box=document.getElementById("duelSetup");
+  if(!box)return;
+  duelNamesPending=true;
+  document.getElementById("duelName1").value=settings.player1Name||"Gracz 1";
+  document.getElementById("duelName2").value=settings.player2Name||"Gracz 2";
+  box.classList.remove("hidden");
+  setTimeout(()=>document.getElementById("duelName1")?.focus(),50);
+}
+function duelConfirmSetup(){
+  const n1=(document.getElementById("duelName1").value||"Gracz 1").trim().slice(0,24)||"Gracz 1";
+  const n2=(document.getElementById("duelName2").value||"Gracz 2").trim().slice(0,24)||"Gracz 2";
+  settings.player1Name=n1;settings.player2Name=n2;
+  duelNamesPending=false;
+  document.getElementById("duelSetup").classList.add("hidden");
+  settings.count=Number(settings.duelRounds)||5;settings.countRandom=false;
+  singleStartOriginal().then(()=>{
+    if(!duelNamesPending)duelStartFromSingle();
+  }).catch(e=>{
+    console.error(e);choiceLocked=false;duelSetStatus("Błąd przygotowania pojedynku: "+esc(e.message||e));
+  });
+}
+function start(){
+  if(settings.gameMode!=="duel")return singleStartOriginal();
+  if(duelIsActive())return;
+  duelShowSetup();
+}
+function loadSettings(){
+  singleLoadSettingsOriginal();
+  settings.gameMode=settings.gameMode==="duel"?"duel":"single";
+  settings.duelRounds=[3,5,7,10].includes(Number(settings.duelRounds))?Number(settings.duelRounds):5;
+  settings.player1Name=settings.player1Name||"Gracz 1";
+  settings.player2Name=settings.player2Name||"Gracz 2";
+}
+function saveSettings(){
+  const restart=singleSaveSettingsOriginal();
+  const mode=document.getElementById("gameMode"),rounds=document.getElementById("duelRounds");
+  if(mode)settings.gameMode=mode.value==="duel"?"duel":"single";
+  if(rounds)settings.duelRounds=[3,5,7,10].includes(Number(rounds.value))?Number(rounds.value):5;
+  localStorage.setItem("trojmiastoGameSettings",JSON.stringify(settings));
+  return restart;
+}
+function openSettings(){
+  singleOpenSettingsOriginal();
+  const mode=document.getElementById("gameMode"),rounds=document.getElementById("duelRounds");
+  if(mode)mode.value=settings.gameMode||"single";
+  if(rounds)rounds.value=String(settings.duelRounds||5);
+}
+function duelDirectionCandidates(from,seen,dir){
+  return directionCandidates(from,seen,dir);
+}
+function showCandidates(dir){
+  if(!duelIsActive())return singleShowCandidatesOriginal(dir);
+  if(choiceLocked)return;
+  const p=duelPlayer();
+  candidateMarkers.forEach(duelRemoveLayer);candidateMarkers=[];
+  clearSearchZone();
+  const a=dirAngle(dir);
+  let c=duelDirectionCandidates(p.current,p.visited,dir);
+  const solutions=points.filter(x=>x.id!==p.current.id&&!p.visited.has(x.id)&&duel.mission.test(x))
+    .map(x=>({...x,d:distance(p.current,x),bd:bearing(p.current,x),ad:angleDiff(bearing(p.current,x),a)}))
+    .filter(x=>x.d<=500&&x.ad<=45).sort((x,y)=>x.d-y.d);
+  let chosen;
+  if(solutions.length){
+    const alternatives=c.filter(x=>x.id!==solutions[0].id).sort((x,y)=>x.d-y.d);
+    chosen=[solutions[0],chooseBestPair(alternatives)[0]||alternatives[0]].filter(Boolean);
+  }else chosen=chooseBestPair(c);
+  if(chosen.length<2){
+    duelSetStatus("W tym kierunku nie ma dwóch dostępnych punktów — wybierz inną strzałkę.");
+    return;
+  }
+  choiceLocked=true;
+  document.querySelector(".controls").classList.add("direction-hidden");
+  document.querySelector(".choice-buttons").style.display="flex";
+  document.querySelector(".choice-title").textContent=esc(p.name)+" — wybierz punkt";
+  chosen.forEach((x,i)=>{
+    const m=L.marker([x.lat,x.lon],{icon:icon(i?"candidate-b":"candidate-a")}).addTo(map);
+    candidateMarkers.push(m);m.on("click",()=>choose(x));
+    const btn=document.getElementById(i?"choiceB":"choiceA");
+    btn.className=i?"choice-b":"choice-a";
+    btn.innerHTML='<span class="letter">'+(i?"B":"A")+'</span> okolice '+esc(placeLabel(x));
+    btn.onclick=()=>choose(x);
+  });
+  choiceEl.classList.remove("hidden");
+  duelZoom();
+}
+function choose(p){
+  if(!duelIsActive())return singleChooseOriginal(p);
+  if(!choiceLocked)return;
+  const pl=duelPlayer();
+  choiceEl.classList.add("hidden");
+  candidateMarkers.forEach(duelRemoveLayer);candidateMarkers=[];
+  document.querySelector(".controls").classList.remove("direction-hidden");
+  pl.current=p;pl.visited.add(p.id);pl.visitedHistory.push(p);pl.routePoints.push(p);pl.moves++;pl.roundMoves++;
+  duelRenderPlayer(pl);duelRenderMap();
+  current=p;visited=pl.visited;visitedHistory=pl.visitedHistory;moves=pl.moves;
+  if(duel.mission.test(p)){
+    duelRoundWin(pl,p);
+    return;
+  }
+  choiceLocked=false;
+  duelUpdatePanel();
+  duelPassScreen();
+}
+function duelRoundWin(pl,p){
+  pl.score++;
+  duelRenderPlayer(pl);
+  missionEl.innerHTML="<div class='duel-win' style='border-color:"+pl.color+"'><div class='duel-win-kicker'>PUNKT DLA</div><h2 style='color:"+pl.color+"'>"+esc(pl.name)+"</h2><p>"+esc(p.name)+" spełnia misję:</p><b>"+esc(duel.mission.text)+"</b><div class='duel-score-big'>"+duel.players[0].score+" : "+duel.players[1].score+"</div></div>";
+  tasksEl.innerHTML="";
+  progressEl.textContent="Runda "+duel.round+" zakończona";
+  choiceLocked=true;
+  setTimeout(()=>{
+    if(duel.round>=duel.totalRounds){duelEnd();return;}
+    duelBeginRound(duel.round);
+  },2200);
+}
+function duelEnd(){
+  choiceLocked=true;
+  const a=duel.players[0],b=duel.players[1];
+  const tied=a.score===b.score;
+  if(tied&&!duel.tieBreak){
+    duel.tieBreak=true;duel.totalRounds++;
+    const used=new Set(duel.missions.map(m=>m.type));
+    const extra=activeTasks.find(t=>!used.has(t.type));
+    if(extra){
+      duel.missions.push(extra);
+      duelBeginRound(duel.round);
+      duelUpdatePanel();
+      missionEl.innerHTML="<div class='duel-round'>RUNDA ROZSTRZYGAJĄCA</div>"+missionEl.innerHTML.replace(/<div class='duel-round'>.*?<\/div>/,"");
+      return;
+    }
+  }
+  duelShowFinal(tied);
+}
+function duelShowFinal(tied){
+  const a=duel.players[0],b=duel.players[1];
+  duel.players.forEach(duelRenderPlayer);
+  const all=duel.players.flatMap(p=>p.routePoints);
+  if(all.length>1)map.fitBounds(L.latLngBounds(all.map(p=>[p.lat,p.lon])),{padding:[100,100],maxZoom:15});
+  const headline=tied?"REMIS":"WYGRYWA";
+  const winner=tied?"":(a.score>b.score?a.name:b.name);
+  missionEl.innerHTML="<div class='duel-final'><div class='duel-final-kicker'>POJEDYNEK ZAKOŃCZONY</div><h2>"+headline+(winner?"<br><span style='color:"+(a.score>b.score?a.color:b.color)+"'>"+esc(winner)+"</span>":"")+"</h2><div class='duel-score-big'>"+a.score+" : "+b.score+"</div><p>"+esc(a.name)+" — "+a.moves+" ruchów<br>"+esc(b.name)+" — "+b.moves+" ruchów</p><button id='duelRestart' class='summary-restart-panel'>NOWA GRA</button></div>";
+  tasksEl.innerHTML="<div class='duel-final-note'>Zielona i czerwona linia pokazują osobne trasy obu graczy. Przebieg całej gry pozostaje na mapie.</div>";
+  progressEl.textContent="Koniec gry";
+  choiceEl.classList.add("hidden");
+  const c=document.querySelector(".controls");if(c)c.classList.add("direction-hidden");
+  document.getElementById("duelRestart").onclick=()=>location.reload();
+  duel.active=false;
+  duelZoom();
+}
+function duelUpdateMapOnResize(){if(duelIsActive())duelRenderMap()}
+window.addEventListener("resize",duelUpdateMapOnResize);
+
+init();
