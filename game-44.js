@@ -1436,7 +1436,9 @@ function duelRenderPlayer(p){
   });
   duelRemoveLayer(p.currentMarker);
   p.currentMarker=L.marker([p.current.lat,p.current.lon],{icon:duelMarkerIcon(p,"current"),zIndexOffset:1200}).addTo(map);
-  p.currentMarker.bindTooltip(p.name+" • "+(p===duelPlayer()?"TU JESTEŚ":"pozycja"),{permanent:true,direction:"top",className:"duel-current-label"});
+  const samePlace=duel.players.some(other=>other!==p&&other.current&&distance(other.current,p.current)<2);
+  const labelDirection=samePlace?(p===duel.players[0]?"top":"bottom"):"top";
+  p.currentMarker.bindTooltip(p.name+" • "+(p===duelPlayer()?"TU JESTEŚ":"pozycja"),{permanent:true,direction:labelDirection,offset:labelDirection==="bottom"?[0,8]:[0,-8],className:"duel-current-label"});
 }
 function duelRenderMap(){
   if(!duel)return;
@@ -1457,13 +1459,28 @@ function duelRemoveSingleLayers(){
   candidateMarkers.forEach(duelRemoveLayer);candidateMarkers=[];
   clearSearchZone();visitedMarkers.forEach(duelRemoveLayer);visitedMarkers=[];
 }
+function duelMissionDistanceInfo(){
+  const p=duelPlayer(),m=duel?.mission;
+  if(!p||!m)return "";
+  const targets=points.filter(x=>x.id!==p.current.id&&!p.visited.has(x.id)&&m.test(x));
+  if(!targets.length)return '<span class="duel-mission-distance"><span class="duel-mission-distance-icon">❄️</span><span>brak dostępnego punktu</span></span>';
+  const nearest=Math.min(...targets.map(x=>distance(p.current,x)));
+  let icon="❄️",label="ponad 3 km";
+  if(nearest<=200){icon="🔥";label="do 200 m";}
+  else if(nearest<=700){icon="🔥";label="200–700 m";}
+  else if(nearest<=1000){icon="🔥";label="700 m–1 km";}
+  else if(nearest<=2000){label="1–2 km";}
+  else if(nearest<=3000){icon="❄️";label="2–3 km";}
+  return '<span class="duel-mission-distance"><span class="duel-mission-distance-icon">'+icon+'</span><span>najbliższy pasujący punkt: '+label+'</span></span>';
+}
 function duelMissionHtml(){
   const m=duel?.mission;if(!m)return "";
   const p=duelPlayer(),a=duel.players[0],b=duel.players[1];
   return "<div class='duel-round'>RUNDA "+duel.round+" / "+duel.totalRounds+"</div>"+
     "<div class='duel-score'><span style='color:#2e7d32'>"+esc(a.name)+" "+a.score+"</span><b> : </b><span style='color:#c62828'>"+esc(b.name)+" "+b.score+"</span></div>"+
     "<div class='duel-turn' style='color:"+p.color+"'>TERAZ GRA: "+esc(p.name)+"</div>"+
-    "<div class='duel-mission-text'>"+esc(m.text)+"</div>";
+    "<div class='duel-mission-text'>"+esc(m.text)+"</div>"+
+    duelMissionDistanceInfo();
 }
 function duelUpdatePanel(){
   if(!duel)return;
