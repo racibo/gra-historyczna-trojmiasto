@@ -581,7 +581,7 @@ function categoryTasks(all,category,title,matcher){
     // w Leningradzie”, które nie mogą być związane z jednym losowym id.
     const institutionPatterns=[
       /\bKombinat\s+Budowy\s+Domów\s+nr\s+\d+(?:\s+w\s+[A-ZĄĆĘŁŃÓŚŹŻ][^.;!?\n]*)?/g,
-      /\b(?:Towarzystwo|Spółdzielnia|Przedsiębiorstwo|Zjednoczenie|Stocznia|Fabryka|Instytut|Uniwersytet|Politechnika|Ministerstwo|Komitet|Związek|Organizacja|Liga|Klub|Bractwo|Cech|Parafia|Drużyna|Jednostka)\s+[A-ZĄĆĘŁŃÓŚŹŻ0-9][^.;!?\n]{3,100}/g
+      /\b(?:Towarzystwo|Spółdzielnia|Przedsiębiorstwo|Zjednoczenie|Stocznia|Fabryka|Instytut|Uniwersytet|Politechnika|Ministerstwo|Komitet|Związek|Organizacja|Liga|Klub|Bractwo|Cech|Parafia|Drużyna|Jednostka)\s+[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż0-9][^.;!?\n]{3,120}/gi
     ];
 
     matching.forEach(p=>{
@@ -1490,11 +1490,32 @@ function duelUpdatePanel(){
   progressEl.textContent="Punkty: "+duel.players[0].score+" : "+duel.players[1].score;
   movesEl.textContent="Tura: "+duelPlayer().name+" • ruchy: "+duelPlayer().moves;
 }
-function duelZoom(){
+function duelMapFit(pointsToShow){
+  const pts=(pointsToShow||[]).filter(Boolean);
+  if(!map||!pts.length)return;
+  requestAnimationFrame(()=>{
+    map.invalidateSize({pan:false});
+    const mapEl=map.getContainer();
+    const mapRect=mapEl.getBoundingClientRect();
+    const missionPanel=document.querySelector(".mission");
+    const choicePanel=document.getElementById("choice");
+    const missionRect=missionPanel?.getBoundingClientRect();
+    const choiceRect=choicePanel?.getBoundingClientRect();
+    const topPad=Math.max(35,missionRect?Math.round(missionRect.bottom-mapRect.top+18):35);
+    const bottomPad=Math.max(35,choiceRect?Math.round(mapRect.bottom-choiceRect.top+18):35);
+    const bounds=L.latLngBounds(pts.map(p=>[p.lat,p.lon]));
+    map.fitBounds(bounds,{
+      paddingTopLeft:[24,topPad],
+      paddingBottomRight:[24,bottomPad],
+      maxZoom:16,
+      animate:true,
+      duration:.35
+    });
+  });
+}
+function duelZoomCurrent(){
   if(!duel)return;
-  const all=duel.players.flatMap(p=>p.routePoints).filter(Boolean);
-  if(all.length<2)return;
-  requestAnimationFrame(()=>map.fitBounds(L.latLngBounds(all.map(x=>[x.lat,x.lon])),{padding:[90,90],maxZoom:16,animate:true,duration:.35}));
+  duelMapFit([duelPlayer()?.current]);
 }
 function duelPointInfoHtml(p){
   if(!p)return "";
@@ -1516,6 +1537,7 @@ function duelPassScreen(reachedPoint=null){
   document.getElementById("duelContinue").onclick=()=>{
     revealEl.classList.add("hidden");revealEl.className="reveal hidden";
     choiceLocked=false;duelUpdatePanel();
+    duelZoomCurrent();
   };
 }
 function duelBeginRound(index,startPlayer,startPoint=null){
@@ -1682,7 +1704,8 @@ function showCandidates(dir){
     btn.innerHTML='<span class="letter">'+(i?"B":"A")+'</span> '+(duel.premiumTieBreak&&isTargetPoint(x)?"META":"okolice "+esc(placeLabel(x)));
     btn.onclick=()=>choose(x);
   });
-  choiceEl.classList.remove("hidden");duelZoom();
+  choiceEl.classList.remove("hidden");
+  duelMapFit([p.current,...chosen]);
 }
 
 function duelPremiumTargetOneMoveAway(p){
@@ -1824,9 +1847,12 @@ function duelPremiumFinish(pl,p){
   const c=document.querySelector(".controls");if(c)c.classList.add("direction-hidden");
   document.getElementById("duelRestart").onclick=()=>location.reload();
   duel.active=false;
-  duelZoom();
 }
-function duelUpdateMapOnResize(){if(duelIsActive())duelRenderMap()}
+function duelUpdateMapOnResize(){
+  if(!duelIsActive())return;
+  duelRenderMap();
+  requestAnimationFrame(()=>duelZoomCurrent());
+}
 window.addEventListener("resize",duelUpdateMapOnResize);
 
 window.start=start;window.duelConfirmSetup=duelConfirmSetup;window.openSettings=openSettings;
