@@ -886,3 +886,6 @@ routeLine{}\n/* V44.5 — automatyczne kadrowanie uwzględnia panel wyboru na do
 
 /* Duel: informacja o kolejnym celu po zakończeniu rundy. */
 .duel-next-mission{margin:10px 0 4px;padding-top:8px;border-top:1px solid rgba(255,255,255,.16);font-size:12px;line-height:1.3;}
+
+/* V67 — wyjaśnienie zależności misje = rundy w pojedynku. */
+.settings-note{margin:4px 0 12px;padding:9px 11px;border:1px solid rgba(255,255,255,.14);border-radius:8px;background:rgba(255,255,255,.045);font-size:12px;line-height:1.4;color:rgba(255,255,255,.78)}
