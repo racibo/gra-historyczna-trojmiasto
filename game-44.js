@@ -581,7 +581,8 @@ function categoryTasks(all,category,title,matcher){
     // w Leningradzie”, które nie mogą być związane z jednym losowym id.
     const institutionPatterns=[
       /\bKombinat\s+Budowy\s+Domów\s+nr\s+\d+(?:\s+w\s+[A-ZĄĆĘŁŃÓŚŹŻ][^.;!?\n]*)?/g,
-      /\b(?:Towarzystwo|Spółdzielnia|Przedsiębiorstwo|Zjednoczenie|Stocznia|Fabryka|Instytut|Uniwersytet|Politechnika|Ministerstwo|Komitet|Związek|Organizacja|Liga|Klub|Bractwo|Cech|Parafia|Drużyna|Jednostka)\s+[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż0-9][^.;!?\n]{3,120}/gi
+      /\b(?:Towarzystwo|Spółdzielnia|Przedsiębiorstwo|Zjednoczenie|Stocznia|Fabryka|Instytut|Uniwersytet|Politechnika|Ministerstwo|Komitet|Związek|Organizacja|Liga|Klub|Bractwo|Cech|Parafia|Drużyna|Jednostka)\s+[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż0-9][^.;!?\n]{3,120}/gi,
+      /\b[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż0-9][A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż0-9 .,&'’\-]{2,100}\b(?:Gemeinn(?:ü|u)tzige\s+)?Eigenheimgenossenschaft\b(?:\s+e\.?\s*g\.?\s*b\.?\s*h\.?)?/gi
     ];
 
     matching.forEach(p=>{
@@ -1443,16 +1444,10 @@ function duelRenderPlayer(p){
 }
 function duelRenderMap(){
   if(!duel)return;
+  // Podczas gry nie dopasowujemy widoku do całej dotychczasowej trasy.
+  // Widok jest ustawiany przy wyborze punktów: aktualna pozycja + A + B.
+  // Pełne skalowanie obu tras następuje dopiero na ekranie końcowym.
   duel.players.forEach(duelRenderPlayer);
-  const all=duel.players.flatMap(p=>[...p.routePoints,p.current]).filter(Boolean);
-  if(all.length>1)requestAnimationFrame(()=>{
-    map.invalidateSize({pan:false});
-    const mr=map.getContainer().getBoundingClientRect();
-    const missionPanel=document.querySelector(".mission"),choicePanel=document.getElementById("choice");
-    const top=Math.max(35,missionPanel?Math.round(missionPanel.getBoundingClientRect().bottom-mr.top+18):35);
-    const bottom=Math.max(35,choicePanel?Math.round(mr.bottom-choicePanel.getBoundingClientRect().top+18):35);
-    map.fitBounds(L.latLngBounds(all.map(x=>[x.lat,x.lon])),{paddingTopLeft:[24,top],paddingBottomRight:[24,bottom],maxZoom:16,animate:true,duration:.35});
-  });
 }
 function duelRemoveSingleLayers(){
   [routeLine,currentMarker,startMarker,targetMarker].forEach(duelRemoveLayer);
