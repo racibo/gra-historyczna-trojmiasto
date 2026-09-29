@@ -1497,19 +1497,34 @@ function duelZoom(){
 }
 function duelPassScreen(){
   const p=duelPlayer();
-  revealEl.innerHTML="<div class='duel-pass'><div class='duel-pass-kicker'>PRZEKAŻ TELEFON</div><h2 style='color:"+p.color+"'>"+esc(p.name)+"</h2><p>Teraz gra <b>"+esc(p.name)+"</b>. Wykonaj ruch dla tego gracza.</p><button id='duelContinue'>MOJA TURA</button></div>";
+  revealEl.innerHTML="<div class='duel-pass'><div class='duel-pass-kicker'>TERAZ RUCH WYKONUJE "+esc(p.name).toUpperCase()+"</div><h2 style='color:"+p.color+"'>"+esc(p.name)+"</h2><p>Wybierz za pomocą strzałek kierunek trasy a następnie wybierz punkt, który przybliży Cię do celu</p><button id='duelContinue'>OK. IDĘ DALEJ</button></div>";
   revealEl.className="reveal duel-reveal";revealEl.classList.remove("hidden");
   document.getElementById("duelContinue").onclick=()=>{
     revealEl.classList.add("hidden");revealEl.className="reveal hidden";
     choiceLocked=false;duelUpdatePanel();
   };
 }
-function duelBeginRound(index,startPlayer){
+function duelBeginRound(index,startPlayer,startPoint=null){
   duel.round=index+1;
   duel.mission=duel.missions[index];
   duel.roundStarter=Number.isInteger(startPlayer)?startPlayer:(index%2);
   duel.activePlayer=duel.roundStarter;
-  duel.players.forEach(p=>{p.roundMoves=0});
+  if(startPoint){
+    duel.players.forEach(p=>{
+      p.start=startPoint;
+      p.current=startPoint;
+      p.visited=new Set([startPoint.id]);
+      p.visitedHistory=[startPoint];
+      p.routePoints=[startPoint];
+      p.roundMoves=0;
+    });
+    current=startPoint;
+    visited=new Set([startPoint.id]);
+    visitedHistory=[startPoint];
+    moves=0;
+  }else{
+    duel.players.forEach(p=>{p.roundMoves=0});
+  }
   duelUpdatePanel();duelRenderMap();
   choiceEl.classList.add("hidden");
   document.querySelector(".controls").classList.remove("direction-hidden");
@@ -1660,13 +1675,18 @@ function choose(p){
 function duelRoundWin(pl,p){
   pl.score++;
   duelRenderPlayer(pl);
-  missionEl.innerHTML="<div class='duel-win' style='border-color:"+pl.color+"'><div class='duel-win-kicker'>PUNKT DLA</div><h2 style='color:"+pl.color+"'>"+esc(pl.name)+"</h2><p>"+esc(p.name)+" spełnia misję:</p><b>"+esc(duel.mission.text)+"</b><div class='duel-score-big'>"+duel.players[0].score+" : "+duel.players[1].score+"</div></div>";
+  const nextIndex=duel.round;
+  const nextMission=duel.missions[nextIndex];
+  const nextInfo=nextMission
+    ? "<p class='duel-next-mission'>Następny cel misji:<br><b>"+esc(nextMission.text)+"</b></p>"
+    : "";
+  missionEl.innerHTML="<div class='duel-win' style='border-color:"+pl.color+"'><div class='duel-win-kicker'>PUNKT DLA</div><h2 style='color:"+pl.color+"'>"+esc(pl.name)+"</h2><p>"+esc(p.name)+" spełnia misję:</p><b>"+esc(duel.mission.text)+"</b>"+nextInfo+"<div class='duel-score-big'>"+duel.players[0].score+" : "+duel.players[1].score+"</div></div>";
   tasksEl.innerHTML="<div class='duel-help'>Runda zakończona. Następna runda otrzyma nową, pojedynczą misję.</div>";
   progressEl.textContent="Runda "+duel.round+" zakończona";
   choiceLocked=true;
   setTimeout(()=>{
     if(duel.round>=duel.totalRounds){duelEnd();return;}
-    duelBeginRound(duel.round,1-duel.roundStarter);
+    duelBeginRound(duel.round,1-duel.roundStarter,p);
   },2200);
 }
 
