@@ -1436,6 +1436,7 @@ function duelRenderPlayer(p){
   });
   duelRemoveLayer(p.currentMarker);
   p.currentMarker=L.marker([p.current.lat,p.current.lon],{icon:duelMarkerIcon(p,"current"),zIndexOffset:1200}).addTo(map);
+  p.currentMarker.bindPopup(visitedLabelHtml(p.current),{closeButton:true,autoClose:true,maxWidth:360});
   const samePlace=duel.players.some(other=>other!==p&&other.current&&distance(other.current,p.current)<2);
   const labelDirection=samePlace?(p===duel.players[0]?"top":"bottom"):"top";
   p.currentMarker.bindTooltip(p.name+" • "+(p===duelPlayer()?"TU JESTEŚ":"pozycja"),{permanent:true,direction:labelDirection,offset:labelDirection==="bottom"?[0,8]:[0,-8],className:"duel-current-label"});
@@ -1495,9 +1496,22 @@ function duelZoom(){
   if(all.length<2)return;
   requestAnimationFrame(()=>map.fitBounds(L.latLngBounds(all.map(x=>[x.lat,x.lon])),{padding:[90,90],maxZoom:16,animate:true,duration:.35}));
 }
-function duelPassScreen(){
+function duelPointInfoHtml(p){
+  if(!p)return "";
+  return "<div class='duel-point-info'><div class='duel-point-kicker'>DOTARŁEŚ DO OBIEKTU</div>"+visitedLabelHtml(p)+"</div>";
+}
+function duelShowPointPopup(p){
+  if(!p)return;
+  const pl=duel.players.find(x=>x.current&&x.current.id===p.id);
+  if(pl&&pl.currentMarker){
+    pl.currentMarker.setPopupContent(visitedLabelHtml(p));
+    pl.currentMarker.openPopup();
+  }
+}
+function duelPassScreen(reachedPoint=null){
   const p=duelPlayer();
-  revealEl.innerHTML="<div class='duel-pass'><div class='duel-pass-kicker'>TERAZ RUCH WYKONUJE "+esc(p.name).toUpperCase()+"</div><h2 style='color:"+p.color+"'>"+esc(p.name)+"</h2><p>Wybierz za pomocą strzałek kierunek trasy a następnie wybierz punkt, który przybliży Cię do celu</p><button id='duelContinue'>OK. IDĘ DALEJ</button></div>";
+  const pointInfo=reachedPoint?duelPointInfoHtml(reachedPoint):"";
+  revealEl.innerHTML="<div class='duel-pass'>"+pointInfo+"<div class='duel-pass-kicker'>TERAZ RUCH WYKONUJE "+esc(p.name).toUpperCase()+"</div><h2 style='color:"+p.color+"'>"+esc(p.name)+"</h2><p>Wybierz za pomocą strzałek kierunek trasy a następnie wybierz punkt, który przybliży Cię do celu</p><button id='duelContinue'>OK. IDĘ DALEJ</button></div>";
   revealEl.className="reveal duel-reveal";revealEl.classList.remove("hidden");
   document.getElementById("duelContinue").onclick=()=>{
     revealEl.classList.add("hidden");revealEl.className="reveal hidden";
@@ -1665,7 +1679,7 @@ function choose(p){
   if(duel.mission.test(p)){duelRoundWin(pl,p);return;}
   // W tej samej rundzie drugi gracz dostaje następną turę.
   duel.activePlayer=duel.activePlayer===0?1:0;
-  choiceLocked=false;duelUpdatePanel();duelPassScreen();
+  choiceLocked=false;duelUpdatePanel();duelShowPointPopup(p);duelPassScreen(p);
 }
 
 function duelRoundWin(pl,p){
@@ -1677,6 +1691,7 @@ function duelRoundWin(pl,p){
     ? "<p class='duel-next-mission'>Następny cel misji:<br><b>"+esc(nextMission.text)+"</b></p>"
     : "";
   missionEl.innerHTML="<div class='duel-win' style='border-color:"+pl.color+"'><div class='duel-win-kicker'>PUNKT DLA</div><h2 style='color:"+pl.color+"'>"+esc(pl.name)+"</h2><p>"+esc(p.name)+" spełnia misję:</p><b>"+esc(duel.mission.text)+"</b>"+nextInfo+"<div class='duel-score-big'>"+duel.players[0].score+" : "+duel.players[1].score+"</div></div>";
+  duelShowPointPopup(p);
   tasksEl.innerHTML="<div class='duel-help'>Runda zakończona. Następna runda otrzyma nową, pojedynczą misję.</div>";
   progressEl.textContent="Runda "+duel.round+" zakończona";
   choiceLocked=true;
