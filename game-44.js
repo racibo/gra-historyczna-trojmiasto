@@ -1529,7 +1529,11 @@ function duelBeginRound(index,startPlayer,startPoint=null){
       p.current=startPoint;
       p.visited=new Set([startPoint.id]);
       p.visitedHistory=[startPoint];
-      p.routePoints=[startPoint];
+      // Zachowujemy całą trasę z poprzednich rund. Nowa runda zaczyna się
+      // w punkcie zakończenia poprzedniej, więc nie tworzymy sztucznego odcinka.
+      if(!p.routePoints.length||p.routePoints[p.routePoints.length-1].id!==startPoint.id){
+        p.routePoints.push(startPoint);
+      }
       p.roundMoves=0;
     });
     current=startPoint;
