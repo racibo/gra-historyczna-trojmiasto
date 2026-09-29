@@ -1695,20 +1695,10 @@ function duelRoundWin(pl,p){
 
 function duelEnd(){
   choiceLocked=true;
-  const a=duel.players[0],b=duel.players[1],tied=a.score===b.score;
-  if(tied&&!duel.tieBreak){
-    const extra=duelFindExtraMission();
-    if(extra){
-      duel.tieBreak=true;duel.totalRounds++;duel.missions.push(extra);
-      duelBeginRound(duel.round,1-duel.roundStarter);
-      missionEl.innerHTML="<div class='duel-round'>RUNDA ROZSTRZYGAJĄCA</div>"+
-        "<div class='duel-score'>"+esc(a.name)+" "+a.score+" : "+esc(b.name)+" "+b.score+"</div>"+
-        "<div class='duel-turn' style='color:"+duelPlayer().color+"'>TERAZ GRA: "+esc(duelPlayer().name)+"</div>"+
-        "<div class='duel-mission-text'>"+esc(extra.text)+"</div>";
-      return;
-    }
-  }
-  duelShowFinal(tied);
+  const a=duel.players[0],b=duel.players[1];
+  // Koniec dokładnie po wykonaniu wszystkich wybranych misji.
+  // Remis pozostaje remisem — żadna dodatkowa misja nie jest doliczana.
+  duelShowFinal(a.score===b.score);
 }
 
 function duelShowFinal(tied){
