@@ -1478,7 +1478,7 @@ function duelMissionHtml(){
   const m=duel?.mission;if(!m)return "";
   const p=duelPlayer(),a=duel.players[0],b=duel.players[1];
   return "<div class='duel-round'>RUNDA "+duel.round+" / "+duel.totalRounds+"</div>"+
-    "<div class='duel-score'><span style='color:#2e7d32'>"+esc(a.name)+" "+a.score+"</span><b> : </b><span style='color:#c62828'>"+esc(b.name)+" "+b.score+"</span></div>"+
+    "<div class='duel-score'><span style='color:#2e7d32'>"+esc(a.name)+":</span> <span style='color:#2e7d32'>"+a.score+"</span><b> : </b><span style='color:#c62828'>"+esc(b.name)+":</span> <span style='color:#c62828'>"+b.score+"</span></div>"+
     "<div class='duel-turn' style='color:"+p.color+"'>TERAZ GRA: "+esc(p.name)+"</div>"+
     "<div class='duel-mission-text'>"+esc(m.text)+"</div>"+
     duelMissionDistanceInfo();
@@ -1575,7 +1575,7 @@ function duelStartFromSingle(){
       {name:cfg.names[0],color:"#2e7d32",start:base,current:base,routePoints:[base],visited:new Set([base.id]),visitedHistory:[base],moves:0,roundMoves:0,score:0,routeLine:null,currentMarker:null,routePointMarkers:[]},
       {name:cfg.names[1],color:"#c62828",start:base,current:base,routePoints:[base],visited:new Set([base.id]),visitedHistory:[base],moves:0,roundMoves:0,score:0,routeLine:null,currentMarker:null,routePointMarkers:[]}
     ],
-    names:cfg.names,tieBreak:false
+    names:cfg.names,tieBreak:false,premiumTieBreak:false,premiumWinner:null,premiumRound:false
   };
   duelConfig=null;
   gameStart=base;current=base;visited=new Set([base.id]);visitedHistory=[base];moves=0;
@@ -1643,14 +1643,27 @@ function showCandidates(dir){
   candidateMarkers.forEach(duelRemoveLayer);candidateMarkers=[];clearSearchZone();
   const a=dirAngle(dir);
   const c=duelDirectionCandidates(p.current,p.visited,dir);
-  const solutions=points.filter(x=>x.id!==p.current.id&&!p.visited.has(x.id)&&duel.mission.test(x))
-    .map(x=>({...x,d:distance(p.current,x),bd:bearing(p.current,x),ad:angleDiff(bearing(p.current,x),a)}))
-    .filter(x=>x.d<=500&&x.ad<=45).sort((x,y)=>x.d-y.d);
   let chosen;
-  if(solutions.length){
-    const alternatives=c.filter(x=>x.id!==solutions[0].id).sort((x,y)=>x.d-y.d);
-    chosen=[solutions[0],alternatives[0]].filter(Boolean);
-  }else chosen=chooseBestPair(c);
+  if(duel.premiumTieBreak&&target){
+    const goalBearing=bearing(p.current,target);
+    const goalDiff=angleDiff(goalBearing,a);
+    const forcedGoal=goalDiff<=45&&!p.visited.has(target.id)?{...target,d:distance(p.current,target),bd:goalBearing,ad:goalDiff,isTarget:true}:null;
+    if(forcedGoal){
+      const alternatives=c.filter(x=>x.id!==target.id).sort((x,y)=>x.d-y.d);
+      const second=alternatives[0];
+      chosen=[forcedGoal,second].filter(Boolean);
+    }else{
+      chosen=chooseBestPair(c.filter(x=>x.id!==target.id));
+    }
+  }else{
+    const solutions=points.filter(x=>x.id!==p.current.id&&!p.visited.has(x.id)&&duel.mission.test(x))
+      .map(x=>({...x,d:distance(p.current,x),bd:bearing(p.current,x),ad:angleDiff(bearing(p.current,x),a)}))
+      .filter(x=>x.d<=500&&x.ad<=45).sort((x,y)=>x.d-y.d);
+    if(solutions.length){
+      const alternatives=c.filter(x=>x.id!==solutions[0].id).sort((x,y)=>x.d-y.d);
+      chosen=[solutions[0],alternatives[0]].filter(Boolean);
+    }else chosen=chooseBestPair(c);
+  }
   if(chosen.length<2){duelSetStatus("W tym kierunku nie ma dwóch dostępnych punktów — wybierz inną strzałkę.");return;}
   choiceLocked=true;
   document.querySelector(".controls").classList.add("direction-hidden");
@@ -1662,10 +1675,41 @@ function showCandidates(dir){
     candidateMarkers.push(m);m.on("click",()=>choose(x));
     const btn=document.getElementById(i?"choiceB":"choiceA");
     btn.className=i?"choice-b":"choice-a";
-    btn.innerHTML='<span class="letter">'+(i?"B":"A")+'</span> okolice '+esc(placeLabel(x));
+    btn.innerHTML='<span class="letter">'+(i?"B":"A")+'</span> '+(duel.premiumTieBreak&&isTargetPoint(x)?"META":"okolice "+esc(placeLabel(x)));
     btn.onclick=()=>choose(x);
   });
   choiceEl.classList.remove("hidden");duelZoom();
+}
+
+function duelPremiumTargetOneMoveAway(p){
+  if(!duel?.premiumTieBreak||!target||!p)return false;
+  if(p.id===target.id)return true;
+  for(const dir of ["up","right","down","left"]){
+    if(directionCandidates(p,p.visited,dir).some(x=>x.id===target.id))return true;
+  }
+  return false;
+}
+
+function duelStartPremiumTieBreak(){
+  const a=duel.players[0],b=duel.players[1];
+  duel.premiumTieBreak=true;
+  duel.premiumWinner=null;
+  duel.premiumRound=true;
+  // Zaczyna gracz, który wykonał mniej ruchów w dotychczasowej części gry.
+  // Przy identycznej liczbie ruchów zachowujemy kolejność gracza 1.
+  duel.activePlayer=a.moves<=b.moves?0:1;
+  duel.roundStarter=duel.activePlayer;
+  duel.mission={text:"Część premium — dotrzyj do mety",test:p=>isTargetPoint(p)};
+  duelUpdatePanel();
+  missionEl.innerHTML="<div class='duel-round'>CZĘŚĆ PREMIUM — ROZSTRZYGAJĄCA</div>"+
+    "<div class='duel-score'><span style='color:#2e7d32'>"+esc(a.name)+":</span> <span style='color:#2e7d32'>"+a.score+"</span><b> : </b><span style='color:#c62828'>"+esc(b.name)+":</span> <span style='color:#c62828'>"+b.score+"</span></div>"+
+    "<div class='duel-turn' style='color:"+duelPlayer().color+"'>ZACZYNA: "+esc(duelPlayer().name)+"</div>"+
+    "<div class='duel-mission-text'>Dotrzyj do mety: <b>"+esc(target?.name||"META")+"</b></div>";
+  tasksEl.innerHTML="<div class='duel-help'>Jeżeli jeden gracz dotrze do mety, a drugi ma do niej jeszcze dokładnie jeden ruch, końcowy wynik pozostaje remisem.</div>";
+  progressEl.textContent="Dogrywka premium";
+  choiceLocked=false;
+  duelRenderMap();
+  duelPassScreen();
 }
 
 function choose(p){
@@ -1676,7 +1720,9 @@ function choose(p){
   document.querySelector(".controls").classList.remove("direction-hidden");
   pl.current=p;pl.visited.add(p.id);pl.visitedHistory.push(p);pl.routePoints.push(p);pl.moves++;pl.roundMoves++;
   duelRenderMap();current=p;visited=pl.visited;visitedHistory=pl.visitedHistory;moves=pl.moves;
-  if(duel.mission.test(p)){duelRoundWin(pl,p);return;}
+  if(duel.premiumTieBreak){
+    if(isTargetPoint(p)){duelPremiumFinish(pl,p);return;}
+  }else if(duel.mission.test(p)){duelRoundWin(pl,p);return;}
   // W tej samej rundzie drugi gracz dostaje następną turę.
   duel.activePlayer=duel.activePlayer===0?1:0;
   choiceLocked=false;duelUpdatePanel();duelShowPointPopup(p);duelPassScreen(p);
@@ -1711,18 +1757,41 @@ function duelRoundWin(pl,p){
 function duelEnd(){
   choiceLocked=true;
   const a=duel.players[0],b=duel.players[1];
-  // Koniec dokładnie po wykonaniu wszystkich wybranych misji.
-  // Remis pozostaje remisem — żadna dodatkowa misja nie jest doliczana.
-  duelShowFinal(a.score===b.score);
+  if(a.score===b.score){
+    duelStartPremiumTieBreak();
+    return;
+  }
+  duelShowFinal(false);
 }
 
-function duelShowFinal(tied){
+function duelPremiumFinish(pl,p){
+  const other=duel.players.find(x=>x!==pl);
+  const otherOneMoveAway=duelPremiumTargetOneMoveAway(other);
+  if(otherOneMoveAway){
+    duel.premiumWinner=null;
+    choiceLocked=true;
+    missionEl.innerHTML="<div class='duel-final'><div class='duel-final-kicker'>CZĘŚĆ PREMIUM</div><h2>REMIS</h2><p>"+esc(pl.name)+" dotarł(a) do mety, ale "+esc(other.name)+" był(a) od niej tylko jeden ruch.</p><div class='duel-score-big'>"+duel.players[0].score+" : "+duel.players[1].score+"</div><p>O wyniku rozstrzygnęła kolejność ruchów.</p></div>";
+    tasksEl.innerHTML="<div class='duel-final-note'>Obaj gracze zakończyli pojedynek w części premium w odległości jednego ruchu od mety.</div>";
+    progressEl.textContent="Koniec gry — remis";
+    choiceEl.classList.add("hidden");
+    document.querySelector(".controls")?.classList.add("direction-hidden");
+    const btn=document.createElement("button");btn.id="duelRestart";btn.className="summary-restart-panel";btn.textContent="NOWA GRA";btn.onclick=()=>location.reload();
+    missionEl.querySelector(".duel-final")?.appendChild(btn);
+    duel.active=false;
+    return;
+  }
+  pl.score++;
+  duel.premiumWinner=pl;
+  choiceLocked=true;
+  duelShowFinal(false);
+}function duelShowFinal(tied){
   const a=duel.players[0],b=duel.players[1];
   duel.players.forEach(duelRenderPlayer);
   const all=duel.players.flatMap(p=>p.routePoints);
   if(all.length>1)map.fitBounds(L.latLngBounds(all.map(p=>[p.lat,p.lon])),{padding:[100,100],maxZoom:15});
+  const premiumWinner=duel.premiumWinner;
   const headline=tied?"REMIS":"WYGRYWA";
-  const winner=tied?"":(a.score>b.score?a.name:b.name);
+  const winner=tied?"":(premiumWinner?premiumWinner.name:(a.score>b.score?a.name:b.name));
   missionEl.innerHTML="<div class='duel-final'><div class='duel-final-kicker'>POJEDYNEK ZAKOŃCZONY</div><h2>"+headline+(winner?"<br><span style='color:"+(a.score>b.score?a.color:b.color)+"'>"+esc(winner)+"</span>":"")+"</h2><div class='duel-score-big'>"+a.score+" : "+b.score+"</div><p>"+esc(a.name)+" — "+a.moves+" ruchów<br>"+esc(b.name)+" — "+b.moves+" ruchów</p><button id='duelRestart' class='summary-restart-panel'>NOWA GRA</button></div>";
   tasksEl.innerHTML="<div class='duel-final-note'>Zielona i czerwona linia pokazują osobne trasy obu graczy. Przebieg całej gry pozostaje na mapie.</div>";
   progressEl.textContent="Koniec gry";
