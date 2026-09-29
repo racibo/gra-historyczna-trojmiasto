@@ -883,3 +883,6 @@ routeLine{}\n/* V44.5 — automatyczne kadrowanie uwzględnia panel wyboru na do
 .duel-reveal{top:auto!important;bottom:118px!important;transform:translateX(-50%)!important;background:transparent!important;padding:0!important;box-shadow:none!important;pointer-events:none;}
 .duel-reveal .duel-pass{pointer-events:auto;}
 @media(max-width:600px){.duel-reveal{bottom:158px!important;}}
+
+/* Duel: informacja o kolejnym celu po zakończeniu rundy. */
+.duel-next-mission{margin:10px 0 4px;padding-top:8px;border-top:1px solid rgba(255,255,255,.16);font-size:12px;line-height:1.3;}
