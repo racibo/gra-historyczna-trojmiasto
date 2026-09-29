@@ -1753,6 +1753,7 @@ function choose(p){
 }
 
 function duelRoundWin(pl,p){
+  duel.lastRoundEndPoint=p;
   pl.score++;
   duelRenderPlayer(pl);
   const nextIndex=duel.round;
@@ -1782,7 +1783,7 @@ function duelEnd(){
   choiceLocked=true;
   const a=duel.players[0],b=duel.players[1];
   if(a.score===b.score){
-    duelStartPremiumTieBreak(a.current);
+    duelStartPremiumTieBreak(duel.lastRoundEndPoint||a.current||b.current);
     return;
   }
   duelShowFinal(false);
