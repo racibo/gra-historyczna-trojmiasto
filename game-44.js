@@ -1544,11 +1544,12 @@ function duelFindExtraMission(){
 function duelStartFromSingle(){
   const base=gameStart;
   const cfg=duelConfig;
-  const total=Number(cfg?.totalRounds)||5;
-  const missions=activeTasks.slice(0,total);
-  if(!base||missions.length<total){
-    settings.count=total;settings.countRandom=false;
-    duelSetStatus("Nie udało się przygotować "+total+" misji. Spróbuj ponownie.");
+  // W pojedynku liczba rund jest zawsze dokładnie równa liczbie wybranych misji.
+  // Etapy premium nie są osobnymi rundami i nie są doliczane do wyniku.
+  const missions=activeTasks.slice();
+  const total=missions.length;
+  if(!base||!total||missions.length!==total){
+    duelSetStatus("Nie udało się przygotować wymaganej liczby misji. Spróbuj ponownie.");
     document.getElementById("start").classList.remove("hidden");
     choiceLocked=false;duelConfig=null;return;
   }
@@ -1580,12 +1581,10 @@ function duelShowSetup(){
 function duelConfirmSetup(){
   const n1=(document.getElementById("duelName1").value||"Gracz 1").trim().slice(0,24)||"Gracz 1";
   const n2=(document.getElementById("duelName2").value||"Gracz 2").trim().slice(0,24)||"Gracz 2";
-  const rounds=[3,5,7,10].includes(Number(settings.duelRounds))?Number(settings.duelRounds):5;
   settings.player1Name=n1;settings.player2Name=n2;
   duelNamesPending=false;duelPrepared=true;
-  duelConfig={totalRounds:rounds,names:[n1,n2]};
+  duelConfig={names:[n1,n2]};
   document.getElementById("duelSetup").classList.add("hidden");
-  settings.count=rounds;settings.countRandom=false;
   singleStartOriginal().then(()=>{
     duelPrepared=false;
     if(gameStart&&activeTasks.length)duelStartFromSingle();
@@ -1605,23 +1604,20 @@ function start(){
 function loadSettings(){
   singleLoadSettingsOriginal();
   settings.gameMode=settings.gameMode==="duel"?"duel":"single";
-  settings.duelRounds=[3,5,7,10].includes(Number(settings.duelRounds))?Number(settings.duelRounds):5;
   settings.player1Name=settings.player1Name||"Gracz 1";
   settings.player2Name=settings.player2Name||"Gracz 2";
 }
 function saveSettings(){
   const restart=singleSaveSettingsOriginal();
-  const mode=document.getElementById("gameMode"),rounds=document.getElementById("duelRounds");
+  const mode=document.getElementById("gameMode");
   if(mode)settings.gameMode=mode.value==="duel"?"duel":"single";
-  if(rounds)settings.duelRounds=[3,5,7,10].includes(Number(rounds.value))?Number(rounds.value):5;
   localStorage.setItem("trojmiastoGameSettings",JSON.stringify(settings));
   return restart;
 }
 function openSettings(){
   singleOpenSettingsOriginal();
-  const mode=document.getElementById("gameMode"),rounds=document.getElementById("duelRounds");
+  const mode=document.getElementById("gameMode");
   if(mode)mode.value=settings.gameMode||"single";
-  if(rounds)rounds.value=String(settings.duelRounds||5);
 }
 function duelDirectionCandidates(from,seen,dir){
   return directionCandidates(from,seen,dir);
@@ -1684,10 +1680,17 @@ function duelRoundWin(pl,p){
   tasksEl.innerHTML="<div class='duel-help'>Runda zakończona. Następna runda otrzyma nową, pojedynczą misję.</div>";
   progressEl.textContent="Runda "+duel.round+" zakończona";
   choiceLocked=true;
-  setTimeout(()=>{
+  let advanced=false;
+  const advance=()=>{
+    if(advanced)return;
+    advanced=true;
+    if(summaryTimer)clearTimeout(summaryTimer);
+    missionEl.onclick=null;
     if(duel.round>=duel.totalRounds){duelEnd();return;}
     duelBeginRound(duel.round,1-duel.roundStarter,p);
-  },2200);
+  };
+  missionEl.onclick=advance;
+  const summaryTimer=setTimeout(advance,7000);
 }
 
 function duelEnd(){
