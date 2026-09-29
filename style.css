@@ -889,3 +889,9 @@ routeLine{}\n/* V44.5 — automatyczne kadrowanie uwzględnia panel wyboru na do
 
 /* V67 — wyjaśnienie zależności misje = rundy w pojedynku. */
 .settings-note{margin:4px 0 12px;padding:9px 11px;border:1px solid rgba(255,255,255,.14);border-radius:8px;background:rgba(255,255,255,.045);font-size:12px;line-height:1.4;color:rgba(255,255,255,.78)}
+
+/* V67 — informacje o obiekcie pomiędzy turami pojedynku. */
+.duel-point-info{margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.16)}
+.duel-point-info .visited-full{margin:0;text-align:left}
+.duel-point-kicker{font-size:11px;font-weight:700;letter-spacing:.08em;opacity:.7;margin-bottom:5px}
+.duel-pass .duel-point-info h3{margin-top:0}
