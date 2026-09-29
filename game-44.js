@@ -1435,7 +1435,7 @@ function duelRenderPlayer(p){
     p.routePointMarkers.push(m);
   });
   duelRemoveLayer(p.currentMarker);
-  p.currentMarker=L.marker([p.current.lat,p.current.lon],{icon:duelMarkerIcon(p,"current"),zIndexOffset:1200}).addTo(map);
+  p.currentMarker=L.marker([p.current.lat,p.current.lon],{icon:duelMarkerIcon(p,"current"),zIndexOffset:900}).addTo(map);
   p.currentMarker.bindPopup(visitedLabelHtml(p.current),{closeButton:true,autoClose:true,maxWidth:360});
   const samePlace=duel.players.some(other=>other!==p&&other.current&&distance(other.current,p.current)<2);
   const labelDirection=samePlace?(p===duel.players[0]?"top":"bottom"):"top";
@@ -1675,7 +1675,7 @@ function showCandidates(dir){
   document.querySelector(".choice-buttons").style.display="flex";
   document.querySelector(".choice-title").textContent="TURA: "+p.name+" — wybierz punkt";
   chosen.forEach((x,i)=>{
-    const m=L.marker([x.lat,x.lon],{icon:icon(i?"candidate-b":"candidate-a")}).addTo(map);
+    const m=L.marker([x.lat,x.lon],{icon:icon(i?"candidate-b":"candidate-a"),zIndexOffset:1800}).addTo(map);
     candidateMarkers.push(m);m.on("click",()=>choose(x));
     const btn=document.getElementById(i?"choiceB":"choiceA");
     btn.className=i?"choice-b":"choice-a";
@@ -1694,8 +1694,9 @@ function duelPremiumTargetOneMoveAway(p){
   return false;
 }
 
-function duelStartPremiumTieBreak(){
+function duelStartPremiumTieBreak(startPoint){
   const a=duel.players[0],b=duel.players[1];
+  const premiumStart=startPoint||a.current||b.current;
   duel.premiumTieBreak=true;
   duel.premiumWinner=null;
   duel.premiumRound=true;
@@ -1703,12 +1704,31 @@ function duelStartPremiumTieBreak(){
   // Przy identycznej liczbie ruchów zachowujemy kolejność gracza 1.
   duel.activePlayer=a.moves<=b.moves?0:1;
   duel.roundStarter=duel.activePlayer;
+  if(premiumStart){
+    duel.players.forEach(p=>{
+      p.start=premiumStart;
+      p.current=premiumStart;
+      p.visited=new Set([premiumStart.id]);
+      p.visitedHistory=[premiumStart];
+      if(!p.routePoints.length||p.routePoints[p.routePoints.length-1].id!==premiumStart.id){
+        p.routePoints.push(premiumStart);
+      }
+      p.roundMoves=0;
+    });
+    current=premiumStart;
+    visited=new Set([premiumStart.id]);
+    visitedHistory=[premiumStart];
+    moves=0;
+  }
   duel.mission={text:"Część premium — dotrzyj do mety",test:p=>isTargetPoint(p)};
+  const targetAddress=target?.address||target?.name||"META";
   duelUpdatePanel();
   missionEl.innerHTML="<div class='duel-round'>CZĘŚĆ PREMIUM — ROZSTRZYGAJĄCA</div>"+
     "<div class='duel-score'><span style='color:#2e7d32'>"+esc(a.name)+":</span> <span style='color:#2e7d32'>"+a.score+"</span><b> : </b><span style='color:#c62828'>"+esc(b.name)+":</span> <span style='color:#c62828'>"+b.score+"</span></div>"+
     "<div class='duel-turn' style='color:"+duelPlayer().color+"'>ZACZYNA: "+esc(duelPlayer().name)+"</div>"+
-    "<div class='duel-mission-text'>Dotrzyj do mety: <b>"+esc(target?.name||"META")+"</b></div>";
+    "<div class='duel-mission-text'>Część premium — dotrzyj do mety</div>"+
+    "<div class='duel-next-mission'><b>META:</b><br>"+esc(targetAddress)+"</div>"+
+    duelMissionDistanceInfo();
   tasksEl.innerHTML="<div class='duel-help'>Jeżeli jeden gracz dotrze do mety, a drugi ma do niej jeszcze dokładnie jeden ruch, końcowy wynik pozostaje remisem.</div>";
   progressEl.textContent="Dogrywka premium";
   choiceLocked=false;
@@ -1762,7 +1782,7 @@ function duelEnd(){
   choiceLocked=true;
   const a=duel.players[0],b=duel.players[1];
   if(a.score===b.score){
-    duelStartPremiumTieBreak();
+    duelStartPremiumTieBreak(a.current);
     return;
   }
   duelShowFinal(false);
